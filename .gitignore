@@ -1,31 +1,15 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+*.class
 
-# Precompiled Headers
-*.gch
-*.pch
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Package Files #
+*.jar
+*.war
+*.ear
 
-# Fortran module files
-*.mod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
 
 # Jetbrain IDE files
 .idea/
