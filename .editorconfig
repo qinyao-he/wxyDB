@@ -11,6 +11,12 @@ indent_style = space
 indent_size = 4
 continuation_indent_size = 8
 
+# java source file
+[*.java]
+indent_style = space
+indent_size = 4
+continuation_indent_size = 8
+
 # Makefile
 [Makefile]
 indent_style = tab
