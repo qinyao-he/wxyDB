@@ -1,11 +1,12 @@
 # wxyDB
 Course project for Fundamental of Database in Tsinghua University
 
-数据文件
+## 基本概念
+### 数据文件
     每个文件为一个数据库
     以页为单位，8192字节
 
-页
+### 页
     库页
         每个数据库文件的第一页为库页，存放库的相关信息
         库信息  96字节
@@ -30,7 +31,7 @@ Course project for Fundamental of Database in Tsinghua University
             位数组，标记空闲位置，向上取整到字节
             数据行结构
 
-索引
+### 索引
     根级页、中间级页和叶级页组成
     B+树
         索引码值 指针
@@ -44,11 +45,11 @@ Course project for Fundamental of Database in Tsinghua University
     分裂页
     删除行
     更新行
-槽
+### 槽
     数据页上存放单条记录的空间，叫做槽
 
------------------------------日志-----------------------------
-2015年10月25日
+##日志
+### 2015年10月25日
     数据库系统框架雏形
         四大模块、exception、utils
     完成页式文件系统、页式文件系统缓存操作（未严格测试）

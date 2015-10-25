@@ -13,6 +13,3 @@ hs_err_pid*
 
 # Jetbrain IDE files
 .idea/
-
-# output
-output/
