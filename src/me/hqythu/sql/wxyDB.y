@@ -6,7 +6,7 @@ SQL         : DDL
             
 DDL         : CREATE DATABASE db_name
             | DROP DATABASE db_name
-            | USE dbname
+            | USE db_name
             | SHOW TABLES
             | CREATE TABLE table_name '(' NewFields ')'
             | DROP TABLE table_name
@@ -54,9 +54,20 @@ Field       : table_name '.' field_name
 
 %%
 /*
-附加模块
-SELECT FUNC(Field) FROM table_name
+必须实现
+    两个表的连接
+        SELECT table_name1.Field,table_name2.Field FROM table_name1,table_name2 WHERE Conditions
 
+可选实现
+    三个表以上的连接
+        SELECT Fields FROM Tables WHERE Conditions
 
-SELECT table_name1.Field,table_name2.Field FROM table_name1,table_name2 WHERE Conditions
+    聚类查询
+        SELECT FUNC(Field) FROM table_name
+
+    索引模块
+        CREATE INDEX customer(name);
+            为 customer 表的 name 字段创建索引。
+        DROP INDEX customer(name);
+            删除 customer 表的 name 字段的索引。
 */

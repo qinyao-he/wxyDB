@@ -49,7 +49,12 @@ Course project for Fundamental of Database in Tsinghua University
     数据页上存放单条记录的空间，叫做槽
 
 ##日志
+### 2015年10月26日
+    补充框架
+    索引能有多个吗？
+
 ### 2015年10月25日
     数据库系统框架雏形
         四大模块、exception、utils
     完成页式文件系统、页式文件系统缓存操作（未严格测试）
+
