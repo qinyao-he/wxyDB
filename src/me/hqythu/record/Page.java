@@ -21,6 +21,7 @@ class Page {
     /**
      * 返回页数据
      * 用于读写
+     *
      * @return
      */
     public byte[] getData() {
@@ -38,6 +39,7 @@ class Page {
     /**
      * 写回
      * 建议在页释放的时候执行
+     *
      * @throws IOException
      */
     public void writeBack() throws IOException {
@@ -55,4 +57,14 @@ class Page {
         return pageId;
     }
 
+    /**
+     * 垃圾回收的时候写回
+     */
+    @Override
+    protected void finalize() {
+        try {
+            writeBack();
+        } catch (Exception e) {
+        }
+    }
 }

@@ -1,7 +1,5 @@
 package me.hqythu.record;
 
-import me.hqythu.utils.LRUCache;
-
 import java.io.IOException;
 
 /**
@@ -13,7 +11,7 @@ public class BufPageManager {
 
     LRUCache<Long, Page> cache;
 
-    BufPageManager(int capacity) {
+    public BufPageManager(int capacity) {
         if (capacity > MAX_CACHE_SIZE) {
             cache = new LRUCache<>(MAX_CACHE_SIZE);
         } else {

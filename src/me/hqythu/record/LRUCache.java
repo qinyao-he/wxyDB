@@ -1,4 +1,4 @@
-package me.hqythu.utils;
+package me.hqythu.record;
 
 import java.util.Hashtable;
 
@@ -122,12 +122,5 @@ public class LRUCache<K, V> {
     private CacheNode last; //链表尾
 
     public static void main(String[] args) {
-//        LRUCache<Integer, String> lruCache = new LRUCache<>(400);
-//        for (int i = 0; i < 500; i++) {
-//            lruCache.put(i, String.format("%d", i));
-//        }
-//        for (int i = 0; i < 500; i++) {
-//            System.out.print(lruCache.get(i) + " ");
-//        }
     }
 }

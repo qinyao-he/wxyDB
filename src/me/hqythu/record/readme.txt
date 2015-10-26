@@ -11,8 +11,8 @@ BufPageManager
     getPage
     releasePage
 
-Record
-    记录
+QuerySet
+    查询返回结果
 
 RecordManager
     记录管理

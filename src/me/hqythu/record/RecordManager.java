@@ -1,9 +1,8 @@
 package me.hqythu.record;
 
-import me.hqythu.utils.Condition;
-
-import java.io.ByteArrayInputStream;
-import java.util.Scanner;
+import me.hqythu.exception.SQLExecException;
+import me.hqythu.sql.Condition;
+import me.hqythu.sql.SelectOption;
 
 
 //recordLength 记录的长度
@@ -11,46 +10,43 @@ import java.util.Scanner;
 //size         文件中记录总数
 //fieldSize    记录的字段个数
 //recordFieldPos 记录的每个字段的位置
+
 public class RecordManager {
 
-    public static final int PER_PAGE_INFO = 96;
-    public static final int PER_PAGE_DATA = 8096;
-
-    int recordLength;
-    int recordSizePerPage;
-    int size;
-    int fieldSize;
-    int[] recordFieldPos;
-
-    public void insert(Record record) {
+    public void insert(String tableName, Object[] values) throws SQLExecException {
 
     }
 
-    public void remove(Condition condition) {
+    public void insert(String tableName, String[] fields, Object[] values) throws SQLExecException {
 
     }
 
-    public void update(Record record, Condition condition) {
+    public void insert(String tableName, int[] cols, Object[] values) throws SQLExecException {
 
     }
 
-    public Record[] query(Condition condition) {
+    public void remove(String tableName, Condition condition) throws SQLExecException {
+
+    }
+
+    public void update(String tableName, String[] fields, Object[] values, Condition condition) throws SQLExecException {
+
+    }
+
+    public void update(String tableName, int[] cols, Object[] values, Condition condition) throws SQLExecException {
+
+    }
+
+    public QuerySet query(String tableName, String[] fields, SelectOption option, Condition condition) throws SQLExecException {
         return null;
     }
 
-    public RecordManager(int fileId) throws Exception {
-        byte[] firstPage = FilePageManager.getInstance().readPage(fileId, 0);
-        if (firstPage == null) throw new Exception();
+    public QuerySet query(String tableName, int[] cols, SelectOption option, Condition condition) throws SQLExecException {
+        return null;
+    }
 
-        Scanner scanner = new Scanner(new ByteArrayInputStream(firstPage));
-        recordLength = scanner.nextInt();
-        recordSizePerPage = scanner.nextInt();
-        size = scanner.nextInt();
-        fieldSize = scanner.nextInt();
-        recordFieldPos = new int[fieldSize];
-        for (int i = 0; i < fieldSize; i++) {
-            recordFieldPos[i] = scanner.nextInt();
-        }
+    public RecordManager() {
+
     }
 }
 

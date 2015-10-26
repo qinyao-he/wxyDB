@@ -1,9 +1,9 @@
-package me.hqythu.utils;
+package me.hqythu.sql;
 
 /**
  * 条件
  */
-public class Condition<T> {
+public class Condition {
     public static final String AND = "and";
     public static final String OR = "or";
     public static final String EQU = "equ";
@@ -17,7 +17,7 @@ public class Condition<T> {
 
     }
 
-    public boolean match(T obj) {
+    public boolean match(Object obj) {
         return false;
     }
 

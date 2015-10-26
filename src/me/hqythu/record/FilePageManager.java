@@ -15,6 +15,8 @@ public class FilePageManager {
     public static final int PAGE_BYTE_SIZE = 8192;
     public static final int PAGE_SIZE_IDX = 13; // 2^13 = 8192
     public static final int MAX_FILE_NUM = 128;
+    public static final int PER_PAGE_INFO = 96;
+    public static final int PER_PAGE_DATA = 8096;
 
     private static FilePageManager manager = null;
     // 文件位图
@@ -71,30 +73,6 @@ public class FilePageManager {
         }
     }
 
-    /**
-     * 创建文件
-     */
-    public boolean createFile(String fileName) {
-        try {
-            File file = new File(fileName);
-            return file.createNewFile();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * 删除文件
-     */
-    public boolean deleteFile(String fileName) {
-        File file = new File(fileName);
-        if (file.exists()) {
-            return file.delete();
-        } else {
-            return false;
-        }
-    }
 
     /**
      * 读文件的某一页
