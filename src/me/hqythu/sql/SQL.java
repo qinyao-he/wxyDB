@@ -1,6 +1,8 @@
 package me.hqythu.sql;
 
 import me.hqythu.exception.SQLExecException;
+import me.hqythu.util.SelectOption;
+import me.hqythu.util.Where;
 
 import java.util.function.Function;
 
@@ -28,7 +30,7 @@ public class SQL {
     SelectOption selectOption = null;
 
     // WHERE
-    Condition condition = null;
+    Where where = null;
 
     // COLUMNS
     String[] fields = null;

@@ -1,38 +1,78 @@
 package me.hqythu.record;
 
+import me.hqythu.Global;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 页式文件系统缓冲管理
  */
 public class BufPageManager {
 
-    public static final int MAX_CACHE_SIZE = 65536;
+    /**
+     * 持久化cache
+     * 数据库文件第一页
+     * 表信息页
+     */
+    Map<Long, Page> primaryCache = null;
+    /**
+     * 非持久化cache
+     * 普通数据页
+     */
+    LRUCache cache;
 
-    LRUCache<Long, Page> cache;
+    private static BufPageManager manager = null;
 
-    public BufPageManager(int capacity) {
-        if (capacity > MAX_CACHE_SIZE) {
-            cache = new LRUCache<>(MAX_CACHE_SIZE);
-        } else {
-            cache = new LRUCache<>(capacity);
+    public static BufPageManager getInstance() {
+        if (manager == null) {
+            manager = new BufPageManager();
         }
+        return manager;
     }
 
+    private BufPageManager() {
+        cache = new LRUCache(Global.MAX_CACHE_SIZE);
+        primaryCache = new HashMap<>();
+    }
+
+    /**
+     * 持久化的页
+     */
+    public Page getPrimaryPage(int fileId, int pageId) throws IOException {
+        long index = hash(fileId, pageId);
+        Page page = primaryCache.get(index);
+        if (page == null) {
+            byte[] data = FilePageManager.getInstance().readPage(fileId, pageId);
+            page = new Page(fileId, pageId, data);
+            primaryCache.put(index, page);
+        }
+        return page;
+    }
+
+    /**
+     * 非持久化的页
+     */
     public Page getPage(int fileId, int pageId) throws IOException {
         long index = hash(fileId, pageId);
         Page page = cache.get(index);
         if (page == null) {
             byte[] data = FilePageManager.getInstance().readPage(fileId, pageId);
             page = new Page(fileId, pageId, data);
-            cache.put(hash(page),page);
+            cache.put(index, page);
         }
         return page;
     }
 
-    public void realsePage(Page page) throws IOException {
-        page.writeBack();
+    public void releasePage(Page page) {
         cache.remove(hash(page));
+    }
+
+    public void clear() {
+        cache.clear();
+        primaryCache.values().forEach(me.hqythu.record.Page::writeBack);
+        primaryCache.clear();
     }
 
     private long hash(Page page) {

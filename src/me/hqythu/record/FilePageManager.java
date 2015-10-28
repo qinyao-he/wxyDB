@@ -1,6 +1,7 @@
 package me.hqythu.record;
 
-import java.io.File;
+import me.hqythu.Global;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -12,16 +13,10 @@ import java.util.*;
  */
 public class FilePageManager {
 
-    public static final int PAGE_BYTE_SIZE = 8192;
-    public static final int PAGE_SIZE_IDX = 13; // 2^13 = 8192
-    public static final int MAX_FILE_NUM = 128;
-    public static final int PER_PAGE_INFO = 96;
-    public static final int PER_PAGE_DATA = 8096;
-
     private static FilePageManager manager = null;
     // 文件位图
-    BitSet fileBitMap;
-    RandomAccessFile[] files;
+    public BitSet fileBitMap;
+    protected RandomAccessFile[] files;
 
 
     /**
@@ -35,8 +30,8 @@ public class FilePageManager {
     }
 
     private FilePageManager() {
-        fileBitMap = new BitSet(MAX_FILE_NUM);
-        files = new RandomAccessFile[MAX_FILE_NUM];
+        fileBitMap = new BitSet(Global.MAX_FILE_NUM);
+        files = new RandomAccessFile[Global.MAX_FILE_NUM];
         fileBitMap.clear();
     }
 
@@ -83,9 +78,9 @@ public class FilePageManager {
      * @throws Exception
      */
     public byte[] readPage(int fileId, int pageId) throws IOException {
-        byte[] buf = new byte[PAGE_BYTE_SIZE];
+        byte[] buf = new byte[Global.PAGE_BYTE_SIZE];
         RandomAccessFile file = files[fileId];
-        file.seek(pageId << PAGE_SIZE_IDX);
+        file.seek(pageId << Global.PAGE_SIZE_IDX);
         file.read(buf);
         return buf;
     }
@@ -97,8 +92,8 @@ public class FilePageManager {
      */
     public void writePage(int fileId, int pageId, byte[] buf) throws IOException {
         RandomAccessFile file = files[fileId];
-        file.seek(pageId << PAGE_SIZE_IDX);
-        file.write(buf, 0, PAGE_BYTE_SIZE);
+        file.seek(pageId << Global.PAGE_SIZE_IDX);
+        file.write(buf, 0, Global.PAGE_BYTE_SIZE);
     }
 
     /**

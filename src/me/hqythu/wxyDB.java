@@ -9,13 +9,13 @@ import me.hqythu.system.SystemManager;
 
 import java.util.Scanner;
 
-public class wxyDB {
+public class WXYDB {
 
     private BufPageManager bufPageManager;
     private SystemManager systemManager;
 
-    public wxyDB() {
-        bufPageManager = new BufPageManager(BufPageManager.MAX_CACHE_SIZE);
+    public WXYDB() {
+        bufPageManager = BufPageManager.getInstance();
         systemManager = new SystemManager();
     }
 
@@ -61,7 +61,7 @@ public class wxyDB {
     }
 
     public static void main(String[] args) {
-        wxyDB db = new wxyDB();
+        WXYDB db = new WXYDB();
         db.go();
     }
 }

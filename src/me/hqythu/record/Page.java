@@ -1,21 +1,24 @@
 package me.hqythu.record;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * 页
  */
-class Page {
-    private int fileId;
-    private int pageId;
-    private boolean dirty;
-    private byte[] data;
+public class Page {
+    protected int fileId;
+    protected int pageId;
+    public boolean dirty;
+    protected byte[] data;
+    protected ByteBuffer buffer;
 
     public Page(int fileId, int pageId, byte[] data) {
         this.fileId = fileId;
         this.pageId = pageId;
         this.dirty = false;
         this.data = data;
+        buffer = ByteBuffer.wrap(data);
     }
 
     /**
@@ -26,6 +29,9 @@ class Page {
      */
     public byte[] getData() {
         return data;
+    }
+    public ByteBuffer getBuffer() {
+        return buffer;
     }
 
     /**
@@ -42,9 +48,14 @@ class Page {
      *
      * @throws IOException
      */
-    public void writeBack() throws IOException {
+    public void writeBack() {
         if (dirty) {
-            FilePageManager.getInstance().writePage(fileId, pageId, data);
+            try {
+                System.out.println(String.format("write file:%d page:%d",fileId,pageId));
+                FilePageManager.getInstance().writePage(fileId, pageId, data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             dirty = false;
         }
     }
@@ -57,14 +68,4 @@ class Page {
         return pageId;
     }
 
-    /**
-     * 垃圾回收的时候写回
-     */
-    @Override
-    protected void finalize() {
-        try {
-            writeBack();
-        } catch (Exception e) {
-        }
-    }
 }

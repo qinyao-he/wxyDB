@@ -1,9 +1,9 @@
-package me.hqythu.sql;
+package me.hqythu.util;
 
 /**
  * 条件
  */
-public class Condition {
+public class Where {
     public static final String AND = "and";
     public static final String OR = "or";
     public static final String EQU = "equ";
@@ -13,7 +13,7 @@ public class Condition {
     public static final String GTR = "gtr";
     public static final String GEQ = "geq";
 
-    public Condition() {
+    public Where() {
 
     }
 
