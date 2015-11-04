@@ -16,7 +16,7 @@ public class WXYDB {
 
     public WXYDB() {
         bufPageManager = BufPageManager.getInstance();
-        systemManager = new SystemManager();
+        systemManager = SystemManager.getInstance();
     }
 
     public void go() {
