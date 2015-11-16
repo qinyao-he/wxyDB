@@ -1,7 +1,7 @@
 package me.hqythu.util;
 
 /**
- * Created by apple on 15/10/26.
+ * select语句的条件
  */
 public class SelectOption {
 

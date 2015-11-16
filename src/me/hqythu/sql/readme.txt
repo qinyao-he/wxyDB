@@ -4,3 +4,8 @@
 
 照着《数据库课程项目测试用例》，写出语法
 
+DML
+    SystemManager里函数参数，解析获得
+DDL
+    RecordManager里函数参数，解析获得
+

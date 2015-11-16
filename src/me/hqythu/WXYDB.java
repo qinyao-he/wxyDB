@@ -2,7 +2,7 @@ package me.hqythu;
 
 import me.hqythu.exception.SQLExecException;
 import me.hqythu.exception.SQLParserException;
-import me.hqythu.record.BufPageManager;
+import me.hqythu.PageFile.BufPageManager;
 import me.hqythu.sql.SQL;
 import me.hqythu.sql.SQLParser;
 import me.hqythu.system.SystemManager;

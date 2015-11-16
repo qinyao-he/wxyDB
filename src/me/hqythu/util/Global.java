@@ -30,18 +30,18 @@ public class Global {
     /**
      * 表页信息
      */
-    public static final int TABLE_NAME_POS = 0;
-    public static final int TABLE_PAGEIDX_POS = 112;
-    public static final int TABLE_DATAIDX_POS = 116;
-    public static final int TABLE_RECORDNUM_POS = 120;
-    public static final int TABLE_RECORDLEN_POS = 122;
-    public static final int TABLE_COLNUM_POS = 124;
+    public static final int TBPAGE_NAME_POS = 0;
+    public static final int TBPAGE_PAGEIDX_POS = 112;
+    public static final int TBPAGE_DATAIDX_POS = 116;
+    public static final int TBPAGE_RECORDNUM_POS = 120;
+    public static final int TBPAGE_RECORDLEN_POS = 122;
+    public static final int TBPAGE_COLNUM_POS = 124;
     public static final int COL_NAME_POS = 0;
     public static final int COL_PROP_POS = 120;
     public static final int COL_TYPE_POS = 124;
     public static final int COL_LEN_POS = 126;
 
-    public static final int TABLE_NAME_LEN = TABLE_DATAIDX_POS - TABLE_NAME_POS;
+    public static final int TABLE_NAME_LEN = TBPAGE_DATAIDX_POS - TBPAGE_NAME_POS;
     public static final int COL_NAME_LEN = COL_PROP_POS - COL_NAME_POS;
     public static final int PER_COL_INFO_POS = 128;
     public static final int PER_COL_INFO_LEN = 128;
@@ -49,7 +49,17 @@ public class Global {
     /**
      * 数据页
      */
+    public static final int  DTPAGE_INFO_POS = 0;
+    public static final int  DTPAGE_IDX_POS = 0;
+    public static final int  DTPAGE_LASTIDX_POS = 4;
+    public static final int  DTPAGE_PROP_POS = 8;
+    public static final int  DTPAGE_RECORDLEN_POS = 10;
+    public static final int  DTPAGE_NEXTIDX_POS = 12;
+    public static final int  DTPAGE_SIZE_POS = 16;
+    public static final int  DTPAGE_CAP_POS = 20;
+    public static final int  DTPAGE_DATA_POS = 96;
 
+    public static final int  DTPAGE_INFO_LEN = DTPAGE_DATA_POS - DTPAGE_INFO_POS;
     /**
      * 行结构
      */

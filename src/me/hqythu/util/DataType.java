@@ -3,7 +3,7 @@ package me.hqythu.util;
 public enum DataType {
     UNKNOWN, INT, VARCHAR;
 
-    public static DataType valueOf(int val) {
+    public static DataType valueOf(short val) {
         switch (val) {
             case 1:
                 return INT;

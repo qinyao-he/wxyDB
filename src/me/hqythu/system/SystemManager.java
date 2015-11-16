@@ -1,12 +1,10 @@
 package me.hqythu.system;
 
-import me.hqythu.Global;
-import me.hqythu.record.BufPageManager;
-import me.hqythu.record.FilePageManager;
-import me.hqythu.record.Page;
+import me.hqythu.util.Global;
+import me.hqythu.PageFile.*;
+import me.hqythu.util.Column;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,16 +16,11 @@ public class SystemManager {
     Map<String, Table> tables = null;
     int fileId;
 
-    private static final byte[] aSetMask = {
-            (byte) 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
-    };
-    private static final byte[] aClearMask = {
-            (byte) 0x7f, (byte) 0xbf, (byte) 0xdf, (byte) 0xef,
-            (byte) 0xf7, (byte) 0xfb, (byte) 0xfd, (byte) 0xfe
-    };
-
     private static SystemManager manager = null;
-    private SystemManager(){}
+
+    private SystemManager() {
+    }
+
     public static SystemManager getInstance() {
         if (manager == null) {
             manager = new SystemManager();
@@ -44,18 +37,11 @@ public class SystemManager {
             File file = new File(DBname);
             if (!file.createNewFile()) return false;
             int tempFileId = FilePageManager.getInstance().openFile(DBname);
-            Page tempPage = BufPageManager.getInstance().getPage(tempFileId, 0);
 
             // 数据库文件第一页初始化
-            ByteBuffer buffer = tempPage.getBuffer();
-            buffer.putInt(Global.FIRST_PAGE_INFO_POS + 0, 0); // 初始化表的个数
-            buffer.position(Global.FIRST_PAGE_BITMAP_POS);    // 初始化页bitmap
-            for (int i = 0; i < Global.FIRST_PAGE_BITMAP_LEN; i++) {
-                buffer.put((byte) 0);
-            }
-            buffer.put(Global.FIRST_PAGE_BITMAP_POS, (byte) 0x80); // 第一页标记1，已被使用
-            tempPage.setDirty();
-            BufPageManager.getInstance().releasePage(tempPage);
+            Page page = BufPageManager.getInstance().getPage(tempFileId, 0);
+            DbPageUser.initDbPage(page);
+            BufPageManager.getInstance().releasePage(page);
             FilePageManager.getInstance().closeFile(tempFileId);
 
             return true;
@@ -90,10 +76,11 @@ public class SystemManager {
         }
         closeDatabase();
         return openDatabase(DBname);
-
-
     }
 
+    /**
+     * 关闭DB
+     */
     protected void closeDatabase() {
         if (connectDB != null) {
             connectDB = null;
@@ -109,76 +96,47 @@ public class SystemManager {
         fileId = FilePageManager.getInstance().openFile(DBname);
         if (fileId == -1) return false;
 
-        // 切换DB的初始化
         try {
-            Page firstPage = BufPageManager.getInstance().getPage(fileId, 0);
-
-            byte[] firstPageData = firstPage.getData();
-            ByteBuffer firstPageBuffer = firstPage.getBuffer();
-
-            int tableSize = firstPageBuffer.getInt(Global.FIRST_PAGE_INFO_POS);
-
-            // 初始化表信息
+            // 切换DB的初始化
+            Page dbPage = BufPageManager.getInstance().getPage(fileId, 0);
             tables = new HashMap<>();
-            try {
-                for (int i = 0; i < tableSize; i++) {
-                    int offset = Global.FIRST_PAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN;
-                    int tablePageId = firstPageBuffer.getInt(offset);
-                    offset += 4;
-                    String name = new String(firstPageData, offset, Global.PER_TABLE_INFO_LEN - 4, "utf8");
-                    Page page = BufPageManager.getInstance().getPage(fileId, tablePageId);
-                    Table table = new Table(page);
-                    tables.put(name, table);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            firstPage.setDirty();
-
+            DbPageUser.initTableFromPage(dbPage, tables);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
-
 
     /**
      * 创建表
      */
-    public boolean createTable(String tableName, String[] names, Table.DataType[] types) {
+    public boolean createTable(String tableName, Column[] columns) {
         if (connectDB == null) return false;
+        if (tables.size() >= Global.TABLE_MAX_SIZE) return false;
+        if (tableName.length() > Global.TABLE_NAME_LEN) {
+            return false;
+        }
+        for (Column column : columns) {
+            if (column.name.length() > Global.COL_NAME_LEN) return false;
+        }
+
         try {
-            int pos = Global.FIRST_PAGE_TABLE_POS + tables.size() * Global.PER_TABLE_INFO_LEN;
-            int tablePageId = nextClearBit();
+            Page dbPage = BufPageManager.getInstance().getPage(fileId, 0);
 
-            Page firstPage = BufPageManager.getInstance().getPage(fileId, 0);
-            byte[] firstPageData = firstPage.getData();
-            ByteBuffer firstPageBuffer = firstPage.getBuffer();
+            // 分配新页
+            Page tablePage = DbPageUser.getNewPage(dbPage);
 
-            firstPageBuffer.putInt(pos, tablePageId); // 表的位置
-            firstPageBuffer.position(pos + 4);
-            firstPageBuffer.put(tableName.getBytes("utf8"));
-            firstPageBuffer.put((byte) 0);
-            firstPage.setDirty();
+            // 数据库页中增加一个表信息
+            assert tablePage != null;
+            DbPageUser.addTableInfo(dbPage, tableName, tablePage.getPageId());
 
-            Page tablePage = BufPageManager.getInstance().getPage(fileId, tablePageId);
-            ByteBuffer buffer = tablePage.getBuffer();
-            buffer.position(0);
-            buffer.put(firstPageData, pos, Global.PER_TABLE_INFO_LEN);
-            for (int i = 0; i < names.length; i++) {
-                pos = Global.PER_COL_INFO_POS + i * Global.PER_COL_INFO_LEN;
-                buffer.position(pos);
-                buffer.putLong(types[i].ordinal());
-                buffer.put(names[i].getBytes("utf8"));
-                buffer.put((byte) 0);
-            }
+            // 初始化表首页
+            TablePageUser.initTablePage(tablePage, tableName, columns);
 
-            tablePage.setDirty();
-            tablePage.writeBack();
-            tables.put(tableName, new Table(tablePage));
-            firstPageBuffer.putInt(Global.FIRST_PAGE_INFO_POS,tables.size());
-            setBitMap(tablePageId);
+            // 系统管理添加表
+            Table table = TablePageUser.readTablePage(tablePage);
+            tables.put(tableName, table);
 
             return true;
         } catch (Exception e) {
@@ -189,79 +147,68 @@ public class SystemManager {
     }
 
     /**
-     * 删除表（未完成）
+     * 删除表
      */
     public boolean dropTable(String tableName) {
         if (connectDB == null) return false;
-        return false;
+        Table table = tables.get(tableName);
+        if (table == null) return false;
+
+        try {
+            Page dbPage = BufPageManager.getInstance().getPage(fileId, 0);
+
+            // 清空表的记录
+            table.removeAll();
+
+            // 库页中删除表的信息
+            int pageId = DbPageUser.delTableInfo(dbPage, tableName);
+
+            // 回收页
+            DbPageUser.recyclePage(dbPage, pageId);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
-     * 显示表（未完成）
+     * 显示表
      */
     public Object[] showTable() {
         if (connectDB == null) return null;
         return tables.keySet().toArray();
     }
 
+    /**
+     * 获取表
+     */
     public Table getTable(String tableName) {
-
+        if (connectDB == null) return null;
         return tables.get(tableName);
     }
 
-    /**
-     * 页bitmap
-     * 分配空闲页
-     */
-    public int nextClearBit() {
-        if (connectDB == null) throw new RuntimeException("have not use db");
+    public Page getDbPage() {
         try {
-            Page firstPage = BufPageManager.getInstance().getPage(fileId,0);
-            byte[] firstPageData = firstPage.getData();
-            for (int i = Global.FIRST_PAGE_BITMAP_POS; i < Global.FIRST_PAGE_TABLE_POS; i++) {
-                byte b = firstPageData[i];
-                for (int j = 0; j < 8; j++) {
-                    if ((b & aSetMask[j]) == 0) return (i - Global.FIRST_PAGE_BITMAP_POS) * 8 + j;
-                }
-            }
+            return BufPageManager.getInstance().getPage(fileId,0);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        return -1;
-    }
-
-    public void setBitMap(int index) {
-        if (connectDB == null) throw new RuntimeException("have not use db");
-        if (index < 0) throw new RuntimeException("illegal page bitmap index");
-        int pos = Global.FIRST_PAGE_BITMAP_POS + (int) (index / 8);
-        try {
-
-            Page firstPage = BufPageManager.getInstance().getPage(fileId,0);
-            byte[] firstPageData = firstPage.getData();
-            firstPageData[pos] |= aSetMask[index % 8];
-            firstPage.setDirty();
-
-        } catch (Exception e) {
-            e.printStackTrace();
+            return null;
         }
     }
-
-    public void clearBitMap(int index) {
-        if (connectDB == null) throw new RuntimeException("have not use db");
-        if (index < 0) throw new RuntimeException("illegal page bitmap index");
-        int pos = Global.FIRST_PAGE_BITMAP_POS + (int) (index / 8);
-        try {
-            Page firstPage = BufPageManager.getInstance().getPage(fileId,0);
-            byte[] firstPageData = firstPage.getData();
-            firstPageData[pos] &= aClearMask[index % 8];
-            firstPage.setDirty();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     public static void main(String[] args) {
-
+//        SystemManager.getInstance().dropDatabase("hello");
+//        SystemManager.getInstance().createDatabase("hello");
+//        SystemManager.getInstance().useDatabase("hello");
+//
+//        Column[] columns = new Column[2];
+//        columns[0] = new Column("name", DataType.VARCHAR, 20);
+//        columns[1] = new Column("age", DataType.INT, 4);
+//
+//        SystemManager.getInstance().createTable("student",columns);
+//        System.out.println(Arrays.toString(SystemManager.getInstance().showTable()));
+//        SystemManager.getInstance().closeDatabase();
     }
 }

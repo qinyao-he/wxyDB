@@ -6,9 +6,6 @@ import me.hqythu.util.Where;
 
 import java.util.function.Function;
 
-/**
- * Created by apple on 15/10/26.
- */
 public class SQL {
 
     enum Type {DML, DDL}

@@ -1,6 +1,6 @@
 package me.hqythu.PageFile;
 
-import me.hqythu.Global;
+import me.hqythu.util.Global;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

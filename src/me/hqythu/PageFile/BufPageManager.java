@@ -1,8 +1,6 @@
 package me.hqythu.PageFile;
 
-import me.hqythu.Global;
-import me.hqythu.record.FilePageManager;
-import me.hqythu.record.LRUCache;
+import me.hqythu.util.Global;
 
 import java.io.IOException;
 

@@ -1,7 +1,7 @@
 package me.hqythu.util;
 
 /**
- * 条件
+ * where条件
  */
 public class Where {
     public static final String AND = "and";
@@ -21,4 +21,7 @@ public class Where {
         return false;
     }
 
+    public void setFromCols(Column[] columns) {
+
+    }
 }

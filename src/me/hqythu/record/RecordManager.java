@@ -1,6 +1,8 @@
 package me.hqythu.record;
 
 import me.hqythu.exception.SQLExecException;
+import me.hqythu.exception.SQLRecordException;
+import me.hqythu.exception.SQLTableException;
 import me.hqythu.system.SystemManager;
 import me.hqythu.system.Table;
 import me.hqythu.util.Where;
@@ -15,41 +17,64 @@ import me.hqythu.util.SelectOption;
 
 public class RecordManager {
 
-    public void insert(String tableName, Object[] values) throws SQLExecException {
+    private static RecordManager manager = null;
+
+    public static RecordManager getInstance() {
+        if (manager == null) {
+            manager = new RecordManager();
+        }
+        return manager;
+    }
+
+    public void insert(String tableName, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
         Table table = SystemManager.getInstance().getTable(tableName);
         if (table == null) throw new SQLExecException(String.format("have not table %s",tableName));
-
+        table.insert(values);
     }
 
-    public void insert(String tableName, String[] fields, Object[] values) throws SQLExecException {
-
+    public void insert(String tableName, String[] fields, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
+        Table table = SystemManager.getInstance().getTable(tableName);
+        if (table == null) throw new SQLExecException("not have table: "+tableName);
+        table.insert(fields,values);
     }
 
-    public void insert(String tableName, int[] cols, Object[] values) throws SQLExecException {
-
+    public void insert(String tableName, int[] cols, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
+        Table table = SystemManager.getInstance().getTable(tableName);
+        if (table == null) throw new SQLExecException("not have table: "+tableName);
+        table.insert(cols,values);
     }
 
-    public void remove(String tableName, Where where) throws SQLExecException {
-
+    public void remove(String tableName, Where where) throws SQLExecException, SQLTableException {
+        Table table = SystemManager.getInstance().getTable(tableName);
+        if (table == null) throw new SQLExecException("not have table: "+tableName);
+        table.remove(where);
     }
 
-    public void update(String tableName, String[] fields, Object[] values, Where where) throws SQLExecException {
-
+    public void update(String tableName, String[] fields, Object[] values, Where where) throws SQLExecException, SQLTableException {
+        Table table = SystemManager.getInstance().getTable(tableName);
+        if (table == null) throw new SQLExecException("not have table: "+tableName);
+        table.update(fields,values,where);
     }
 
     public void update(String tableName, int[] cols, Object[] values, Where where) throws SQLExecException {
-
+        Table table = SystemManager.getInstance().getTable(tableName);
+        if (table == null) throw new SQLExecException("not have table: "+tableName);
+        table.update(cols,values,where);
     }
 
-    public QuerySet query(String tableName, String[] fields, SelectOption option, Where where) throws SQLExecException {
-        return null;
-    }
+//    public QuerySet query(String tableName, String[] fields, SelectOption option, Where where) throws SQLExecException {
+//        Table table = SystemManager.getInstance().getTable(tableName);
+//        if (table == null) throw new SQLExecException("not have table: "+tableName);
+//        return table.query(fields,option,where);
+//    }
+//
+//    public QuerySet query(String tableName, int[] cols, SelectOption option, Where where) throws SQLExecException {
+//        Table table = SystemManager.getInstance().getTable(tableName);
+//        if (table == null) throw new SQLExecException("not have table: "+tableName);
+//        return table.query(cols,option,where);
+//    }
 
-    public QuerySet query(String tableName, int[] cols, SelectOption option, Where where) throws SQLExecException {
-        return null;
-    }
-
-    public RecordManager() {
+    private RecordManager() {
 
     }
 }
