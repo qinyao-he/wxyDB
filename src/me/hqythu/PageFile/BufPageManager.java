@@ -1,26 +1,16 @@
-package me.hqythu.record;
+package me.hqythu.PageFile;
 
 import me.hqythu.Global;
+import me.hqythu.record.FilePageManager;
+import me.hqythu.record.LRUCache;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 页式文件系统缓冲管理
  */
 public class BufPageManager {
 
-    /**
-     * 持久化cache
-     * 数据库文件第一页
-     * 表信息页
-     */
-    Map<Long, Page> primaryCache = null;
-    /**
-     * 非持久化cache
-     * 普通数据页
-     */
     LRUCache cache;
 
     private static BufPageManager manager = null;
@@ -34,21 +24,6 @@ public class BufPageManager {
 
     private BufPageManager() {
         cache = new LRUCache(Global.MAX_CACHE_SIZE);
-        primaryCache = new HashMap<>();
-    }
-
-    /**
-     * 持久化的页
-     */
-    public Page getPrimaryPage(int fileId, int pageId) throws IOException {
-        long index = hash(fileId, pageId);
-        Page page = primaryCache.get(index);
-        if (page == null) {
-            byte[] data = FilePageManager.getInstance().readPage(fileId, pageId);
-            page = new Page(fileId, pageId, data);
-            primaryCache.put(index, page);
-        }
-        return page;
     }
 
     /**
@@ -71,8 +46,6 @@ public class BufPageManager {
 
     public void clear() {
         cache.clear();
-        primaryCache.values().forEach(me.hqythu.record.Page::writeBack);
-        primaryCache.clear();
     }
 
     private long hash(Page page) {

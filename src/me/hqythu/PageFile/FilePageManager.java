@@ -1,4 +1,4 @@
-package me.hqythu.record;
+package me.hqythu.PageFile;
 
 import me.hqythu.Global;
 

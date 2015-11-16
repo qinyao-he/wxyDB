@@ -7,8 +7,6 @@ import me.hqythu.record.Page;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,9 +15,6 @@ public class SystemManager {
     // connectDB是否为null，决定其他是否为null
     String connectDB = null;
 
-    Page firstPage = null;
-    byte[] firstPageData = null;
-    ByteBuffer firstPageBuffer = null;
     Map<String, Table> tables = null;
     int fileId;
 
@@ -102,9 +97,6 @@ public class SystemManager {
     protected void closeDatabase() {
         if (connectDB != null) {
             connectDB = null;
-            firstPage = null;
-            firstPageData = null;
-            firstPageBuffer = null;
             tables.clear();
 
             BufPageManager.getInstance().clear();
@@ -119,10 +111,10 @@ public class SystemManager {
 
         // 切换DB的初始化
         try {
-            firstPage = BufPageManager.getInstance().getPrimaryPage(fileId, 0);
+            Page firstPage = BufPageManager.getInstance().getPage(fileId, 0);
 
-            firstPageData = firstPage.getData();
-            firstPageBuffer = firstPage.getBuffer();
+            byte[] firstPageData = firstPage.getData();
+            ByteBuffer firstPageBuffer = firstPage.getBuffer();
 
             int tableSize = firstPageBuffer.getInt(Global.FIRST_PAGE_INFO_POS);
 
@@ -134,7 +126,7 @@ public class SystemManager {
                     int tablePageId = firstPageBuffer.getInt(offset);
                     offset += 4;
                     String name = new String(firstPageData, offset, Global.PER_TABLE_INFO_LEN - 4, "utf8");
-                    Page page = BufPageManager.getInstance().getPrimaryPage(fileId, tablePageId);
+                    Page page = BufPageManager.getInstance().getPage(fileId, tablePageId);
                     Table table = new Table(page);
                     tables.put(name, table);
                 }
@@ -160,13 +152,17 @@ public class SystemManager {
             int pos = Global.FIRST_PAGE_TABLE_POS + tables.size() * Global.PER_TABLE_INFO_LEN;
             int tablePageId = nextClearBit();
 
+            Page firstPage = BufPageManager.getInstance().getPage(fileId, 0);
+            byte[] firstPageData = firstPage.getData();
+            ByteBuffer firstPageBuffer = firstPage.getBuffer();
+
             firstPageBuffer.putInt(pos, tablePageId); // 表的位置
             firstPageBuffer.position(pos + 4);
             firstPageBuffer.put(tableName.getBytes("utf8"));
             firstPageBuffer.put((byte) 0);
             firstPage.setDirty();
 
-            Page tablePage = BufPageManager.getInstance().getPrimaryPage(fileId, tablePageId);
+            Page tablePage = BufPageManager.getInstance().getPage(fileId, tablePageId);
             ByteBuffer buffer = tablePage.getBuffer();
             buffer.position(0);
             buffer.put(firstPageData, pos, Global.PER_TABLE_INFO_LEN);
@@ -209,6 +205,7 @@ public class SystemManager {
     }
 
     public Table getTable(String tableName) {
+
         return tables.get(tableName);
     }
 
@@ -218,11 +215,17 @@ public class SystemManager {
      */
     public int nextClearBit() {
         if (connectDB == null) throw new RuntimeException("have not use db");
-        for (int i = Global.FIRST_PAGE_BITMAP_POS; i < Global.FIRST_PAGE_TABLE_POS; i++) {
-            byte b = firstPageData[i];
-            for (int j = 0; j < 8; j++) {
-                if ((b & aSetMask[j]) == 0) return (i - Global.FIRST_PAGE_BITMAP_POS) * 8 + j;
+        try {
+            Page firstPage = BufPageManager.getInstance().getPage(fileId,0);
+            byte[] firstPageData = firstPage.getData();
+            for (int i = Global.FIRST_PAGE_BITMAP_POS; i < Global.FIRST_PAGE_TABLE_POS; i++) {
+                byte b = firstPageData[i];
+                for (int j = 0; j < 8; j++) {
+                    if ((b & aSetMask[j]) == 0) return (i - Global.FIRST_PAGE_BITMAP_POS) * 8 + j;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return -1;
     }
@@ -231,16 +234,30 @@ public class SystemManager {
         if (connectDB == null) throw new RuntimeException("have not use db");
         if (index < 0) throw new RuntimeException("illegal page bitmap index");
         int pos = Global.FIRST_PAGE_BITMAP_POS + (int) (index / 8);
-        firstPageData[pos] |= aSetMask[index % 8];
-        firstPage.setDirty();
+        try {
+
+            Page firstPage = BufPageManager.getInstance().getPage(fileId,0);
+            byte[] firstPageData = firstPage.getData();
+            firstPageData[pos] |= aSetMask[index % 8];
+            firstPage.setDirty();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void clearBitMap(int index) {
         if (connectDB == null) throw new RuntimeException("have not use db");
         if (index < 0) throw new RuntimeException("illegal page bitmap index");
         int pos = Global.FIRST_PAGE_BITMAP_POS + (int) (index / 8);
-        firstPageData[pos] &= aClearMask[index % 8];
-        firstPage.setDirty();
+        try {
+            Page firstPage = BufPageManager.getInstance().getPage(fileId,0);
+            byte[] firstPageData = firstPage.getData();
+            firstPageData[pos] &= aClearMask[index % 8];
+            firstPage.setDirty();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
