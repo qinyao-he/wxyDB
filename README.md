@@ -26,11 +26,15 @@ Course project for Fundamental of Database in Tsinghua University
         数据文件中的各个索引码值就必须出现且只能出现一次
         Pn将叶结点按索引码顺序链接在一起
 
+### 槽
+    数据页上存放单条记录的空间，叫做槽
+
+### 记录管理
     插入行
     分裂页
     删除行
+
+### 查询
     更新行
-### 槽
-    数据页上存放单条记录的空间，叫做槽
 
 

@@ -13,14 +13,36 @@ public class Where {
     public static final String GTR = "gtr";
     public static final String GEQ = "geq";
 
+    enum Op {
+        AND,OR,EQU,NEQ,LES,LEQ,GTR,GEO
+    }
+
+    private BoolExpr boolExpr;
+
+    private String fieldName;
+    private Op op;
+
     public Where() {
 
     }
 
-    public boolean match(Object obj) {
+    public boolean match(byte[] record) {
         return false;
     }
 
+    /**
+     * 优化查询
+     */
+    public void optimize() {
+
+    }
+
+    public void setFieldName(String fieldName) {
+        this.fieldName = fieldName;
+    }
+    public void setOp(Op op) {
+        this.op = op;
+    }
     public void setFromCols(Column[] columns) {
 
     }

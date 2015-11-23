@@ -27,18 +27,25 @@
             insert removeAll remove
         DataPageUser
             init write read get remove
-    未完成
-        Table
-             update
-        页式文件系统测试
-        Table的测试
-        SelectOption
-        Where
 
-    下次开始
-        完成Table的remove(Where where)
-        完成Table的update(cols,values,where);
+2015年11月23日
+    设计Where类
+    
+未完成
+    Table
+         update
+    页式文件系统测试
+    Table的测试
+    SelectOption
+    Where
 
-    问题
-        QuerySet Where SelectOption 这几个类的设计
-        设计query操作的位置
+下次开始
+    完成Table的remove(Where where)
+    完成Table的update(cols,values,where);
+
+问题
+    QuerySet SelectOption 这几个类的设计
+    设计query操作的位置
+    Where类的设计
+
+

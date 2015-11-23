@@ -11,12 +11,9 @@ import java.util.Scanner;
 
 public class WXYDB {
 
-    private BufPageManager bufPageManager;
-    private SystemManager systemManager;
-
     public WXYDB() {
-        bufPageManager = BufPageManager.getInstance();
-        systemManager = SystemManager.getInstance();
+        BufPageManager.getInstance(); // 加载类，完成初始化
+        SystemManager.getInstance();  // 加载类，完成初始化
     }
 
     public void go() {
@@ -31,12 +28,6 @@ public class WXYDB {
             try {
                 SQL sql = SQLParser.parse(sqlString);
                 result = sql.execute();
-            } catch (SQLParserException e) {
-                result = e.getMessage();
-                e.printStackTrace();
-            } catch (SQLExecException e) {
-                result = e.getMessage();
-                e.printStackTrace();
             } catch (Exception e) {
                 result = e.getMessage();
                 e.printStackTrace();

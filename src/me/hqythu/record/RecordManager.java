@@ -14,7 +14,11 @@ import me.hqythu.util.SelectOption;
 //size         文件中记录总数
 //fieldSize    记录的字段个数
 //recordFieldPos 记录的每个字段的位置
-
+/**
+ * RecordManager
+ * 记录管理器
+ * 记录的插入、删除、修改
+ */
 public class RecordManager {
 
     private static RecordManager manager = null;

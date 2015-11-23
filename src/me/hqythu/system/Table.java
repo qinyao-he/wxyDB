@@ -3,10 +3,8 @@ package me.hqythu.system;
 import me.hqythu.PageFile.*;
 import me.hqythu.exception.SQLRecordException;
 import me.hqythu.exception.SQLTableException;
-import me.hqythu.record.QuerySet;
 import me.hqythu.record.Record;
 import me.hqythu.util.Column;
-import me.hqythu.util.SelectOption;
 import me.hqythu.util.Where;
 
 /**
