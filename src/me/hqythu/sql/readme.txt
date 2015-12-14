@@ -44,4 +44,5 @@ DDL
         tableNames.get(0)：表名
     DESC:
         tableNames.get(0)：表名
-
+    ERROR:
+        语句错误
