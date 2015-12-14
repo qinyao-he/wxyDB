@@ -3,6 +3,7 @@ package me.hqythu;
 import me.hqythu.exception.SQLExecException;
 import me.hqythu.exception.SQLParserException;
 import me.hqythu.PageFile.BufPageManager;
+import me.hqythu.sql.ParseResult;
 import me.hqythu.sql.SQL;
 import me.hqythu.sql.SQLParser;
 import me.hqythu.system.SystemManager;
@@ -29,11 +30,11 @@ public class WXYDB {
 
             // 解析执行命令
             try {
-                SQL sql = SQLParser.parse(sqlString);
+                ParseResult sql = SQLParser.parse(sqlString);
                 result = sql.execute();
-            } catch (SQLParserException e) {
-                result = e.getMessage();
-                e.printStackTrace();
+//            } catch (SQLParserException e) {
+//                result = e.getMessage();
+//                e.printStackTrace();
             } catch (SQLExecException e) {
                 result = e.getMessage();
                 e.printStackTrace();
