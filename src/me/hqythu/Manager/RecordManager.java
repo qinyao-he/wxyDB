@@ -67,18 +67,6 @@ public class RecordManager {
         table.update(cols,values,where);
     }
 
-//    public QuerySet query(String tableName, String[] fields, SelectOption option, Where where) throws SQLExecException {
-//        Table table = SystemManager.getInstance().getTable(tableName);
-//        if (table == null) throw new SQLExecException("not have table: "+tableName);
-//        return table.query(fields,option,where);
-//    }
-//
-//    public QuerySet query(String tableName, int[] cols, SelectOption option, Where where) throws SQLExecException {
-//        Table table = SystemManager.getInstance().getTable(tableName);
-//        if (table == null) throw new SQLExecException("not have table: "+tableName);
-//        return table.query(cols,option,where);
-//    }
-
     private RecordManager() {
 
     }

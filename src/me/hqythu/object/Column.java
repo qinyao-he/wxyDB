@@ -4,6 +4,9 @@ package me.hqythu.object;
  * 列
  */
 public class Column {
+
+    public static final int FLAG_NULL = 0x80000000;
+    public static final int FLAG_PRIMARY = 0x40000000;
     public Column(String name, DataType type, short len) {
         this.name = name;
         this.prop = 0;
@@ -30,15 +33,23 @@ public class Column {
         this.len = len;
     }
     public void setNull() {
-        prop |= 0x80000000;
+        prop |= FLAG_NULL;
     }
     public void clearNull() {
-        prop &= 0x7fffffff;
+        prop &= ~FLAG_NULL;
     }
     public boolean isNull() {
-        return (prop & 0x80000000) != 0;
+        return (prop & FLAG_NULL) != 0;
     }
-
+    public void setPrimary() {
+        prop |= FLAG_PRIMARY;
+    }
+    public void clearPrimary() {
+        prop &= ~FLAG_PRIMARY;
+    }
+    public boolean isPrimary() {
+        return (prop & FLAG_PRIMARY) != 0;
+    }
 
     // 列名
     public String name;

@@ -1,18 +1,15 @@
-记录管理模块
+数据库对象模块
 
-Page
-    页
+Colume 列
 
-FilePageManager
-    页式文件系统操作
+DateType 数据类型
 
-BufPageManager
-    页式文件系统页操作（缓存）
-    getPage
-    releasePage
+QuerySet 查询结果
 
-QuerySet
-    查询返回结果
+Record 记录
+    记录在项目中主要以byte[]形式存在
+    因此该类实际是记录的相关操作
 
-RecordManager
-    记录管理
+Table 表
+    插入,删除,更新
+

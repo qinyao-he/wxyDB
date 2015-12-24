@@ -1,8 +1,8 @@
-package me.hqythu.sql;
+package me.hqythu.manager;
 
 import me.hqythu.exception.SQLExecException;
-import me.hqythu.manager.SystemManager;
 import me.hqythu.object.Table;
+import me.hqythu.object.QuerySet;
 import me.hqythu.util.SelectOption;
 import me.hqythu.util.Where;
 

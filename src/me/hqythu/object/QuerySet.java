@@ -1,4 +1,4 @@
-package me.hqythu.sql;
+package me.hqythu.object;
 
 public class QuerySet {
     public QuerySet() {

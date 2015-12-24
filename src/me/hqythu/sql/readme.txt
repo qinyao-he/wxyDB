@@ -9,11 +9,6 @@ DML
 DDL
     RecordManager里函数参数，解析获得
 
-
-QueryEngine
-    增删改在RecordManager里执行
-    查询在QueryEngine里执行
-
 查询结果说明：
     type：该语句的类型
     对于每种类型：

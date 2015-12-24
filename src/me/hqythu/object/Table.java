@@ -51,6 +51,12 @@ public class Table {
         insert(record);
     }
 
+    public void update(String[] fields, Object[] values, Where where) throws SQLTableException {
+        if (fields == null) throw new SQLTableException("updata none cols");
+        int[] cols = fieldsToCols(fields);
+        update(cols,values,where);
+    }
+
     //------------------------辅助函数------------------------
     // 记录的域名转为列位置
     protected int[] fieldsToCols(String[] fields) throws SQLTableException {
@@ -70,22 +76,45 @@ public class Table {
 
     //------------------------实际主函数------------------------
     /**
-     * 删除所有记录
+     * 插入记录，处理数据页
      */
-    public void removeAll() throws SQLTableException {
+    protected void insert(byte[] record) throws SQLTableException {
+
         Page dbPage = SystemManager.getInstance().getDbPage();
         int fileId = dbPage.getFileId();
+        Page tablePage;
+        Page dataPage;
+        Page dataPage2;
+
         try {
-            Page page = BufPageManager.getInstance().getPage(fileId, pageId);
-            TablePageUser.removeAllRecord(page);
+            tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
+            int dataPageId = TablePageUser.getFirstDataPage(tablePage);
+            if (dataPageId == -1) {
+                dataPage = DbPageUser.getNewPage(dbPage);
+                DataPageUser.initPage(dataPage, (short) record.length);
+            } else {
+                dataPage = BufPageManager.getInstance().getPage(fileId, pageId);
+            }
+
+            // 已经满了，则增加新页
+            // 插入数据
+            if (DataPageUser.isFull(dataPage)) {
+                dataPage2 = DbPageUser.getNewPage(dbPage);
+                DataPageUser.initPage(dataPage, (short) record.length);
+                DataPageUser.connectPage(dataPage, dataPage2);
+                DataPageUser.writeRecord(dataPage2, record);
+            } else {
+                DataPageUser.writeRecord(dataPage, record);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SQLTableException("remove all fialed");
+            throw new SQLTableException("insert failed");
         }
     }
 
     /**
      * 删除记录
+     * 删除策略:用该页的最后一条记录取代
      * （未完成，Where没有实现）
      */
     public void remove(Where where) throws SQLTableException {
@@ -93,7 +122,7 @@ public class Table {
         int fileId = dbPage.getFileId();
         try {
             Page tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
-            int firstPageId = TablePageUser.getDataPageIndex(tablePage);
+            int firstPageId = TablePageUser.getFirstDataPage(tablePage);
             int dataPageId = firstPageId;
             if (dataPageId == -1) return;
             where.setFromCols(columns);
@@ -111,10 +140,10 @@ public class Table {
                         index++;
                     }
                 }
-                dataPageId = DataPageUser.getNextPageId(page);
+                dataPageId = DataPageUser.getNextIndex(page);
                 if (size == 0) { // 该页已清空，无记录
                     if (dataPageId == firstPageId) {
-                        TablePageUser.setDataPageIndex(tablePage, dataPageId);
+                        TablePageUser.setFirstDataPage(tablePage, dataPageId);
                     }
                     DataPageUser.removeConnectPage(page);            // 断开连接
                     DbPageUser.recyclePage(dbPage,page.getPageId()); // 回收该页
@@ -127,61 +156,28 @@ public class Table {
         }
     }
 
-
-    public void update(String[] fields, Object[] values, Where where) throws SQLTableException {
-        if (fields == null) throw new SQLTableException("updata none cols");
-        int[] cols = fieldsToCols(fields);
-        update(cols,values,where);
-    }
-
+    /**
+     * 更新记录
+     * 先取出记录,将对应列的数据改写,再写回
+     * （未完成）
+     */
     // 这里未完成
     public void update(int[] cols, Object[] values, Where where) {
 
     }
 
-//    public QuerySet query(String[] fields, SelectOption option, Where where) {
-//        return null;
-//    }
-//
-//    public QuerySet query(int[] cols, SelectOption option, Where where) {
-//        return null;
-//    }
-
     /**
-     * 插入记录，处理数据页
+     * 删除所有记录
      */
-    protected void insert(byte[] record) throws SQLTableException {
-
+    public void removeAll() throws SQLTableException {
         Page dbPage = SystemManager.getInstance().getDbPage();
         int fileId = dbPage.getFileId();
-        Page tablePage;
-        Page dataPage;
-        Page dataPage2;
-
         try {
-            tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
-            int dataPageId = TablePageUser.getDataPageIndex(tablePage);
-            if (dataPageId == -1) {
-                dataPage = DbPageUser.getNewPage(dbPage);
-                DataPageUser.initDataPage(dataPage, (short) record.length);
-            } else {
-                dataPage = BufPageManager.getInstance().getPage(fileId, pageId);
-            }
-
-            // 已经满了，则增加新页
-            // 插入数据
-            if (DataPageUser.isFull(dataPage)) {
-                dataPage2 = DbPageUser.getNewPage(dbPage);
-                DataPageUser.initDataPage(dataPage, (short) record.length);
-                DataPageUser.connectPage(dataPage, dataPage2);
-                DataPageUser.writeRecord(dataPage2, record);
-            } else {
-                DataPageUser.writeRecord(dataPage, record);
-            }
+            Page page = BufPageManager.getInstance().getPage(fileId, pageId);
+            TablePageUser.removeAllRecord(page);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SQLTableException("insert failed");
+            throw new SQLTableException("remove all fialed");
         }
     }
-
 }

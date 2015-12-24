@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 /**
  * 系统模块单元测试
  * test.db为测试文件,测试函数请不要删除test.db
@@ -91,5 +93,13 @@ public class SystemManagerTest {
         // 无法删除不存在的表
         Assert.assertFalse(SystemManager.getInstance().dropTable("Customer"));
 
+        // 重新打开数据库,表信息是否仍然正确
+        Assert.assertTrue(SystemManager.getInstance().createDatabase(TEST_NEWDB));
+        Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_NEWDB));
+        Assert.assertTrue(SystemManager.getInstance().dropDatabase(TEST_NEWDB));
+        Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_DB));
+        tableNames = SystemManager.getInstance().showTable();
+        Assert.assertEquals(1,tableNames.length);
+        Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
     }
 }

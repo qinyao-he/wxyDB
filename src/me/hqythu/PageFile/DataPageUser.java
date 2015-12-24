@@ -7,18 +7,16 @@ import java.nio.ByteBuffer;
 public class DataPageUser {
     private DataPageUser(){}
 
-    public static void initDataPage(Page page, short recordLen) {
-        byte[] data = page.getData();
-        ByteBuffer buffer = page.getBuffer();
-        buffer.position(0);
-        buffer.putInt(Global.DTPAGE_IDX_POS, page.getPageId());  // 该页索引号
-        buffer.putInt(Global.DTPAGE_LASTIDX_POS, -1);            // 上一页索引
-        buffer.putInt(Global.DTPAGE_NEXTIDX_POS, -1);            // 下一页索引
-        buffer.putShort(Global.DTPAGE_PROP_POS, (short) 0);      // 属性
-        buffer.putShort(Global.DTPAGE_RECORDLEN_POS, recordLen); // 记录的长度
+    public static void initPage(Page page, short recordLen) {
+        setIndex(page,page.getPageId()); // 该页索引号
+        setPreIndex(page,-1); // 上一页索引
+        setNextIndex(page,-1); // 下一页索引
+        setProp(page,(short)0); // 属性
+        setRecordLen(page,recordLen); // 记录的长度
+        setCapacity(page,(Global.DTPAGE_DATA_LEN/recordLen));
         page.setDirty();
     }
-
+    
     /**
      * 获取该数据页上的一个记录
      * @param index 在该页中的位置,从[0,size)
@@ -26,6 +24,9 @@ public class DataPageUser {
     public static byte[] readRecord(Page page, int index) {
         ByteBuffer buffer = page.getBuffer();
         short recordLen = buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
+        int size = getRecordSize(page);
+
+        if (index >= size) return null;
         int pos = Global.DTPAGE_DATA_POS + index * recordLen;
         byte[] record = new byte[recordLen];
         buffer.position(pos);
@@ -39,16 +40,16 @@ public class DataPageUser {
      */
     public static boolean writeRecord(Page page, byte[] record) {
         ByteBuffer buffer = page.getBuffer();
-        int size = buffer.getInt(Global.DTPAGE_SIZE_POS);
-        short recordLen = buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
+        int size = getRecordSize(page);
+        short recordLen = getRecordLen(page);
+
+        if (isFull(page)) return false;
+        if (record.length != recordLen) return false;
         int pos = Global.DTPAGE_DATA_POS + size * recordLen;
-        if (pos + record.length > Global.PAGE_BYTE_SIZE) {
-            return false;
-        }
         buffer.position(pos);
         buffer.put(record);
-        size++;
-        buffer.putInt(Global.DTPAGE_SIZE_POS, size);
+        incRecordSize(page);
+
         page.setDirty();
         return true;
     }
@@ -59,16 +60,17 @@ public class DataPageUser {
      */
     public static void removeRecord(Page page, int index) {
         byte[] data = page.getData();
-        ByteBuffer buffer = page.getBuffer();
-        short recordLen = buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
-        int size = buffer.getInt(Global.DTPAGE_SIZE_POS);
+        int size = getRecordSize(page);
+        short recordLen = getRecordLen(page);
+
+        if (index >= size) return;
         if (index != (size - 1)) {
             int posTo = Global.DTPAGE_DATA_POS + index * recordLen;
             int posFrom = Global.DTPAGE_DATA_POS + (size - 1) * recordLen;
             System.arraycopy(data,posFrom,data,posTo,recordLen);
         }
-        size--;
-        buffer.putInt(Global.DTPAGE_SIZE_POS,size);
+        decRecordSize(page);
+
         page.setDirty();
     }
 
@@ -76,11 +78,8 @@ public class DataPageUser {
      * 连着两个数据页
      */
     public static void connectPage(Page page1, Page page2) {
-        ByteBuffer buffer1 = page1.getBuffer();
-        ByteBuffer buffer2 = page2.getBuffer();
-
-        buffer1.putInt(Global.DTPAGE_NEXTIDX_POS, page2.getPageId());
-        buffer2.putInt(Global.DTPAGE_LASTIDX_POS, page1.getPageId());
+        setNextIndex(page1,page2.getPageId());
+        setPreIndex(page2,page1.getPageId());
         page1.setDirty();
         page2.setDirty();
     }
@@ -89,20 +88,17 @@ public class DataPageUser {
      * 断开数据页的连接
      */
     public static void removeConnectPage(Page page) {
-        ByteBuffer buffer = page.getBuffer();
         int fileId = page.getFileId();
         try {
-            int lastPageIndex = buffer.getInt(Global.DTPAGE_LASTIDX_POS);
+            int lastPageIndex = getPreIndex(page);
+            int nextPageIndex = getNextIndex(page);
             if (lastPageIndex != -1) {
                 Page lastPage = BufPageManager.getInstance().getPage(fileId,lastPageIndex);
-                ByteBuffer lastBuffer = lastPage.getBuffer();
-                lastBuffer.putInt(Global.DTPAGE_NEXTIDX_POS, page.getPageId());
+                setNextIndex(lastPage,nextPageIndex);
             }
-            int nextPageIndex = buffer.getInt(Global.DTPAGE_NEXTIDX_POS);
             if (nextPageIndex != -1) {
                 Page nextPage = BufPageManager.getInstance().getPage(fileId,nextPageIndex);
-                ByteBuffer nextBuffer = nextPage.getBuffer();
-                nextBuffer.putInt(Global.DTPAGE_LASTIDX_POS, lastPageIndex);
+                setPreIndex(nextPage,lastPageIndex);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,26 +109,77 @@ public class DataPageUser {
      * 数据页是否存满记录
      */
     public static boolean isFull(Page page) {
-        ByteBuffer buffer = page.getBuffer();
-        int size = buffer.getInt(Global.DTPAGE_SIZE_POS);
-        int cap = buffer.getInt(Global.DTPAGE_CAP_POS);
+        int size = getRecordSize(page);
+        int cap = getCapacity(page);
         return size < cap;
     }
 
-    /**
-     * 下一页
-     */
-    public static int getNextPageId(Page page) {
+    //------------------------获取页信息------------------------
+    public static void setIndex(Page page, int index) { // 该页索引号
+        ByteBuffer buffer = page.getBuffer();
+        buffer.putInt(Global.DTPAGE_IDX_POS, index);
+    }
+    public static int getIndex(Page page) {
+        ByteBuffer buffer = page.getBuffer();
+        return buffer.getInt(Global.DTPAGE_IDX_POS);
+    }
+    public static void setPreIndex(Page page, int index) { // 该页索引号
+        ByteBuffer buffer = page.getBuffer();
+        buffer.putInt(Global.DTPAGE_PREIDX_POS, index);
+    }
+    public static int getPreIndex(Page page) {
+        ByteBuffer buffer = page.getBuffer();
+        return buffer.getInt(Global.DTPAGE_PREIDX_POS);
+    }
+    public static void setNextIndex(Page page, int index) { // 该页索引号
+        ByteBuffer buffer = page.getBuffer();
+        buffer.putInt(Global.DTPAGE_NEXTIDX_POS, index);
+    }
+    public static int getNextIndex(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.DTPAGE_NEXTIDX_POS);
     }
-
-    /**
-     * 数据页存放记录的个数
-     */
+    public static void setProp(Page page, short prop) { // 该页索引号
+        ByteBuffer buffer = page.getBuffer();
+        buffer.putShort(Global.DTPAGE_PROP_POS, prop);
+    }
+    public static short getProp(Page page) { // 该页索引号
+        ByteBuffer buffer = page.getBuffer();
+        return buffer.getShort(Global.DTPAGE_PROP_POS);
+    }
+    public static void setRecordLen(Page page, short len) { // 该页索引号
+        ByteBuffer buffer = page.getBuffer();
+        buffer.putShort(Global.DTPAGE_RECORDLEN_POS,len);
+    }
+    public static short getRecordLen(Page page) { // 该页索引号
+        ByteBuffer buffer = page.getBuffer();
+        return buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
+    }
+    public static void setRecordSize(Page page, int size) {
+        ByteBuffer buffer = page.getBuffer();
+        buffer.putInt(Global.DTPAGE_SIZE_POS,size);
+    }
     public static int getRecordSize(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.DTPAGE_SIZE_POS);
+    }
+    public static void incRecordSize(Page page) {
+        int size = getRecordSize(page);
+        size++;
+        setRecordSize(page,size);
+    }
+    public static void decRecordSize(Page page) {
+        int size = getRecordSize(page);
+        size--;
+        setRecordSize(page,size);
+    }
+    public static void setCapacity(Page page, int cap) {
+        ByteBuffer buffer = page.getBuffer();
+        buffer.putInt(Global.DTPAGE_CAP_POS,cap);
+    }
+    public static int getCapacity(Page page) {
+        ByteBuffer buffer = page.getBuffer();
+        return buffer.getInt(Global.DTPAGE_CAP_POS);
     }
 
 

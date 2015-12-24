@@ -17,29 +17,26 @@ public class DbPageUser {
         ByteBuffer buffer = page.getBuffer();
 
         // 初始化表的个数
-        buffer.putInt(Global.DBPAGE_INFO_POS + 0, 0);
+        setTableSize(page,0);
         // 初始化页bitmap
-        Arrays.fill(buffer.array(), Global.DBPAGE_BITMAP_POS, Global.DBPAGE_TABLE_POS, (byte) 0);
-
-        setBitMap(page, 0); // 第一页标记1，已被使用
+        initBitMap(page);
+        // 第一页标记1，已被使用
+        setBitMap(page, 0);
 
         page.setDirty();
     }
 
     public static void initTableFromPage(Page dbPage, Map<String, Table> tables) {
         int fileId = dbPage.getFileId();
-        byte[] dbPageData = dbPage.getData();
-        ByteBuffer dbPageBuffer = dbPage.getBuffer();
-        int nTable = dbPageBuffer.getInt(Global.DBPAGE_INFO_POS);
+        int nTable = getTableSize(dbPage);
 
         // 初始化表信息
         try {
             for (int i = 0; i < nTable; i++) {
-                int offset = Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN;
-                int pageIndex = dbPageBuffer.getInt(offset);
-                String name = new String(dbPageData, offset + 4, Global.PER_TABLE_INFO_LEN - 4);
+                String name = getTableName(dbPage,i);
+                int pageIndex = getTableIdx(dbPage,i);
                 Page page = BufPageManager.getInstance().getPage(fileId, pageIndex);
-                Table table = TablePageUser.readTablePage(page);
+                Table table = TablePageUser.getTable(page);
                 tables.put(name, table);
             }
             dbPage.setDirty();
@@ -53,44 +50,39 @@ public class DbPageUser {
      * 添加表的信息
      */
     public static void addTableInfo(Page dbPage, String tableName, int tablePageIndex) {
-
-        ByteBuffer dbPageBuffer = dbPage.getBuffer();
-        int nTable = dbPageBuffer.getInt(Global.DBPAGE_INFO_POS);
-        int pos = Global.DBPAGE_TABLE_POS + nTable * Global.PER_TABLE_INFO_LEN;
-
-        dbPageBuffer.putInt(pos, tablePageIndex);        // 表的位置
-        dbPageBuffer.position(pos + 4);
-        dbPageBuffer.put(tableName.getBytes());
-        dbPageBuffer.putInt(Global.DBPAGE_INFO_POS, nTable + 1);
+        int nTable = getTableSize(dbPage);
+        setTableName(dbPage,nTable,tableName);     // 表名
+        setTableIdx(dbPage,nTable,tablePageIndex); // 表的位置
+        incTableSize(dbPage);
         dbPage.setDirty();
-
     }
 
     /**
      * 从数据库首页删除表的信息
      */
     public static int delTableInfo(Page dbPage, String tableName) {
-        byte[] dbPageData = dbPage.getData();
-        ByteBuffer dbPageBuffer = dbPage.getBuffer();
+        byte[] data = dbPage.getData();
         int pageIndex = -1;
-        int size = dbPageBuffer.getInt(Global.DBPAGE_INFO_POS);
-        int i; // 被删除的表信息在哪一行
+        int size = getTableSize(dbPage);
+        int i; // 找到被删除的表信息的位置
         for (i = 0; i < size; i++) {
-            int offset = Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN;
-            pageIndex = dbPageBuffer.getInt(offset);
-            String name = new String(dbPageData, offset + 4, tableName.length());
+            String name = getTableName(dbPage,i);
             if (name.equals(tableName)) { // 删除表信息
+                pageIndex = getTableIdx(dbPage,i);
                 break;
             }
         }
-        // 找到表信息的位置
         // 最后一条表信息移到被删除的位置
-        System.arraycopy(dbPageData,
-                Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN + 128,
-                dbPageData,
-                Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN,
-                (size - i - 1) * Global.PER_TABLE_INFO_LEN);
-        dbPage.setDirty();
+        if (pageIndex != -1) {
+            if (i < size - 1) {
+                System.arraycopy(data, Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN,
+                        data, Global.DBPAGE_TABLE_POS + (size-1) * Global.PER_TABLE_INFO_LEN,
+                        Global.PER_TABLE_INFO_LEN
+                        );
+            }
+            decTableSize(dbPage);
+            dbPage.setDirty();
+        }
         return pageIndex;
     }
 
@@ -107,11 +99,68 @@ public class DbPageUser {
             return null;
         }
     }
-
     public static void recyclePage(Page dbPage, int pageId) {
         clearBitMap(dbPage, pageId);
     }
 
+
+    //------------------------获取页信息------------------------
+    public static void setTableSize(Page dbPage, int size) {
+        ByteBuffer buffer = dbPage.getBuffer();
+        buffer.putInt(Global.DBPATE_INFO_TABLESIZE, size);
+    }
+    public static int getTableSize(Page dbPage) {
+        ByteBuffer buffer = dbPage.getBuffer();
+        return buffer.getInt(Global.DBPATE_INFO_TABLESIZE);
+    }
+    public static void incTableSize(Page dbPage) {
+        int temp = getTableSize(dbPage);
+        temp++;
+        setTableSize(dbPage,temp);
+    }
+    public static void decTableSize(Page dbPage) {
+        int temp = getTableSize(dbPage);
+        temp--;
+        setTableSize(dbPage,temp);
+    }
+    public static int getTableOffset(int index) {
+        return Global.DBPAGE_TABLE_POS + index * Global.PER_TABLE_INFO_LEN;
+    }
+    public static int getTableIdx(Page dbPage, int i) {
+        ByteBuffer buffer = dbPage.getBuffer();
+        return buffer.getInt(Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN);
+    }
+    public static void setTableIdx(Page dbPage, int i, int index) {
+        ByteBuffer buffer = dbPage.getBuffer();
+        buffer.putInt(Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN,index);
+    }
+    public static String getTableName(Page dbPage, int index) {
+        byte[] data = dbPage.getData();
+        String temp = new String(data,getTableOffset(index)+4,Global.TABLE_NAME_LEN);
+        if (temp.indexOf(0) > 0) {
+            return temp.substring(0,temp.indexOf(0));
+        } else {
+            return temp;
+        }
+    }
+    public static void setTableName(Page dbPage, int index, String name) {
+        ByteBuffer buffer = dbPage.getBuffer();
+        byte[] data = name.getBytes();
+        int offset = getTableOffset(index);
+        buffer.position(offset + 4);
+        if (data.length > Global.TABLE_NAME_LEN) {
+            buffer.put(data,0,Global.TABLE_NAME_LEN);
+        } else {
+            buffer.put(name.getBytes());
+        }
+    }
+
+
+
+    private static void initBitMap(Page page) {
+        ByteBuffer buffer = page.getBuffer();
+        Arrays.fill(buffer.array(), Global.DBPAGE_BITMAP_POS, Global.DBPAGE_TABLE_POS, (byte) 0);
+    }
     private static void setBitMap(Page dbPage, int index) {
         if (index < 0) throw new RuntimeException("illegal page bitmap index");
         byte[] dbPageData = dbPage.getData();

@@ -15,7 +15,7 @@ public class SystemManager {
     String connectDB = null;
 
     Map<String, Table> tables = null;
-    int fileId;
+    int fileId = -1;
 
     private static SystemManager manager = null;
 
@@ -86,9 +86,9 @@ public class SystemManager {
         if (connectDB != null) {
             connectDB = null;
             tables.clear();
-
             BufPageManager.getInstance().clear();
             FilePageManager.getInstance().closeFile(fileId);
+            fileId = -1;
         }
     }
 
@@ -133,10 +133,10 @@ public class SystemManager {
             DbPageUser.addTableInfo(dbPage, tableName, tablePage.getPageId());
 
             // 初始化表首页
-            TablePageUser.initTablePage(tablePage, tableName, columns);
+            TablePageUser.initPage(tablePage, tableName, columns);
 
             // 系统管理添加表
-            Table table = TablePageUser.readTablePage(tablePage);
+            Table table = TablePageUser.getTable(tablePage);
             tables.put(tableName, table);
 
             return true;
@@ -163,7 +163,6 @@ public class SystemManager {
             table.removeAll();
             // 从SystemManager缓存的map中删除
             tables.remove(tableName);
-
             // 库页中删除表的信息
             int pageId = DbPageUser.delTableInfo(dbPage, tableName);
             // 回收页
@@ -200,8 +199,7 @@ public class SystemManager {
             return null;
         }
     }
-
-    public static void main(String[] args) {
-
+    public int getFileId() {
+        return fileId;
     }
 }
