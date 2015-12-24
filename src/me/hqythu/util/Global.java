@@ -41,8 +41,8 @@ public class Global {
     public static final int COL_TYPE_POS = 124;
     public static final int COL_LEN_POS = 126;
 
-    public static final int TABLE_NAME_LEN = TBPAGE_DATAIDX_POS - TBPAGE_NAME_POS;
-    public static final int COL_NAME_LEN = COL_PROP_POS - COL_NAME_POS;
+    public static final int TABLE_NAME_LEN = TBPAGE_DATAIDX_POS - TBPAGE_NAME_POS; // 116
+    public static final int COL_NAME_LEN = COL_PROP_POS - COL_NAME_POS; // 120
     public static final int PER_COL_INFO_POS = 128;
     public static final int PER_COL_INFO_LEN = 128;
 

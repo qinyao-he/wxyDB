@@ -67,7 +67,7 @@ public class TablePageUser {
             DataType type = DataType.valueOf(buffer.getShort(offset + Global.COL_TYPE_POS)); // 数据类型
             short len = buffer.getShort(offset + Global.COL_LEN_POS);                          // 数据列长
 
-            cols[i] = new Column(name, prop, type, len);
+            cols[i] = new Column(name, type, len, prop);
         }
         return new Table(tableName, index, recordLen, nRecord, cols);
     }

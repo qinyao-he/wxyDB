@@ -92,9 +92,9 @@ public class SystemManager {
     }
 
     protected boolean openDatabase(String DBname) {
-        connectDB = DBname;
         fileId = FilePageManager.getInstance().openFile(DBname);
         if (fileId == -1) return false;
+        connectDB = DBname;
 
         try {
             // 切换DB的初始化
@@ -151,6 +151,7 @@ public class SystemManager {
      */
     public boolean dropTable(String tableName) {
         if (connectDB == null) return false;
+
         Table table = tables.get(tableName);
         if (table == null) return false;
 
@@ -159,10 +160,11 @@ public class SystemManager {
 
             // 清空表的记录
             table.removeAll();
+            // 从SystemManager缓存的map中删除
+            tables.remove(tableName);
 
             // 库页中删除表的信息
             int pageId = DbPageUser.delTableInfo(dbPage, tableName);
-
             // 回收页
             DbPageUser.recyclePage(dbPage, pageId);
 
@@ -199,16 +201,6 @@ public class SystemManager {
     }
 
     public static void main(String[] args) {
-//        SystemManager.getInstance().dropDatabase("hello");
-//        SystemManager.getInstance().createDatabase("hello");
-//        SystemManager.getInstance().useDatabase("hello");
-//
-//        Column[] columns = new Column[2];
-//        columns[0] = new Column("name", DataType.VARCHAR, 20);
-//        columns[1] = new Column("age", DataType.INT, 4);
-//
-//        SystemManager.getInstance().createTable("student",columns);
-//        System.out.println(Arrays.toString(SystemManager.getInstance().showTable()));
-//        SystemManager.getInstance().closeDatabase();
+
     }
 }

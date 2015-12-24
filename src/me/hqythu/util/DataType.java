@@ -1,5 +1,8 @@
 package me.hqythu.util;
 
+/**
+ * 列数据类型
+ */
 public enum DataType {
     UNKNOWN, INT, VARCHAR;
 

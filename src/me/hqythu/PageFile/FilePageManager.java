@@ -2,8 +2,7 @@ package me.hqythu.PageFile;
 
 import me.hqythu.util.Global;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -43,6 +42,8 @@ public class FilePageManager {
      */
     public int openFile(String fileName) {
         try {
+            File testFile = new File(fileName);
+            if (!testFile.exists()) return -1;
             RandomAccessFile file = new RandomAccessFile(fileName, "rw");
             int fileId = fileBitMap.nextClearBit(0);
             files[fileId] = file;

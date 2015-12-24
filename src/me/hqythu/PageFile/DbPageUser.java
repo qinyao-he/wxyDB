@@ -67,7 +67,7 @@ public class DbPageUser {
     }
 
     /**
-     * 删除表的信息
+     * 从数据库首页删除表的信息
      */
     public static int delTableInfo(Page dbPage, String tableName) {
         byte[] dbPageData = dbPage.getData();
@@ -78,11 +78,13 @@ public class DbPageUser {
         for (i = 0; i < size; i++) {
             int offset = Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN;
             pageIndex = dbPageBuffer.getInt(offset);
-            String name = new String(dbPageData, offset + 4, Global.PER_TABLE_INFO_LEN - 4);
+            String name = new String(dbPageData, offset + 4, tableName.length());
             if (name.equals(tableName)) { // 删除表信息
                 break;
             }
         }
+        // 找到表信息的位置
+        // 最后一条表信息移到被删除的位置
         System.arraycopy(dbPageData,
                 Global.DBPAGE_TABLE_POS + i * Global.PER_TABLE_INFO_LEN + 128,
                 dbPageData,
