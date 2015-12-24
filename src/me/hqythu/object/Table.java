@@ -14,19 +14,20 @@ public class Table {
     String name;        // 表名
     int pageId;         // 表页的id
     int len;          // 记录的长度
-    int nRecord;        // 记录的个数
     Column[] columns;   // 列属性
 
-    public Table(String name, int index, int len, int nRecord, Column[] columns) {
+    public Table(String name, int index, int len, Column[] columns) {
         this.name = name;
         this.pageId = index;
         this.len = len;
-        this.nRecord = nRecord;
         this.columns = columns;
     }
 
     public String getName() {
         return name;
+    }
+    public int getPageId() {
+        return pageId;
     }
 
     //------------------------预处理------------------------
@@ -64,7 +65,7 @@ public class Table {
         for (int i = 0; i < cols.length; i++) {
             cols[i] = -1;
             for (int j = 0; j < columns.length; j++) {
-                if (fields.equals(columns[j].name)) {
+                if (fields[i].equals(columns[j].name)) {
                     cols[i] = j;
                     break;
                 }
@@ -106,6 +107,7 @@ public class Table {
             } else {
                 DataPageUser.writeRecord(dataPage, record);
             }
+            TablePageUser.incRecordSize(tablePage);
         } catch (Exception e) {
             e.printStackTrace();
             throw new SQLTableException("insert failed");

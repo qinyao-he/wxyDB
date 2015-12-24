@@ -15,11 +15,9 @@ public class Record {
      * 将内容转为byte[]
      */
     public static byte[] valueToByte(Column[] columns, int recordLen, int[] cols, Object[] values) throws SQLRecordException {
-//        System.out.println(recordLen);
-//        ByteBuffer buffer = ByteBuffer.allocateDirect(recordLen);
+
         ByteBuffer buffer = ByteBuffer.allocate(recordLen);
 
-        System.out.println(buffer.capacity());
         int[] offsets = new int[columns.length+1];
         offsets[0] = 0;
         for (int i = 0; i < columns.length; i++) {

@@ -10,6 +10,11 @@ public class DataPageUser {
 
     private DataPageUser(){}
 
+    /**
+     * 初始化数据页
+     * @param page
+     * @param recordLen 每个记录的长度
+     */
     public static void initPage(Page page, int recordLen) {
         setIndex(page,page.getPageId());    // 该页索引号
         setPreIndex(page,-1);               // 上一页索引

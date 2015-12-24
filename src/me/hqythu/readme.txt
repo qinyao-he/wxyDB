@@ -64,15 +64,17 @@
     SQL大部分语句的解析
 
 未完成
-    PageFile测试
-    Record测试
     Query模块
     Table测试
         插入、删除、更新
     Query测试
         查询
     SQL语句的执行
-
+    
+可能存在的问题
+    PageFile测试
+    Record测试
+    
 可以实现的功能
     CREATE DATABASE orderDB; 创建名为 orderDB 的数据库
     DROP DATABASE orderDB; 删除名为 orderDB 的数据库

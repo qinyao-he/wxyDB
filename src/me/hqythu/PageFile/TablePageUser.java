@@ -11,8 +11,8 @@ import java.nio.ByteBuffer;
 
 public class TablePageUser {
 
-    public static final int TABLE_PROP_ALLOWNULL = 0x80000000;
-    public static final int TABLE_PROP_HASPRIMARY = 0x40000000;
+    public static final int TABLE_PROP_ALLOW_NULL = 0x80000000;
+    public static final int TABLE_PROP_HAS_PRIMARY = 0x40000000;
 
     private TablePageUser() {
     }
@@ -46,8 +46,6 @@ public class TablePageUser {
         String tableName = getName(page); // 表名
         int index = getTableIndex(page); // 表页索引
         int recordLen = getRecordLen(page); // 每条记录长度
-//        System.out.println(recordLen);
-        int nRecord = getRecordSize(page); // 记录总数
         int n = getColumnSize(page); // 列数
 
         // 列信息
@@ -55,10 +53,15 @@ public class TablePageUser {
         for (int i = 0; i < n; i++) {
             cols[i] = getColumn(page,i);
         }
-        return new Table(tableName, index, recordLen, nRecord, cols);
+        return new Table(tableName, index, recordLen, cols);
     }
 
-
+    /**
+     * 按id获取某个记录所在的页
+     * @param page
+     * @param recordId
+     * @return
+     */
     public static Page getRecordPage(Page page, int recordId) {
         int fileId = SystemManager.getInstance().getFileId();
         int dataPageId = getFirstDataPage(page);
@@ -76,6 +79,12 @@ public class TablePageUser {
         return null;
     }
 
+    /**
+     * 按id获取某个记录
+     * @param page
+     * @param recordId
+     * @return
+     */
     public static byte[] getRecord(Page page, int recordId) {
         int fileId = SystemManager.getInstance().getFileId();
         int dataPageId = getFirstDataPage(page);
@@ -102,6 +111,10 @@ public class TablePageUser {
         }
     }
 
+    /**
+     * 删除所有记录
+     * @param page
+     */
     public static void removeAllRecord(Page page) {
         Page dbPage = SystemManager.getInstance().getDbPage();
         int fileId = SystemManager.getInstance().getFileId();
@@ -146,11 +159,19 @@ public class TablePageUser {
     }
     public static int getRecordSize(Page page) {
         ByteBuffer buffer = page.getBuffer();
-        return buffer.getInt(Global.TBPAGE_RECORDNUM_POS);
+        return buffer.getInt(Global.TBPAGE_RECORD_SIZE_POS);
     }
     public static void setRecordSize(Page page, int size) {
         ByteBuffer buffer = page.getBuffer();
-        buffer.putInt(Global.TBPAGE_RECORDNUM_POS, size);
+        buffer.putInt(Global.TBPAGE_RECORD_SIZE_POS, size);
+    }
+    public static void incRecordSize(Page page) {
+        int size = getRecordSize(page);
+        setRecordSize(page,++size);
+    }
+    public static void decRecordSize(Page page) {
+        int size = getRecordSize(page);
+        setRecordSize(page,--size);
     }
     public static int getTableIndex(Page page) {
         ByteBuffer buffer = page.getBuffer();
@@ -170,34 +191,34 @@ public class TablePageUser {
     }
     public static void setRecordLen(Page page, int len) {
         ByteBuffer buffer = page.getBuffer();
-        buffer.putInt(Global.TBPAGE_RECORDLEN_POS, len);
+        buffer.putInt(Global.TBPAGE_RECORD_LEN_POS, len);
     }
     public static int getRecordLen(Page page) {
         ByteBuffer buffer = page.getBuffer();
-        return buffer.getInt(Global.TBPAGE_RECORDLEN_POS);
+        return buffer.getInt(Global.TBPAGE_RECORD_LEN_POS);
     }
     public static void setAllowNull(Page page) {
         ByteBuffer buffer = page.getBuffer();
         int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
-        flag |= TABLE_PROP_ALLOWNULL;
+        flag |= TABLE_PROP_ALLOW_NULL;
         buffer.putInt(Global.TBPAGE_PROP_POS,flag);
     }
     public static void clearAllowNull(Page page) {
         ByteBuffer buffer = page.getBuffer();
         int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
-        flag &= ~TABLE_PROP_ALLOWNULL;
+        flag &= ~TABLE_PROP_ALLOW_NULL;
         buffer.putInt(Global.TBPAGE_PROP_POS,flag);
     }
     public static void setHasPrimary(Page page) {
         ByteBuffer buffer = page.getBuffer();
         int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
-        flag |= TABLE_PROP_HASPRIMARY;
+        flag |= TABLE_PROP_HAS_PRIMARY;
         buffer.putInt(Global.TBPAGE_PROP_POS,flag);
     }
     public static void clearHasPrimary(Page page) {
         ByteBuffer buffer = page.getBuffer();
         int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
-        flag &= ~TABLE_PROP_HASPRIMARY;
+        flag &= ~TABLE_PROP_HAS_PRIMARY;
         buffer.putInt(Global.TBPAGE_PROP_POS,flag);
     }
     public static Column getColumn(Page page, int index) {
