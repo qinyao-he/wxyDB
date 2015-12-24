@@ -12,6 +12,7 @@ public enum DataType {
                 return INT;
             case 2:
                 return VARCHAR;
+
             default:
                 return UNKNOWN;
         }

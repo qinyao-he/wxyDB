@@ -4,6 +4,7 @@ import me.hqythu.manager.SystemManager;
 import me.hqythu.pagefile.*;
 import me.hqythu.exception.SQLRecordException;
 import me.hqythu.exception.SQLTableException;
+import me.hqythu.util.SetValue;
 import me.hqythu.util.Where;
 
 /**
@@ -29,6 +30,9 @@ public class Table {
     public int getPageId() {
         return pageId;
     }
+    public Column[] getColumns() {
+        return columns;
+    }
 
     //------------------------预处理------------------------
     // 插入预处理
@@ -52,12 +56,6 @@ public class Table {
         insert(record);
     }
 
-    public void update(String[] fields, Object[] values, Where where) throws SQLTableException {
-        if (fields == null) throw new SQLTableException("updata none cols");
-        int[] cols = fieldsToCols(fields);
-        update(cols,values,where);
-    }
-
     //------------------------辅助函数------------------------
     // 记录的域名转为列位置
     protected int[] fieldsToCols(String[] fields) throws SQLTableException {
@@ -70,7 +68,9 @@ public class Table {
                     break;
                 }
             }
-            if (cols[i] == -1) throw new SQLTableException("not have column: " + fields[i]);
+            if (cols[i] == -1) {
+                throw new SQLTableException("not have column: " + fields[i]);
+            }
         }
         return cols;
     }
@@ -89,24 +89,33 @@ public class Table {
 
         try {
             tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
+
+            // 数据首页
             int dataPageId = TablePageUser.getFirstDataPage(tablePage);
+            // 如果数据首页-1,表示无数据页
             if (dataPageId == -1) {
                 dataPage = DbPageUser.getNewPage(dbPage);
+                if (dataPage == null) throw new SQLTableException("can not getNewPage in INSERT");
+                TablePageUser.setFirstDataPage(tablePage, dataPage.getPageId());
                 DataPageUser.initPage(dataPage, record.length);
             } else {
-                dataPage = BufPageManager.getInstance().getPage(fileId, pageId);
+                dataPage = BufPageManager.getInstance().getPage(fileId, dataPageId);
             }
 
-            // 已经满了，则增加新页
-            // 插入数据
-            if (DataPageUser.isFull(dataPage)) {
-                dataPage2 = DbPageUser.getNewPage(dbPage);
-                DataPageUser.initPage(dataPage, record.length);
-                DataPageUser.connectPage(dataPage, dataPage2);
-                DataPageUser.writeRecord(dataPage2, record);
-            } else {
-                DataPageUser.writeRecord(dataPage, record);
+            // 找到有空槽的页
+            while(DataPageUser.isFull(dataPage)) {
+                dataPageId = DataPageUser.getNextIndex(dataPage);
+                if (dataPageId == -1) { // 无下一页,需要分配新页.肯定为空
+                    dataPage2 = DbPageUser.getNewPage(dbPage);
+                    if (dataPage2 == null) throw new SQLTableException("can not getNewPage in INSERT");
+                    DataPageUser.initPage(dataPage2, record.length);
+                    DataPageUser.connectPage(dataPage, dataPage2);
+                    dataPage = dataPage2;
+                } else {
+                    dataPage = BufPageManager.getInstance().getPage(fileId,dataPageId);
+                }
             }
+            DataPageUser.addRecord(dataPage, record);
             TablePageUser.incRecordSize(tablePage);
         } catch (Exception e) {
             e.printStackTrace();
@@ -116,42 +125,46 @@ public class Table {
 
     /**
      * 删除记录
-     * 删除策略:用该页的最后一条记录取代
+     * 删除策略:
+     * 遍历:每个数据页的每个记录
+     * 用该页的最后一条记录取代被删除的记录
+     * 每个数据页空则回收
+     * 数据页之间不合并
      * （未完成，Where没有实现）
      */
     public void remove(Where where) throws SQLTableException {
         Page dbPage = SystemManager.getInstance().getDbPage();
-        int fileId = dbPage.getFileId();
+        int fileId = SystemManager.getInstance().getFileId();
+        if (fileId == -1) throw new SQLTableException("have not open database");
         try {
             Page tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
+
+            // 每个数据页
             int firstPageId = TablePageUser.getFirstDataPage(tablePage);
-            int dataPageId = firstPageId;
-            if (dataPageId == -1) return;
-            where.setFromCols(columns);
-            while (dataPageId != -1) {
+            for (int dataPageId = firstPageId; dataPageId != -1;) {
                 Page page = BufPageManager.getInstance().getPage(fileId,dataPageId);
+
+                // 每条记录
                 int size = DataPageUser.getRecordSize(page);
-                int index = 0;
-                while (index < size) {
+                for (int index = 0; index > size; ) {
                     byte[] data = DataPageUser.readRecord(page, index);
 //                    byte[] data = TablePageUser.getRecord(tablePage, index);
-                    if (where.match(data)) {
-                        DataPageUser.removeRecord(tablePage, index);
+                    if (where.match(data, columns)) {
+                        DataPageUser.removeRecord(page, index);
                         size--;
                     } else {
                         index++;
                     }
                 }
+
                 dataPageId = DataPageUser.getNextIndex(page);
-                if (size == 0) { // 该页已清空，无记录
-                    if (dataPageId == firstPageId) {
-                        TablePageUser.setFirstDataPage(tablePage, dataPageId);
-                    }
+                if (size == 0 && page.getPageId() != firstPageId) { // 该页已清空，无记录
                     DataPageUser.removeConnectPage(page);            // 断开连接
                     DbPageUser.recyclePage(dbPage,page.getPageId()); // 回收该页
+                } else {
+                    DataPageUser.setRecordSize(page,size);
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new SQLTableException("remove failed");
@@ -163,9 +176,34 @@ public class Table {
      * 先取出记录,将对应列的数据改写,再写回
      * （未完成）
      */
-    // 这里未完成
-    public void update(int[] cols, Object[] values, Where where) {
+    public void update(Where where, SetValue setValue) throws SQLTableException {
+        int fileId = SystemManager.getInstance().getFileId();
+        if (fileId == -1) throw new SQLTableException("have not open database");
 
+        try {
+            Page tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
+
+            // 每个数据页
+            int firstPageId = TablePageUser.getFirstDataPage(tablePage);
+            for (int dataPageId = firstPageId; dataPageId != -1;) {
+                Page page = BufPageManager.getInstance().getPage(fileId,dataPageId);
+
+                // 每条记录
+                int size = DataPageUser.getRecordSize(page);
+                for (int index = 0; index > size; index++) {
+                    byte[] data = DataPageUser.readRecord(page, index);
+                    if (where.match(data, columns)) {
+                        DataPageUser.removeRecord(page, index);
+                        setValue.set(data, columns);
+                        DataPageUser.writeRecord(page,index,data);
+                    }
+                }
+                dataPageId = DataPageUser.getNextIndex(page);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new SQLTableException("update failed");
+        }
     }
 
     /**

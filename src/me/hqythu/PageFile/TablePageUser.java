@@ -239,7 +239,12 @@ public class TablePageUser {
         int pos = Global.COL_INFO_POS + index * Global.PER_COL_INFO_LEN;
 
         buffer.position(pos);
-        buffer.put(col.name.getBytes());                              // 列名称 120, 未检查
+        byte[] data = col.name.getBytes();
+        if (data.length > Global.COL_NAME_LEN) { // 列名称
+            buffer.put(data,0,Global.COL_NAME_LEN);
+        } else {
+            buffer.put(data);
+        }
         buffer.putInt(pos + Global.COL_PROP_POS, col.prop);           // 数据属性 4
         buffer.putShort(pos + Global.COL_TYPE_POS, (short) col.type.ordinal()); // 数据类型 2
         buffer.putShort(pos + Global.COL_LEN_POS, col.len);             // 数据长度 2

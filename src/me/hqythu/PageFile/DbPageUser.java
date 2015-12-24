@@ -36,7 +36,6 @@ public class DbPageUser {
                 String name = getTableName(dbPage,i);
                 int pageIndex = getTableIdx(dbPage,i);
                 Page page = BufPageManager.getInstance().getPage(fileId, pageIndex);
-//                System.out.println("initTableFromPage");
                 Table table = TablePageUser.getTable(page);
                 tables.put(name, table);
             }

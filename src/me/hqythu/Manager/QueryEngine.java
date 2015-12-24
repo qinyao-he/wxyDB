@@ -3,6 +3,7 @@ package me.hqythu.manager;
 import me.hqythu.exception.SQLExecException;
 import me.hqythu.object.Table;
 import me.hqythu.object.QuerySet;
+import me.hqythu.pagefile.Page;
 import me.hqythu.util.SelectOption;
 import me.hqythu.util.Where;
 
@@ -22,18 +23,19 @@ public class QueryEngine {
         return engine;
     }
 
-    public QuerySet query(String tableName, String[] fields, SelectOption option, Where where) throws SQLExecException {
-        Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: " + tableName);
-        return null;
-//        return table.query(fields, option, where);
-    }
+    public QuerySet query(SelectOption option, Where where) throws SQLExecException {
 
-    public QuerySet query(String tableName, int[] cols, SelectOption option, Where where) throws SQLExecException {
-        Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: " + tableName);
+//        Page dbPage = SystemManager.getInstance().getDbPage();
+//        int recordLen = 0;
+//        String tableNames[] = option.tableNames;
+//        for (int i = 0; i < tableNames.length; i++) {
+//            Table table = SystemManager.getInstance().getTable(tableNames[i]);
+//            for (int j = 0; j < 1; j++) {
+//                recordLen += 1;
+//            }
+//        }
+
         return null;
-//        return table.query(cols,option,where);
     }
 
 }

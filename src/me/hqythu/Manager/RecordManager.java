@@ -4,6 +4,7 @@ import me.hqythu.object.Table;
 import me.hqythu.exception.SQLExecException;
 import me.hqythu.exception.SQLRecordException;
 import me.hqythu.exception.SQLTableException;
+import me.hqythu.util.SetValue;
 import me.hqythu.util.Where;
 
 
@@ -55,17 +56,12 @@ public class RecordManager {
         table.remove(where);
     }
 
-    public void update(String tableName, String[] fields, Object[] values, Where where) throws SQLExecException, SQLTableException {
+    public void update(String tableName, Where where, SetValue setValue) throws SQLExecException, SQLTableException {
         Table table = SystemManager.getInstance().getTable(tableName);
         if (table == null) throw new SQLExecException("not have table: "+tableName);
-        table.update(fields,values,where);
+        table.update(where,setValue);
     }
 
-    public void update(String tableName, int[] cols, Object[] values, Where where) throws SQLExecException {
-        Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: "+tableName);
-        table.update(cols,values,where);
-    }
 
     private RecordManager() {
 

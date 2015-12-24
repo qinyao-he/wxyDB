@@ -21,14 +21,13 @@ public class Where {
 
     private BoolExpr boolExpr;
 
-    private String fieldName;
     private Op op;
 
     public Where() {
 
     }
 
-    public boolean match(byte[] record) {
+    public boolean match(byte[] record, Column[] columns) {
         return false;
     }
 
@@ -39,13 +38,7 @@ public class Where {
 
     }
 
-    public void setFieldName(String fieldName) {
-        this.fieldName = fieldName;
-    }
     public void setOp(Op op) {
         this.op = op;
-    }
-    public void setFromCols(Column[] columns) {
-
     }
 }

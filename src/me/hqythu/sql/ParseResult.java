@@ -24,7 +24,7 @@ public class ParseResult
 	}
 	OrderType type;
 	String dataBaseName;
-	List<String> tableNames;
+	List<String> tableNames;//
 	List<String> rowNames;
 	List<Object> data;
 	List<Value> values;

@@ -2,11 +2,16 @@ package me.hqythu.manager;
 
 import me.hqythu.object.Column;
 import me.hqythu.object.DataType;
+import me.hqythu.object.Table;
+import me.hqythu.pagefile.BufPageManager;
+import me.hqythu.pagefile.Page;
+import me.hqythu.pagefile.TablePageUser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -18,6 +23,9 @@ public class SystemManagerTest {
     public static final String TEST_DB = "test.db";
     public static final String TEST_NEWDB = "newdb.db";
     public static final String TEST_OTHERDB = "hello.db";
+
+    public static final String TEST_TABLE1 = "Student";
+    public static final String TEST_TABLE2 = "Customer";
 
     @Before
     public void setUp() throws Exception {
@@ -102,4 +110,5 @@ public class SystemManagerTest {
         Assert.assertEquals(1,tableNames.length);
         Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
     }
+
 }

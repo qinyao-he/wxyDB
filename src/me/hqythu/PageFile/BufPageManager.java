@@ -51,7 +51,8 @@ public class BufPageManager {
     }
 
     private long hash(int fileId, int pageId) {
-        return (fileId << 32) + pageId;
+        long temp = fileId;
+        return (temp << 32) + pageId;
     }
 
     public static void main(String[] args) throws IOException {

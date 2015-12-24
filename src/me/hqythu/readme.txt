@@ -34,11 +34,14 @@
 
 2015年12月24日
     单元测试框架
-
+    测试了原有的大部分内容
+        系统管理模块,插入
+    重新构思update,query
 
 未完成
     Table
-         update
+        update
+        remove
     页式文件系统测试
     Table的测试
     SelectOption
@@ -62,6 +65,10 @@
         创建、切换、删除数据库
         创建、删除、显示表
     SQL大部分语句的解析
+    TablePage测试
+    Table部分测试
+        插入
+    Record测试
 
 未完成
     Query模块
@@ -73,7 +80,6 @@
     
 可能存在的问题
     PageFile测试
-    Record测试
     
 可以实现的功能
     CREATE DATABASE orderDB; 创建名为 orderDB 的数据库
@@ -114,6 +120,21 @@
             INSERT, DELETE, UPDATE, SELECT
             涉及Table，Record，querySet来完成相关操作
     4、可能根据执行结果String执行一些简单操作，例如退出
+
+技术细节
+    DML
+        Create DataBase, Drop DataBase, Use DataBase
+            相当于文件的创建,删除,打开
+        ShowTable
+    DDL
+        Insert
+            从第一个数据页开始找,找到空位置就插入
+        remove
+            需要Where
+        update
+            需要Where,set
+        query
+            需要Where
 
 文件框架
     WXYDB

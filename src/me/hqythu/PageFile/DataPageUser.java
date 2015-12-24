@@ -21,6 +21,7 @@ public class DataPageUser {
         setNextIndex(page,-1);              // 下一页索引
         setProp(page,0);                    // 属性
         setRecordLen(page,recordLen);       // 记录的长度
+        setRecordSize(page,0);              // 记录的个数
         setCapacity(page,(Global.DTPAGE_DATA_LEN/recordLen)); // 容量
         page.setDirty();
     }
@@ -46,7 +47,7 @@ public class DataPageUser {
      * 往数据页上写一个记录
      * @param record 记录
      */
-    public static boolean writeRecord(Page page, byte[] record) {
+    public static boolean addRecord(Page page, byte[] record) {
         ByteBuffer buffer = page.getBuffer();
         int size = getRecordSize(page);
         int recordLen = getRecordLen(page);
@@ -57,6 +58,24 @@ public class DataPageUser {
         buffer.position(pos);
         buffer.put(record);
         incRecordSize(page);
+
+        page.setDirty();
+        return true;
+    }
+
+    /**
+     * 删除记录
+     * 最后一个挪到被删除位置
+     */
+    public static boolean writeRecord(Page page, int index, byte[] record) {
+        byte[] data = page.getData();
+        int size = getRecordSize(page);
+        int recordLen = getRecordLen(page);
+
+        if (index >= size) return false;
+        if (record.length != recordLen) return false;
+        int pos = Global.DTPAGE_DATA_POS + index * recordLen;
+        System.arraycopy(data,pos,record,0,recordLen);
 
         page.setDirty();
         return true;
@@ -119,7 +138,7 @@ public class DataPageUser {
     public static boolean isFull(Page page) {
         int size = getRecordSize(page);
         int cap = getCapacity(page);
-        return size < cap;
+        return size >= cap;
     }
 
     //------------------------获取页信息------------------------
@@ -173,13 +192,11 @@ public class DataPageUser {
     }
     public static void incRecordSize(Page page) {
         int size = getRecordSize(page);
-        size++;
-        setRecordSize(page,size);
+        setRecordSize(page,++size);
     }
     public static void decRecordSize(Page page) {
         int size = getRecordSize(page);
-        size--;
-        setRecordSize(page,size);
+        setRecordSize(page,--size);
     }
     public static void setCapacity(Page page, int cap) {
         ByteBuffer buffer = page.getBuffer();
