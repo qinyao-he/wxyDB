@@ -1,12 +1,10 @@
-package me.hqythu.record;
+package me.hqythu.manager;
 
+import me.hqythu.object.Table;
 import me.hqythu.exception.SQLExecException;
 import me.hqythu.exception.SQLRecordException;
 import me.hqythu.exception.SQLTableException;
-import me.hqythu.system.SystemManager;
-import me.hqythu.system.Table;
 import me.hqythu.util.Where;
-import me.hqythu.util.SelectOption;
 
 
 //recordLength 记录的长度
@@ -31,9 +29,12 @@ public class RecordManager {
     }
 
     public void insert(String tableName, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
-        Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException(String.format("have not table %s",tableName));
-        table.insert(values);
+        if (values == null) throw new SQLTableException("insert none value");
+        int[] cols = new int[values.length];
+        for (int i = 0; i < cols.length; i++) {
+            cols[i] = i;
+        }
+        insert(tableName,cols,values);
     }
 
     public void insert(String tableName, String[] fields, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {

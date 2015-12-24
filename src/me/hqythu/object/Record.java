@@ -1,8 +1,7 @@
-package me.hqythu.record;
+package me.hqythu.object;
 
 import me.hqythu.exception.SQLRecordException;
 import me.hqythu.util.BitSetMask;
-import me.hqythu.util.Column;
 
 import java.nio.ByteBuffer;
 

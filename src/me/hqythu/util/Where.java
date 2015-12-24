@@ -1,5 +1,7 @@
 package me.hqythu.util;
 
+import me.hqythu.object.Column;
+
 /**
  * where条件
  */

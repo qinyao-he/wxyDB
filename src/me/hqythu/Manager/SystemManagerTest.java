@@ -1,16 +1,11 @@
-package me.hqythu.system;
+package me.hqythu.manager;
 
-import me.hqythu.util.Column;
-import me.hqythu.util.DataType;
+import me.hqythu.object.Column;
+import me.hqythu.object.DataType;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Objects;
-
-import static org.junit.Assert.*;
 
 /**
  * 系统模块单元测试

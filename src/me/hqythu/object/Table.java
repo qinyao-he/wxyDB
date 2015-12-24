@@ -1,10 +1,9 @@
-package me.hqythu.system;
+package me.hqythu.object;
 
-import me.hqythu.PageFile.*;
+import me.hqythu.manager.SystemManager;
+import me.hqythu.pagefile.*;
 import me.hqythu.exception.SQLRecordException;
 import me.hqythu.exception.SQLTableException;
-import me.hqythu.record.Record;
-import me.hqythu.util.Column;
 import me.hqythu.util.Where;
 
 /**
@@ -33,17 +32,6 @@ public class Table {
     //------------------------预处理------------------------
     // 插入预处理
     // 将参数转为byte[]
-    public void insert(Object[] values) throws SQLRecordException, SQLTableException {
-        if (values == null) throw new SQLTableException("insert none value");
-        if (values.length != columns.length) throw new SQLTableException("insert not enough columns");
-
-        int[] cols = new int[values.length];
-        for (int i = 0; i < cols.length; i++) {
-            cols[i] = i;
-        }
-
-        insert(cols, values);
-    }
 
     public void insert(String[] fields, Object[] values) throws SQLTableException, SQLRecordException {
         if (fields == null) throw new SQLTableException("insert none fields");

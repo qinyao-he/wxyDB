@@ -69,6 +69,7 @@
     Query测试
         查询
     SQL语句的执行
+    index
 
 
 ----------------------基本框架----------------------
@@ -77,7 +78,11 @@ WXYDB启动数据库软件
 输入数据库命令，解析得到ParseResult
 ParseResult执行excute，返回一个String说明结果
     对不同的指令执行不同的任务
-    
+    调用SystemManager执行DMLType
+        CREATE, DROP, USE, SHOW, DESC
+    调用RecordManager执行DDLType
+        INSERT, DELETE, UPDATE, SELECT
+        涉及Table，queryEngine来完成相关操作
 可能根据执行结果String执行一些简单操作，例如退出
 
 

@@ -1,6 +1,4 @@
-package me.hqythu.PageFile;
-
-import me.hqythu.PageFile.Page;
+package me.hqythu.pagefile;
 
 import java.util.Hashtable;
 

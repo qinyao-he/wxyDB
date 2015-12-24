@@ -1,7 +1,7 @@
-package me.hqythu.PageFile;
+package me.hqythu.pagefile;
 
 import me.hqythu.util.Global;
-import me.hqythu.system.Table;
+import me.hqythu.object.Table;
 import me.hqythu.util.BitSetMask;
 
 import java.nio.ByteBuffer;

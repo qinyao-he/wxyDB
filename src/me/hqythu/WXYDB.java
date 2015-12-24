@@ -1,12 +1,9 @@
 package me.hqythu;
 
-import me.hqythu.exception.SQLExecException;
-import me.hqythu.exception.SQLParserException;
-import me.hqythu.PageFile.BufPageManager;
+import me.hqythu.pagefile.BufPageManager;
 import me.hqythu.sql.ParseResult;
-import me.hqythu.sql.SQL;
 import me.hqythu.sql.SQLParser;
-import me.hqythu.system.SystemManager;
+import me.hqythu.manager.SystemManager;
 
 import java.util.Scanner;
 

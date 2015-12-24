@@ -1,4 +1,4 @@
-package me.hqythu.util;
+package me.hqythu.object;
 
 /**
  * 列

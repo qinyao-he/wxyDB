@@ -1,4 +1,4 @@
-package me.hqythu.PageFile;
+package me.hqythu.pagefile;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
