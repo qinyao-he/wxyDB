@@ -11,13 +11,13 @@ import me.hqythu.util.Where;
  */
 public class Table {
 
-    String name;
-    int pageId;
-    short len;
-    int nRecord;
-    Column[] columns;
+    String name;        // 表名
+    int pageId;         // 表页的id
+    int len;          // 记录的长度
+    int nRecord;        // 记录的个数
+    Column[] columns;   // 列属性
 
-    public Table(String name, int index, short len, int nRecord, Column[] columns) {
+    public Table(String name, int index, int len, int nRecord, Column[] columns) {
         this.name = name;
         this.pageId = index;
         this.len = len;
@@ -91,7 +91,7 @@ public class Table {
             int dataPageId = TablePageUser.getFirstDataPage(tablePage);
             if (dataPageId == -1) {
                 dataPage = DbPageUser.getNewPage(dbPage);
-                DataPageUser.initPage(dataPage, (short) record.length);
+                DataPageUser.initPage(dataPage, record.length);
             } else {
                 dataPage = BufPageManager.getInstance().getPage(fileId, pageId);
             }
@@ -100,7 +100,7 @@ public class Table {
             // 插入数据
             if (DataPageUser.isFull(dataPage)) {
                 dataPage2 = DbPageUser.getNewPage(dbPage);
-                DataPageUser.initPage(dataPage, (short) record.length);
+                DataPageUser.initPage(dataPage, record.length);
                 DataPageUser.connectPage(dataPage, dataPage2);
                 DataPageUser.writeRecord(dataPage2, record);
             } else {

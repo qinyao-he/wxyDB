@@ -79,9 +79,6 @@ public class SystemManager {
         return openDatabase(DBname);
     }
 
-    /**
-     * 关闭DB
-     */
     protected void closeDatabase() {
         if (connectDB != null) {
             connectDB = null;

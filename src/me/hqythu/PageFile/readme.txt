@@ -59,8 +59,8 @@ DbPageUser, TablePageUser, DataPageUser
 
 ---------------------行结构---------------------
 行结构
-    状态位 1 1
+    状态位 2
     定长部分的长度 2
     列数 2
     定长数据 n
-    NULL位图 ceil(n/8)
+    NULL位图 ceil(列数/8)

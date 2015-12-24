@@ -51,7 +51,7 @@ public class Page {
     public void writeBack() {
         if (dirty) {
             try {
-                System.out.println(String.format("write file:%d page:%d",fileId,pageId));
+//                System.out.println(String.format("write file:%d page:%d",fileId,pageId));
                 FilePageManager.getInstance().writePage(fileId, pageId, data);
             } catch (Exception e) {
                 e.printStackTrace();

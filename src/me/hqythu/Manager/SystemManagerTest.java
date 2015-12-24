@@ -73,10 +73,10 @@ public class SystemManagerTest {
 
         // 创建表
         Column cols2[] = new Column[3];
-        cols[0] = new Column("id",DataType.INT,(short)4);
-        cols[1] = new Column("name",DataType.VARCHAR,(short)100);
-        cols[1] = new Column("sex",DataType.VARCHAR,(short)1);
-        Assert.assertTrue(SystemManager.getInstance().createTable("Customer",cols));
+        cols2[0] = new Column("id",DataType.INT,(short)4);
+        cols2[1] = new Column("name",DataType.VARCHAR,(short)100);
+        cols2[2] = new Column("sex",DataType.VARCHAR,(short)1);
+        Assert.assertTrue(SystemManager.getInstance().createTable("Customer",cols2));
 
         // 对比数据库表
         // 由于用树存放,所以返回的表名为字典序

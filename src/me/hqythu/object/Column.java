@@ -59,4 +59,5 @@ public class Column {
     public short len;
     // 该列属性,如是否为null
     public int prop;
+
 }

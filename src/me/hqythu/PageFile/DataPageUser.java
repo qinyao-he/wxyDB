@@ -5,25 +5,28 @@ import me.hqythu.util.Global;
 import java.nio.ByteBuffer;
 
 public class DataPageUser {
+
+    public static final int DATA_PROP_HASPRIMARY = 0x8000;
+
     private DataPageUser(){}
 
-    public static void initPage(Page page, short recordLen) {
-        setIndex(page,page.getPageId()); // 该页索引号
-        setPreIndex(page,-1); // 上一页索引
-        setNextIndex(page,-1); // 下一页索引
-        setProp(page,(short)0); // 属性
-        setRecordLen(page,recordLen); // 记录的长度
-        setCapacity(page,(Global.DTPAGE_DATA_LEN/recordLen));
+    public static void initPage(Page page, int recordLen) {
+        setIndex(page,page.getPageId());    // 该页索引号
+        setPreIndex(page,-1);               // 上一页索引
+        setNextIndex(page,-1);              // 下一页索引
+        setProp(page,0);                    // 属性
+        setRecordLen(page,recordLen);       // 记录的长度
+        setCapacity(page,(Global.DTPAGE_DATA_LEN/recordLen)); // 容量
         page.setDirty();
     }
-    
+
     /**
      * 获取该数据页上的一个记录
      * @param index 在该页中的位置,从[0,size)
      */
     public static byte[] readRecord(Page page, int index) {
         ByteBuffer buffer = page.getBuffer();
-        short recordLen = buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
+        int recordLen = getRecordLen(page);
         int size = getRecordSize(page);
 
         if (index >= size) return null;
@@ -41,7 +44,7 @@ public class DataPageUser {
     public static boolean writeRecord(Page page, byte[] record) {
         ByteBuffer buffer = page.getBuffer();
         int size = getRecordSize(page);
-        short recordLen = getRecordLen(page);
+        int recordLen = getRecordLen(page);
 
         if (isFull(page)) return false;
         if (record.length != recordLen) return false;
@@ -61,7 +64,7 @@ public class DataPageUser {
     public static void removeRecord(Page page, int index) {
         byte[] data = page.getData();
         int size = getRecordSize(page);
-        short recordLen = getRecordLen(page);
+        int recordLen = getRecordLen(page);
 
         if (index >= size) return;
         if (index != (size - 1)) {
@@ -139,21 +142,21 @@ public class DataPageUser {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.DTPAGE_NEXTIDX_POS);
     }
-    public static void setProp(Page page, short prop) { // 该页索引号
+    public static void setProp(Page page, int prop) { // 该页索引号
         ByteBuffer buffer = page.getBuffer();
-        buffer.putShort(Global.DTPAGE_PROP_POS, prop);
+        buffer.putInt(Global.DTPAGE_PROP_POS, prop);
     }
-    public static short getProp(Page page) { // 该页索引号
+    public static int getProp(Page page) { // 该页索引号
         ByteBuffer buffer = page.getBuffer();
-        return buffer.getShort(Global.DTPAGE_PROP_POS);
+        return buffer.getInt(Global.DTPAGE_PROP_POS);
     }
-    public static void setRecordLen(Page page, short len) { // 该页索引号
+    public static void setRecordLen(Page page, int len) { // 该页索引号
         ByteBuffer buffer = page.getBuffer();
-        buffer.putShort(Global.DTPAGE_RECORDLEN_POS,len);
+        buffer.putInt(Global.DTPAGE_RECORDLEN_POS,len);
     }
-    public static short getRecordLen(Page page) { // 该页索引号
+    public static int getRecordLen(Page page) { // 该页索引号
         ByteBuffer buffer = page.getBuffer();
-        return buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
+        return buffer.getInt(Global.DTPAGE_RECORDLEN_POS);
     }
     public static void setRecordSize(Page page, int size) {
         ByteBuffer buffer = page.getBuffer();
@@ -181,6 +184,4 @@ public class DataPageUser {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.DTPAGE_CAP_POS);
     }
-
-
 }

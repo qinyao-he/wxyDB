@@ -25,10 +25,9 @@ public class TablePageUser {
         setName(page,tableName);                // 表名 108
         setFirstDataPage(page,-1);              // 首数据页索引 4
         setTableIndex(page,page.getPageId());   // 表索引 4
-        setColumnSize(page,(short) columns.length); // 列数 2
-        setRecordLen(page,Record.getRecordLen(columns)); // 记录长度 2
+        setRecordLen(page,Record.getRecordLen(columns)); // 记录长度 4
         setRecordSize(page,0); // 记录个数
-
+        setColumnSize(page,(short) columns.length); // 列数 2
         for (int i = 0; i < columns.length; i++) {
             setColumn(page,i,columns[i]);
             if (columns[i].isPrimary()) {
@@ -46,7 +45,8 @@ public class TablePageUser {
         // 表信息
         String tableName = getName(page); // 表名
         int index = getTableIndex(page); // 表页索引
-        short recordLen = getRecordLen(page); // 每条记录长度
+        int recordLen = getRecordLen(page); // 每条记录长度
+//        System.out.println(recordLen);
         int nRecord = getRecordSize(page); // 记录总数
         int n = getColumnSize(page); // 列数
 
@@ -168,13 +168,13 @@ public class TablePageUser {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getShort(Global.TBPAGE_COLUMN_POS);
     }
-    public static void setRecordLen(Page page, short len) {
+    public static void setRecordLen(Page page, int len) {
         ByteBuffer buffer = page.getBuffer();
-        buffer.putShort(Global.TBPAGE_RECORDLEN_POS, len);
+        buffer.putInt(Global.TBPAGE_RECORDLEN_POS, len);
     }
-    public static short getRecordLen(Page page) {
+    public static int getRecordLen(Page page) {
         ByteBuffer buffer = page.getBuffer();
-        return buffer.getShort(Global.TBPAGE_RECORDLEN_POS);
+        return buffer.getInt(Global.TBPAGE_RECORDLEN_POS);
     }
     public static void setAllowNull(Page page) {
         ByteBuffer buffer = page.getBuffer();
@@ -216,6 +216,7 @@ public class TablePageUser {
     public static void setColumn(Page page, int index, Column col) {
         ByteBuffer buffer = page.getBuffer();
         int pos = Global.COL_INFO_POS + index * Global.PER_COL_INFO_LEN;
+
         buffer.position(pos);
         buffer.put(col.name.getBytes());                              // 列名称 120, 未检查
         buffer.putInt(pos + Global.COL_PROP_POS, col.prop);           // 数据属性 4
