@@ -30,10 +30,9 @@ public class Table {
         return name;
     }
 
-    /**
-     * 插入一条记录
-     * 将参数转为byte[], 再插入
-     */
+    //------------------------预处理------------------------
+    // 插入预处理
+    // 将参数转为byte[]
     public void insert(Object[] values) throws SQLRecordException, SQLTableException {
         if (values == null) throw new SQLTableException("insert none value");
         if (values.length != columns.length) throw new SQLTableException("insert not enough columns");
@@ -64,6 +63,24 @@ public class Table {
         insert(record);
     }
 
+    //------------------------辅助函数------------------------
+    // 记录的域名转为列位置
+    protected int[] fieldsToCols(String[] fields) throws SQLTableException {
+        int cols[] = new int[fields.length];
+        for (int i = 0; i < cols.length; i++) {
+            cols[i] = -1;
+            for (int j = 0; j < columns.length; j++) {
+                if (fields.equals(columns[j].name)) {
+                    cols[i] = j;
+                    break;
+                }
+            }
+            if (cols[i] == -1) throw new SQLTableException("not have column: " + fields[i]);
+        }
+        return cols;
+    }
+
+    //------------------------实际主函数------------------------
     /**
      * 删除所有记录
      */
@@ -97,7 +114,8 @@ public class Table {
                 int size = DataPageUser.getRecordSize(page);
                 int index = 0;
                 while (index < size) {
-                    byte[] data = TablePageUser.getRecord(tablePage, index);
+                    byte[] data = DataPageUser.readRecord(page, index);
+//                    byte[] data = TablePageUser.getRecord(tablePage, index);
                     if (where.match(data)) {
                         DataPageUser.removeRecord(tablePage, index);
                         size--;
@@ -176,21 +194,6 @@ public class Table {
             e.printStackTrace();
             throw new SQLTableException("insert failed");
         }
-    }
-
-    protected int[] fieldsToCols(String[] fields) throws SQLTableException {
-        int cols[] = new int[fields.length];
-        for (int i = 0; i < cols.length; i++) {
-            cols[i] = -1;
-            for (int j = 0; j < columns.length; j++) {
-                if (fields.equals(columns[j].name)) {
-                    cols[i] = j;
-                    break;
-                }
-            }
-            if (cols[i] == -1) throw new SQLTableException("not have column: " + fields[i]);
-        }
-        return cols;
     }
 
 }

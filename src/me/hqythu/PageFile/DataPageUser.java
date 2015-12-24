@@ -19,6 +19,10 @@ public class DataPageUser {
         page.setDirty();
     }
 
+    /**
+     * 获取该数据页上的一个记录
+     * @param index 在该页中的位置,从[0,size)
+     */
     public static byte[] readRecord(Page page, int index) {
         ByteBuffer buffer = page.getBuffer();
         short recordLen = buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
@@ -29,11 +33,18 @@ public class DataPageUser {
         return record;
     }
 
+    /**
+     * 往数据页上写一个记录
+     * @param record 记录
+     */
     public static boolean writeRecord(Page page, byte[] record) {
         ByteBuffer buffer = page.getBuffer();
         int size = buffer.getInt(Global.DTPAGE_SIZE_POS);
         short recordLen = buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
         int pos = Global.DTPAGE_DATA_POS + size * recordLen;
+        if (pos + record.length > Global.PAGE_BYTE_SIZE) {
+            return false;
+        }
         buffer.position(pos);
         buffer.put(record);
         size++;
@@ -124,16 +135,5 @@ public class DataPageUser {
         return buffer.getInt(Global.DTPAGE_SIZE_POS);
     }
 
-    /**
-     * 获取该数据页上的一个记录
-     * @param index 在该页中的位置
-     */
-    public static byte[] getRecord(Page page, int index) {
-        ByteBuffer buffer = page.getBuffer();
-        short recordLen = buffer.getShort(Global.DTPAGE_RECORDLEN_POS);
-        int pos = Global.DTPAGE_DATA_POS + index * recordLen;
-        byte[] record = new byte[recordLen];
-        buffer.get(record);
-        return record;
-    }
+
 }

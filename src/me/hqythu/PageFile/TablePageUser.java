@@ -116,7 +116,7 @@ public class TablePageUser {
             if (dataPageId == -1) {
                 return null;
             } else {
-                return DataPageUser.getRecord(dataPage, recordId);
+                return DataPageUser.readRecord(dataPage, recordId);
             }
         } catch (Exception e) {
             e.printStackTrace();
