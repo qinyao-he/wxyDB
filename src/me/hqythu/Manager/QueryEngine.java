@@ -7,6 +7,9 @@ import me.hqythu.pagefile.Page;
 import me.hqythu.util.SelectOption;
 import me.hqythu.util.Where;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * QueryEngine
  * 查询器
@@ -23,18 +26,13 @@ public class QueryEngine {
         return engine;
     }
 
-    public QuerySet query(Where where) throws SQLExecException {
+    public List<Object[]> query(Where where) throws SQLExecException {
+        Map<String,Table> tables = SystemManager.getInstance().getTables();
 
-//        Page dbPage = SystemManager.getInstance().getDbPage();
-//        int recordLen = 0;
-//        String tableNames[] = option.tableNames;
-//        for (int i = 0; i < tableNames.length; i++) {
-//            Table table = SystemManager.getInstance().getTable(tableNames[i]);
-//            for (int j = 0; j < 1; j++) {
-//                recordLen += 1;
-//            }
-//        }
+        return null;
+    }
 
+    public String queryResultToString(List<Object[]> results) {
         return null;
     }
 

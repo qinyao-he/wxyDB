@@ -17,8 +17,8 @@ public class Record {
     public static byte[] valueToBytes(Table table, int recordLen, int[] cols, Object[] values) throws SQLRecordException {
 
         ByteBuffer buffer = ByteBuffer.allocate(recordLen);
-        Column[] columns = table.columns;
-        int[] offsets = table.offsets;
+        Column[] columns = table.getColumns();
+        int[] offsets = table.getOffsets();
         int nullPos = offsets[columns.length];
 
         // 状态位AB
@@ -73,8 +73,8 @@ public class Record {
     }
 
     public static Object[] bytesToValues(Table table, byte[] record) {
-        Column[] columns = table.columns;
-        int[] offsets = table.offsets;
+        Column[] columns = table.getColumns();
+        int[] offsets = table.getOffsets();
         int nullPos = offsets[columns.length];
         ByteBuffer buffer = ByteBuffer.wrap(record);
         Object[] values = new Object[columns.length];
@@ -108,7 +108,7 @@ public class Record {
      * 检查某个列是否为null
      */
     public static boolean checkNull(Table table, byte[] record, int index) {
-        int offset = table.offsets[table.columns.length];
+        int offset = table.getOffsets()[table.getColumns().length];
         return BitSetMask.checkBit(record,offset,index);
     }
 }

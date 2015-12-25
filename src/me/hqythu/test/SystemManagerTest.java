@@ -69,10 +69,6 @@ public class SystemManagerTest {
         cols[1] = new Column("age",DataType.INT,(short)4);
         Assert.assertTrue(SystemManager.getInstance().createTable("Student",cols));
 
-        // 对比数据库表
-        Object[] tableNames = SystemManager.getInstance().getTableNames();
-        Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
-
         // 创建表
         Column cols2[] = new Column[3];
         cols2[0] = new Column("id",DataType.INT,(short)4);
@@ -80,18 +76,10 @@ public class SystemManagerTest {
         cols2[2] = new Column("sex",DataType.VARCHAR,(short)1);
         Assert.assertTrue(SystemManager.getInstance().createTable("Customer",cols2));
 
-        // 对比数据库表
-        // 由于用树存放,所以返回的表名为字典序
-        tableNames = SystemManager.getInstance().getTableNames();
-        Assert.assertArrayEquals(tableNames,new Object[]{"Customer", "Student"});
-
         // 无法删除不存在的表
         Assert.assertFalse(SystemManager.getInstance().dropTable("Hello"));
         // 正常删除表
         Assert.assertTrue(SystemManager.getInstance().dropTable("Customer"));
-        // 对比数据库表
-        tableNames = SystemManager.getInstance().getTableNames();
-        Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
         // 无法删除不存在的表
         Assert.assertFalse(SystemManager.getInstance().dropTable("Customer"));
 
@@ -100,9 +88,6 @@ public class SystemManagerTest {
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_NEWDB));
         Assert.assertTrue(SystemManager.getInstance().dropDatabase(TEST_NEWDB));
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_DB));
-        tableNames = SystemManager.getInstance().getTableNames();
-        Assert.assertEquals(1,tableNames.length);
-        Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
     }
 
     @Test

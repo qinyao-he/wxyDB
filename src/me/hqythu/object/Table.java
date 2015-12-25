@@ -16,11 +16,11 @@ import java.util.stream.Collectors;
  */
 public class Table {
 
-    String name;        // 表名
-    int pageId;         // 表页的id
-    int len;          // 记录的长度
-    Column[] columns;   // 列属性
-    int[] offsets;      // 列偏移
+    private String name;        // 表名
+    private int pageId;         // 表页的id
+    private int len;          // 记录的长度
+    private Column[] columns;   // 列属性
+    private int[] offsets;      // 列偏移
 
     public Table(String name, int index, int len, Column[] columns) {
         this.name = name;
@@ -33,7 +33,6 @@ public class Table {
             offsets[i+1] = offsets[i] + columns[i].len;
         }
     }
-
     public String getName() {
         return name;
     }
@@ -43,7 +42,7 @@ public class Table {
     public Column[] getColumns() {
         return columns;
     }
-
+    public int[] getOffsets() {return offsets;}
     //------------------------预处理------------------------
     // 插入预处理
     // 将参数转为byte[]
@@ -64,25 +63,6 @@ public class Table {
 
         byte[] record = Record.valueToBytes(this, len, cols, values);
         insert(record);
-    }
-
-    //------------------------辅助函数------------------------
-    // 记录的域名转为列位置
-    protected int[] fieldsToCols(String[] fields) throws SQLTableException {
-        int cols[] = new int[fields.length];
-        for (int i = 0; i < cols.length; i++) {
-            cols[i] = -1;
-            for (int j = 0; j < columns.length; j++) {
-                if (fields[i].equals(columns[j].name)) {
-                    cols[i] = j;
-                    break;
-                }
-            }
-            if (cols[i] == -1) {
-                throw new SQLTableException("not have column: " + fields[i]);
-            }
-        }
-        return cols;
     }
 
     //------------------------实际主函数------------------------
@@ -226,6 +206,11 @@ public class Table {
         }
     }
 
+    /**
+     * 获取所有记录
+     * @return
+     * @throws SQLTableException
+     */
     public List<Object[]> getAllRecords() throws SQLTableException  {
         int fileId = SystemManager.getInstance().getFileId();
         if (fileId == -1) throw new SQLTableException("can not get DB fileId");
@@ -243,28 +228,6 @@ public class Table {
         return records;
     }
 
-
-    public boolean checkPrimaryOk(byte[] data) throws SQLTableException {
-        int fileId = SystemManager.getInstance().getFileId();
-        if (fileId == -1) throw new SQLTableException("can not get DB fileId");
-        Object[] toCheck = Record.bytesToValues(this,data);
-        try {
-            Page page = BufPageManager.getInstance().getPage(fileId,pageId);
-            int keyPos = TablePageUser.getPrimaryCol(page);
-            if (keyPos > -1) {
-                List<Object[]> records = getAllRecords();
-                for (Object[] record : records) {
-                    if (record[keyPos].equals(toCheck[keyPos])) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        } catch (Exception e) {
-            throw new SQLTableException("check failed: "+ e.getMessage());
-        }
-    }
-
     /**
      * 删除所有记录
      */
@@ -279,4 +242,45 @@ public class Table {
             throw new SQLTableException("remove all fialed");
         }
     }
+
+    //-------------------辅助函数-------------------
+    //检查是否与primary key冲突
+    protected boolean checkPrimaryOk(byte[] data) throws SQLTableException {
+        int fileId = SystemManager.getInstance().getFileId();
+        if (fileId == -1) throw new SQLTableException("can not get DB fileId");
+        try {
+            Page page = BufPageManager.getInstance().getPage(fileId,pageId);
+            int keyPos = TablePageUser.getPrimaryCol(page);
+            if (keyPos > -1) {
+                Object[] toCheck = Record.bytesToValues(this,data);
+                List<Object[]> records = getAllRecords();
+                for (Object[] record : records) {
+                    if (record[keyPos].equals(toCheck[keyPos])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            throw new SQLTableException("check failed: "+ e.getMessage());
+        }
+    }
+    // 记录的域名转为列位置
+    protected int[] fieldsToCols(String[] fields) throws SQLTableException {
+        int cols[] = new int[fields.length];
+        for (int i = 0; i < cols.length; i++) {
+            cols[i] = -1;
+            for (int j = 0; j < columns.length; j++) {
+                if (fields[i].equals(columns[j].name)) {
+                    cols[i] = j;
+                    break;
+                }
+            }
+            if (cols[i] == -1) {
+                throw new SQLTableException("not have column: " + fields[i]);
+            }
+        }
+        return cols;
+    }
+
 }

@@ -84,9 +84,9 @@ public class ParseResult
             case DROP_TABLE:
                 break;
             case DESC:
-
                 break;
             case ERROR:
+                result = "parse sql error";
                 break;
         }
         return result;

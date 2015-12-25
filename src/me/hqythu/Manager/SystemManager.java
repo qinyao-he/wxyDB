@@ -14,12 +14,9 @@ public class SystemManager {
 
     // connectDB是否为null，决定其他是否为null
     String connectDB = null;
-
     Map<String, Table> tables = null;
     int fileId = -1;
-
     private static SystemManager manager = null;
-
     private SystemManager() {
     }
 
@@ -30,7 +27,7 @@ public class SystemManager {
         return manager;
     }
 
-
+    //--------------------DML support--------------------
     /**
      * 创建DB
      */
@@ -80,32 +77,6 @@ public class SystemManager {
         return openDatabase(DBname);
     }
 
-    protected void closeDatabase() {
-        if (connectDB != null) {
-            connectDB = null;
-            tables.clear();
-            BufPageManager.getInstance().clear();
-            FilePageManager.getInstance().closeFile(fileId);
-            fileId = -1;
-        }
-    }
-
-    protected boolean openDatabase(String DBname) {
-        fileId = FilePageManager.getInstance().openFile(DBname);
-        if (fileId == -1) return false;
-        connectDB = DBname;
-
-        try {
-            // 切换DB的初始化
-            Page dbPage = BufPageManager.getInstance().getPage(fileId, 0);
-            tables = new HashMap<>();
-            DbPageUser.initTableFromPage(dbPage, tables);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     /**
      * 创建表
@@ -177,21 +148,17 @@ public class SystemManager {
     }
 
     /**
-     * 获取所有表名
-     */
-    public Object[] getTableNames() {
-        if (connectDB == null) return null;
-        return tables.keySet().toArray();
-    }
-
-    /**
      * SHOW TABLES 命令
      */
     public String showTables() {
-        Object[] tableNames = getTableNames();
+        if (tables == null) return "";
+        Object[] tableNames = tables.keySet().toArray();
         return Arrays.toString(tableNames);
     }
 
+    /**
+     * DESC 命令
+     */
     public String showTableColumns(String tableName) {
         Table table = getTable(tableName);
         Column[] columns = table.getColumns();
@@ -207,14 +174,42 @@ public class SystemManager {
         return builder.toString();
     }
 
-    /**
-     * 获取表
-     */
+    //--------------------内部辅助函数--------------------
+    protected void closeDatabase() {
+        if (connectDB != null) {
+            connectDB = null;
+            tables.clear();
+            BufPageManager.getInstance().clear();
+            FilePageManager.getInstance().closeFile(fileId);
+            fileId = -1;
+        }
+    }
+
+    protected boolean openDatabase(String DBname) {
+        fileId = FilePageManager.getInstance().openFile(DBname);
+        if (fileId == -1) return false;
+        connectDB = DBname;
+
+        try {
+            // 切换DB的初始化
+            Page dbPage = BufPageManager.getInstance().getPage(fileId, 0);
+            tables = new HashMap<>();
+            DbPageUser.initTableFromPage(dbPage, tables);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //--------------------为其他模块提供系统管理--------------------
     public Table getTable(String tableName) {
         if (connectDB == null) return null;
         return tables.get(tableName);
     }
-
+    public Map<String, Table> getTables() {
+        return tables;
+    }
     public Page getDbPage() {
         try {
             return BufPageManager.getInstance().getPage(fileId,0);

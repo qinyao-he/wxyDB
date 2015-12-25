@@ -128,8 +128,11 @@
 技术细节
     DML
         Create DataBase, Drop DataBase, Use DataBase
-            相当于文件的创建,删除,打开
-        ShowTable
+            文件的创建,删除,打开
+        ShowTables ShowTableColumns
+            将SystemManager的tables字符串化
+            将某个Table的columns字符串化
+        CreateTable, DrowTable
     DDL
         Insert
             从第一个数据页开始找,找到空位置就插入

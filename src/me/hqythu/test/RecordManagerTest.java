@@ -151,7 +151,7 @@ public class RecordManagerTest {
      * @throws Exception
      */
     @Test
-    public void testInsert1() throws Exception {
+    public void testInsertMany() throws Exception {
         Table table;
         int pageId;
         int fileId;
@@ -254,9 +254,7 @@ public class RecordManagerTest {
         }
 
         List<Object[]> objects = table.getAllRecords();
-//        for (Object[] object : objects) {
-//            System.out.println(Arrays.toString(object));
-//        }
+        Assert.assertEquals(10,objects.size());
     }
 //
 //    @Test
