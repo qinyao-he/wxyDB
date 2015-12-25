@@ -7,6 +7,10 @@ import me.hqythu.exception.SQLTableException;
 import me.hqythu.util.SetValue;
 import me.hqythu.util.Where;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * 表
  */
@@ -96,6 +100,10 @@ public class Table {
         try {
             tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
 
+            if (!checkPrimaryOk(record)) {
+                throw new SQLTableException("can not insert duplicate primary key");
+            }
+
             // 数据首页
             int dataPageId = TablePageUser.getFirstDataPage(tablePage);
             // 如果数据首页-1,表示无数据页
@@ -125,7 +133,7 @@ public class Table {
             TablePageUser.incRecordSize(tablePage);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SQLTableException("insert failed");
+            throw new SQLTableException("insert failed: "+e.getMessage());
         }
     }
 
@@ -155,7 +163,7 @@ public class Table {
 
                 // 每条记录
                 int size = DataPageUser.getRecordSize(page);
-                for (int index = 0; index > size; ) {
+                for (int index = 0; index < size; ) {
                     byte[] data = DataPageUser.readRecord(page, index);
 //                    byte[] data = TablePageUser.getRecord(tablePage, index);
                     if (where.match(data, columns)) {
@@ -217,6 +225,45 @@ public class Table {
         } catch (Exception e) {
             e.printStackTrace();
             throw new SQLTableException("update failed");
+        }
+    }
+
+    public List<Object[]> getAllRecords() throws SQLTableException  {
+        int fileId = SystemManager.getInstance().getFileId();
+        if (fileId == -1) throw new SQLTableException("can not get DB fileId");
+        List<byte[]> datas;
+        try {
+            Page page = BufPageManager.getInstance().getPage(fileId,pageId);
+            datas = TablePageUser.getAllRecords(page);
+        } catch (Exception e) {
+            datas = null;
+        }
+        if (datas == null) throw new SQLTableException("can not get DB fileId");
+        List<Object[]> records = new ArrayList<>(datas.size());
+        records.addAll(datas.stream().map(data -> Record.bytesToValues(this, data)).collect(Collectors.toList()));
+
+        return records;
+    }
+
+
+    public boolean checkPrimaryOk(byte[] data) throws SQLTableException {
+        int fileId = SystemManager.getInstance().getFileId();
+        if (fileId == -1) throw new SQLTableException("can not get DB fileId");
+        Object[] toCheck = Record.bytesToValues(this,data);
+        try {
+            Page page = BufPageManager.getInstance().getPage(fileId,pageId);
+            int keyPos = TablePageUser.getPrimaryCol(page);
+            if (keyPos > -1) {
+                List<Object[]> records = getAllRecords();
+                for (Object[] record : records) {
+                    if (record[keyPos].equals(toCheck[keyPos])) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            throw new SQLTableException("check failed: "+ e.getMessage());
         }
     }
 

@@ -1,6 +1,8 @@
-package me.hqythu.manager;
+package me.hqythu.test;
 
 import me.hqythu.exception.SQLRecordException;
+import me.hqythu.manager.RecordManager;
+import me.hqythu.manager.SystemManager;
 import me.hqythu.object.Column;
 import me.hqythu.object.DataType;
 import me.hqythu.object.Record;
@@ -14,6 +16,7 @@ import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -26,7 +29,7 @@ public class RecordManagerTest {
     public static final String TEST_NEWDB = "test_hello.db";
     public static final String TEST_TABLE1 = "Student";
     public static final String TEST_TABLE2 = "Customer";
-    public static final int BIG_NUM = 1000;
+    public static final int BIG_NUM = 10000;
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -95,7 +98,7 @@ public class RecordManagerTest {
         // 检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
         pageId = table.getPageId();
-        fileId = SystemManager.getInstance().fileId;
+        fileId = SystemManager.getInstance().getFileId();
         Assert.assertTrue(pageId != -1);
         Assert.assertTrue(fileId != -1);
         tPage = BufPageManager.getInstance().getPage(fileId,pageId);
@@ -122,7 +125,7 @@ public class RecordManagerTest {
         //切换数据库之后,再检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
         pageId = table.getPageId();
-        fileId = SystemManager.getInstance().fileId;
+        fileId = SystemManager.getInstance().getFileId();
         Assert.assertTrue(pageId != -1);
         Assert.assertTrue(fileId != -1);
         Assert.assertEquals(3,TablePageUser.getRecordSize(tPage));
@@ -134,8 +137,12 @@ public class RecordManagerTest {
         thrown.expect(SQLRecordException.class);
         thrown.expectMessage("not null try to null");
         RecordManager.getInstance().insert(TEST_TABLE1,record);
-//        RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
-//        RecordManager.getInstance().insert(TEST_TABLE1,cols,record);
+        thrown.expect(SQLRecordException.class);
+        thrown.expectMessage("not null try to null");
+        RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
+        thrown.expect(SQLRecordException.class);
+        thrown.expectMessage("not null try to null");
+        RecordManager.getInstance().insert(TEST_TABLE1,cols,record);
 
     }
 
@@ -149,20 +156,13 @@ public class RecordManagerTest {
         int pageId;
         int fileId;
         Object[] record;
-        String fields[];
-        int[] cols;
         Page tPage;
         Page dPage;
-        byte[] data;
-        ByteBuffer buffer;
-        String str;
         int total;
 
         // 初始化插入数据
         record = new Object[2];
-
         record[0] = "LiuXiaoHong";
-
         for (int i = 0; i < BIG_NUM; i++) {
             record[1] = i;
             RecordManager.getInstance().insert(TEST_TABLE1,record);
@@ -171,20 +171,21 @@ public class RecordManagerTest {
         // 检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
         pageId = table.getPageId();
-        fileId = SystemManager.getInstance().fileId;
+        fileId = SystemManager.getInstance().getFileId();
         Assert.assertTrue(pageId != -1);
         Assert.assertTrue(fileId != -1);
         tPage = BufPageManager.getInstance().getPage(fileId,pageId);
         Assert.assertEquals(BIG_NUM,TablePageUser.getRecordSize(tPage));
 
         pageId = TablePageUser.getFirstDataPage(tPage);
+        total = 0;
         for (; pageId != -1; ) {
             dPage = BufPageManager.getInstance().getPage(fileId,pageId);
-            int size = DataPageUser.getRecordSize(dPage);
-            int cap = DataPageUser.getCapacity(dPage);
-            Assert.assertEquals(158,cap);
+            total += DataPageUser.getRecordSize(dPage);
             pageId = DataPageUser.getNextIndex(dPage);
         }
+        // 检查总数
+        Assert.assertEquals(total, BIG_NUM);
 
         // 切换数据库
         Assert.assertTrue(SystemManager.getInstance().createDatabase(TEST_NEWDB));
@@ -192,23 +193,23 @@ public class RecordManagerTest {
         Assert.assertTrue(SystemManager.getInstance().dropDatabase(TEST_NEWDB));
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_DB));
 
-        // 检查记录个数
+        // 检查总数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
         pageId = table.getPageId();
-        fileId = SystemManager.getInstance().fileId;
-        Assert.assertTrue(pageId != -1);
-        Assert.assertTrue(fileId != -1);
+        fileId = SystemManager.getInstance().getFileId();
         tPage = BufPageManager.getInstance().getPage(fileId,pageId);
-        Assert.assertEquals(BIG_NUM,TablePageUser.getRecordSize(tPage));
-
         pageId = TablePageUser.getFirstDataPage(tPage);
+        total = 0;
         for (; pageId != -1; ) {
             dPage = BufPageManager.getInstance().getPage(fileId,pageId);
-            int size = DataPageUser.getRecordSize(dPage);
-            int cap = DataPageUser.getCapacity(dPage);
-            Assert.assertEquals(158,cap);
+            total += DataPageUser.getRecordSize(dPage);
             pageId = DataPageUser.getNextIndex(dPage);
         }
+        Assert.assertEquals(total, BIG_NUM);
+
+        List<Object[]> objects = table.getAllRecords();
+        Assert.assertEquals(BIG_NUM, objects.size());
+
     }
 
     /**
@@ -221,31 +222,16 @@ public class RecordManagerTest {
         int fileId;
         Object[] record;
         Object[] values;
-        String fields[];
-        int[] cols;
         Page tPage;
-        Page dPage;
         byte[] data;
-        ByteBuffer buffer;
-        String str;
-        int total;
 
         // 初始化插入数据
         record = new Object[2];
-
         record[0] = "LiuXiaoHong";
-
         for (int i = 0; i < 10; i++) {
             record[1] = i;
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
-
-        table = SystemManager.getInstance().getTable(TEST_TABLE1);
-        pageId = table.getPageId();
-        fileId = SystemManager.getInstance().fileId;
-        Assert.assertTrue(pageId != -1);
-        Assert.assertTrue(fileId != -1);
-        tPage = BufPageManager.getInstance().getPage(fileId,pageId);
 
         // 切换数据库
         Assert.assertTrue(SystemManager.getInstance().createDatabase(TEST_NEWDB));
@@ -255,7 +241,7 @@ public class RecordManagerTest {
 
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
         pageId = table.getPageId();
-        fileId = SystemManager.getInstance().fileId;
+        fileId = SystemManager.getInstance().getFileId();
         Assert.assertTrue(pageId != -1);
         Assert.assertTrue(fileId != -1);
         tPage = BufPageManager.getInstance().getPage(fileId,pageId);
@@ -263,9 +249,14 @@ public class RecordManagerTest {
         for (int i = 0; i < 10; i++) {
             data = TablePageUser.getRecord(tPage,i);
             values = Record.bytesToValues(table,data);
+            Assert.assertEquals(values[0],record[0]);
             Assert.assertEquals(values[1],i);
-//            System.out.println(Arrays.toString(values));
         }
+
+        List<Object[]> objects = table.getAllRecords();
+//        for (Object[] object : objects) {
+//            System.out.println(Arrays.toString(object));
+//        }
     }
 //
 //    @Test

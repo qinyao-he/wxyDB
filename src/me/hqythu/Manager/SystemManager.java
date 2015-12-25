@@ -6,6 +6,7 @@ import me.hqythu.pagefile.*;
 import me.hqythu.object.Column;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -173,11 +174,34 @@ public class SystemManager {
     }
 
     /**
-     * 显示表
+     * 获取所有表名
      */
-    public Object[] showTable() {
+    public Object[] getTableNames() {
         if (connectDB == null) return null;
         return tables.keySet().toArray();
+    }
+
+    /**
+     * SHOW TABLES 命令
+     */
+    public String showTables() {
+        Object[] tableNames = getTableNames();
+        return Arrays.toString(tableNames);
+    }
+
+    public String showTableColumns(String tableName) {
+        Table table = getTable(tableName);
+        Column[] columns = table.getColumns();
+        StringBuilder builder = new StringBuilder(1024);
+        builder.append('[');
+        for (int i = 0; i < columns.length; i++) {
+            builder.append(columns[i].toString());
+            if (i != columns.length-1) {
+                builder.append(',');
+            }
+        }
+        builder.append(']');
+        return builder.toString();
     }
 
     /**

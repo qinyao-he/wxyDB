@@ -1,5 +1,6 @@
-package me.hqythu.manager;
+package me.hqythu.test;
 
+import me.hqythu.manager.SystemManager;
 import me.hqythu.object.Column;
 import me.hqythu.object.DataType;
 import me.hqythu.object.Table;
@@ -46,18 +47,8 @@ public class TablePageTest {
         int pageId;
         int fileId;
         int size;
-        Object[] record;
-        String fields[];
-        int[] cols;
         Page tpage;
 
-        // 初始化插入数据
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
-        record[1] = 18;
-        fields = new String[]{"name","age"};
-        cols = new int[]{0,1};
-        Column[] tcols;
         Column col;
 
         // 检查列数

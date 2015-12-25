@@ -8,6 +8,8 @@ import me.hqythu.object.Column;
 import me.hqythu.object.DataType;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TablePageUser {
 
@@ -28,10 +30,12 @@ public class TablePageUser {
         setRecordLen(page,Record.getRecordLen(columns)); // 记录长度 4
         setRecordSize(page,0); // 记录个数
         setColumnSize(page,(short) columns.length); // 列数 2
+        setPrimaryCol(page,-1);
         for (int i = 0; i < columns.length; i++) {
             setColumn(page,i,columns[i]);
             if (columns[i].isPrimary()) {
-                setHasPrimary(page);
+                setPrimaryCol(page,i);
+                break;
             }
         }
         page.setDirty();
@@ -111,6 +115,35 @@ public class TablePageUser {
         }
     }
 
+    public static List<byte[]> getAllRecords(Page page) {
+
+        int fileId = SystemManager.getInstance().getFileId();
+        if (fileId == -1) return null;
+
+        try {
+            int totalSize = TablePageUser.getRecordSize(page);
+            List<byte[]> datas = new ArrayList<>(totalSize);
+
+            // 每个数据页
+            int firstPageId = TablePageUser.getFirstDataPage(page);
+            for (int dataPageId = firstPageId; dataPageId != -1;) {
+                Page dPage = BufPageManager.getInstance().getPage(fileId,dataPageId);
+
+                // 每条记录
+                int size = DataPageUser.getRecordSize(dPage);
+                for (int index = 0; index < size; index++) {
+                    byte[] data = DataPageUser.readRecord(dPage, index);
+                    datas.add(data);
+                }
+                dataPageId = DataPageUser.getNextIndex(dPage);
+            }
+            return datas;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /**
      * 删除所有记录
      * @param page
@@ -132,6 +165,7 @@ public class TablePageUser {
             e.printStackTrace();
         }
     }
+
 
     //------------------------获取页信息------------------------
     public static String getName(Page page) {
@@ -209,22 +243,13 @@ public class TablePageUser {
         flag &= ~TABLE_PROP_ALLOW_NULL;
         buffer.putInt(Global.TBPAGE_PROP_POS,flag);
     }
-    public static void setHasPrimary(Page page) {
+    public static void setPrimaryCol(Page page, int col) {
         ByteBuffer buffer = page.getBuffer();
-        int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
-        flag |= TABLE_PROP_HAS_PRIMARY;
-        buffer.putInt(Global.TBPAGE_PROP_POS,flag);
+        buffer.putInt(Global.TBPAGE_PRIMARY_POS,col);
     }
-    public static void clearHasPrimary(Page page) {
+    public static int getPrimaryCol(Page page) {
         ByteBuffer buffer = page.getBuffer();
-        int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
-        flag &= ~TABLE_PROP_HAS_PRIMARY;
-        buffer.putInt(Global.TBPAGE_PROP_POS,flag);
-    }
-    public static boolean isHasPrimary(Page page) {
-        ByteBuffer buffer = page.getBuffer();
-        int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
-        return (flag & TABLE_PROP_HAS_PRIMARY) != 0;
+        return buffer.getInt(Global.TBPAGE_PRIMARY_POS);
     }
     public static Column getColumn(Page page, int index) {
         ByteBuffer buffer = page.getBuffer();

@@ -60,4 +60,30 @@ public class Column {
     // 该列属性,如是否为null
     public int prop;
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder(1024);
+        builder.append(name);
+        builder.append('(');
+        switch (type) {
+            case UNKNOWN:
+                builder.append("unkown");
+                break;
+            case INT:
+                builder.append("int");
+                break;
+            case VARCHAR:
+                builder.append("varchar(");
+                builder.append(len);
+                builder.append(')');
+                break;
+        }
+        builder.append(')');
+        if (notNull()) {
+            builder.append(" not null");
+        }
+        if (isPrimary()) {
+            builder.append(" primary key");
+        }
+        return builder.toString();
+    }
 }

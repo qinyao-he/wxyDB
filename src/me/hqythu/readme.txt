@@ -72,6 +72,7 @@
     NULL的检查
 
 未完成
+    主键的支持的测试
     Query模块
     Table测试
         插入、删除、更新
@@ -88,10 +89,11 @@
     USE orderDB; 当前数据库切换为 orderDB
     SHOW TABLES; 列出当前数据库包含的所有表
     DROP TABLE customer; 删除名为 customer 的表
+    null的检查
+
 
 未能实现的功能
-    主键的支持
-    null的检查
+
 
     CREATE TABLE customer( id int(10) NOT NULL,
     name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id)); 创建名为 customer 的表,它包含三个字段 id、name 和 gender,其中 id 是主键。这三个 字段的数据类型分别为整型、字符串和字符串,并且都不允许为空。

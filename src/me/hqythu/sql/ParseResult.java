@@ -1,6 +1,8 @@
 package me.hqythu.sql;
 
 import me.hqythu.exception.SQLExecException;
+import me.hqythu.manager.RecordManager;
+import me.hqythu.manager.SystemManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,55 @@ public class ParseResult
 	}
     public String execute() throws SQLExecException
     {
-        return "hello world";
+        String result = "hello world";
+        Object[] objects;
+        boolean ok;
+        switch (type) {
+            case INSERT:
+                break;
+            case DELETE:
+                break;
+            case UPDATE:
+                break;
+            case SELECT:
+                break;
+            case CREATE_DATABASE:
+                ok = SystemManager.getInstance().createDatabase(dataBaseName);
+                if (ok) {
+                    result = "create database "+dataBaseName+" success";
+                } else {
+                    result = "create database "+dataBaseName+" failed";
+                }
+                break;
+            case DROP_DATABASE:
+                ok = SystemManager.getInstance().dropDatabase(dataBaseName);
+                if (ok) {
+                    result = "drop database "+dataBaseName+" success";
+                } else {
+                    result = "drop database "+dataBaseName+" failed";
+                }
+                break;
+            case USE:
+                ok = SystemManager.getInstance().useDatabase(dataBaseName);
+                if (ok) {
+                    result = "use database "+dataBaseName+" success";
+                } else {
+                    result = "use database "+dataBaseName+" failed";
+                }
+                break;
+            case SHOW_TABLES:
+                result = SystemManager.getInstance().showTables();
+                break;
+            case CREATE_TABLE:
+                break;
+            case DROP_TABLE:
+                break;
+            case DESC:
+
+                break;
+            case ERROR:
+                break;
+        }
+        return result;
     }
 }

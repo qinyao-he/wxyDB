@@ -1,18 +1,12 @@
-package me.hqythu.manager;
+package me.hqythu.test;
 
+import me.hqythu.manager.SystemManager;
 import me.hqythu.object.Column;
 import me.hqythu.object.DataType;
-import me.hqythu.object.Table;
-import me.hqythu.pagefile.BufPageManager;
-import me.hqythu.pagefile.Page;
-import me.hqythu.pagefile.TablePageUser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * 系统模块单元测试
@@ -76,7 +70,7 @@ public class SystemManagerTest {
         Assert.assertTrue(SystemManager.getInstance().createTable("Student",cols));
 
         // 对比数据库表
-        Object[] tableNames = SystemManager.getInstance().showTable();
+        Object[] tableNames = SystemManager.getInstance().getTableNames();
         Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
 
         // 创建表
@@ -88,7 +82,7 @@ public class SystemManagerTest {
 
         // 对比数据库表
         // 由于用树存放,所以返回的表名为字典序
-        tableNames = SystemManager.getInstance().showTable();
+        tableNames = SystemManager.getInstance().getTableNames();
         Assert.assertArrayEquals(tableNames,new Object[]{"Customer", "Student"});
 
         // 无法删除不存在的表
@@ -96,7 +90,7 @@ public class SystemManagerTest {
         // 正常删除表
         Assert.assertTrue(SystemManager.getInstance().dropTable("Customer"));
         // 对比数据库表
-        tableNames = SystemManager.getInstance().showTable();
+        tableNames = SystemManager.getInstance().getTableNames();
         Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
         // 无法删除不存在的表
         Assert.assertFalse(SystemManager.getInstance().dropTable("Customer"));
@@ -106,7 +100,7 @@ public class SystemManagerTest {
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_NEWDB));
         Assert.assertTrue(SystemManager.getInstance().dropDatabase(TEST_NEWDB));
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_DB));
-        tableNames = SystemManager.getInstance().showTable();
+        tableNames = SystemManager.getInstance().getTableNames();
         Assert.assertEquals(1,tableNames.length);
         Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
     }
