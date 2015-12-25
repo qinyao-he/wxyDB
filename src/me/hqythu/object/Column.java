@@ -23,15 +23,6 @@ public class Column {
 
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-    public void setType(DataType type) {
-        this.type = type;
-    }
-    public void setLen(short len) {
-        this.len = len;
-    }
     public void setNotNull() {
         prop |= FLAG_NOTNULL;
     }

@@ -35,7 +35,6 @@ public class TablePageUser {
             setColumn(page,i,columns[i]);
             if (columns[i].isPrimary()) {
                 setPrimaryCol(page,i);
-                break;
             }
         }
         page.setDirty();

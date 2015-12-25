@@ -112,8 +112,11 @@ public class SystemManager {
      */
     public boolean createTable(String tableName, Column[] columns) {
         if (connectDB == null) return false;
-        if (tables.size() >= Global.TABLE_MAX_SIZE) return false;
-        if (tableName.length() > Global.TABLE_NAME_LEN) {
+        if (tables.size() >= Global.TABLE_MAX_SIZE) return false; // 限制一个库的表数
+        if (tableName.length() > Global.TABLE_NAME_LEN) { // 表名
+            return false;
+        }
+        if (tables.containsKey(tableName)) { // 已经存在
             return false;
         }
         for (Column column : columns) {

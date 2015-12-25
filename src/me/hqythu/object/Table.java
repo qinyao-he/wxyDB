@@ -147,7 +147,6 @@ public class Table {
      *
      * 未完成
      * Where没有实现
-     * 未考虑primary key
      */
     public void remove(Where where) throws SQLTableException {
         Page dbPage = SystemManager.getInstance().getDbPage();
@@ -165,7 +164,6 @@ public class Table {
                 int size = DataPageUser.getRecordSize(page);
                 for (int index = 0; index < size; ) {
                     byte[] data = DataPageUser.readRecord(page, index);
-//                    byte[] data = TablePageUser.getRecord(tablePage, index);
                     if (where.match(data, columns)) {
                         DataPageUser.removeRecord(page, index);
                         size--;

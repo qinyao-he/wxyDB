@@ -37,27 +37,19 @@
     测试了原有的大部分内容
         系统管理模块,插入
     重新构思update,query
+    设计query操作的位置
 
-未完成
-    Table
-        update
-        remove
-    页式文件系统测试
-    Table的测试
-    SelectOption
-    Where
+2015年12月25日
+    实现primary key 检查
+    实现null检查
 
 下次开始
-    完成Table的remove(Where where)
-    完成Table的update(cols,values,where);
-
-问题
-    primary key 的支持
-    null的检查
-    QuerySet SelectOption 这几个类的设计
-    设计query操作的位置
-    Where类的设计
-
+    Table的remove
+        Where
+    Table的update
+        Where SetValue
+    QueryEngine的query
+        Where Tables
 
 ----------------------进度----------------------
 已完成
@@ -72,7 +64,17 @@
     NULL的检查
 
 未完成
+    Where类的设计
+    Table
+        update
+        remove
+    Where
+    测试 INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’);
+        如果主键出现重复，应报错
+    测试 INSERT INTO orders VALUES (315000,200001,’eight’);
+        如果数据类型不符合，应报错
     主键的支持的测试
+    页式文件系统测试
     Query模块
     Table测试
         插入、删除、更新
@@ -89,23 +91,22 @@
     USE orderDB; 当前数据库切换为 orderDB
     SHOW TABLES; 列出当前数据库包含的所有表
     DROP TABLE customer; 删除名为 customer 的表
-    null的检查
+    DESC customer; 列出该表的信息
 
+    null的检查
+    primary key主键的支持
 
 未能实现的功能
 
-
     CREATE TABLE customer( id int(10) NOT NULL,
-    name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id)); 创建名为 customer 的表,它包含三个字段 id、name 和 gender,其中 id 是主键。这三个 字段的数据类型分别为整型、字符串和字符串,并且都不允许为空。
-    DESC customer; 列出该表的信息
-    primary key主键的支持
+    name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id));
+        创建名为 customer 的表,它包含三个字段 id、name 和 gender,其中 id 是主键。
+        这三 字段的数据类型分别为整型、字符串和字符串,并且都不允许为空。
 
-    INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’); 
-    如果主键出现重复，应报错
-    INSERT INTO orders VALUES (315000,200001,’eight’);
-    如果数据类型不符合，应报错
-    DELETE FROM publisher WHERE state=’CA’; 删除所有加州的出版商。
-    UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’; 把作者 Anthony Boucher 的书的书名改为 Nine Times Nine
+    DELETE FROM publisher WHERE state=’CA’;
+        删除所有加州的出版商
+    UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;
+        把作者 Anthony Boucher 的书的书名改为 Nine Times Nine
 
     SELECT * FROM publisher WHERE nation=’CA’; 列出所有加州出版商的信息。
     SELECT title FROM book WHERE authors is null; 列出 authors 字段为空的记录的书名。
@@ -135,7 +136,7 @@
         remove
             需要Where
         update
-            需要Where,set
+            需要Where,setValue
         query
             需要Where
 

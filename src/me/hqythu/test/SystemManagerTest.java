@@ -105,4 +105,29 @@ public class SystemManagerTest {
         Assert.assertArrayEquals(tableNames,new Object[]{"Student"});
     }
 
+    @Test
+    public void testShow() {
+        Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_DB));
+        String columnInfos;
+
+        // 创建表
+        Column cols[] = new Column[2];
+        cols[0] = new Column("name",DataType.VARCHAR,(short)20);
+        cols[1] = new Column("age",DataType.INT,(short)4);
+        Assert.assertTrue(SystemManager.getInstance().createTable(TEST_TABLE1,cols));
+
+        // 创建表
+        Column cols2[] = new Column[3];
+        cols2[0] = new Column("id",DataType.INT,(short)4);
+        cols2[0].setPrimary();
+        cols2[1] = new Column("name",DataType.VARCHAR,(short)100);
+        cols2[2] = new Column("sex",DataType.VARCHAR,(short)1);
+        Assert.assertTrue(SystemManager.getInstance().createTable(TEST_TABLE2,cols2));
+
+        columnInfos = SystemManager.getInstance().showTableColumns(TEST_TABLE1);
+        Assert.assertEquals("[name(varchar(20)),age(int)]",columnInfos);
+        columnInfos = SystemManager.getInstance().showTableColumns(TEST_TABLE2);
+        Assert.assertEquals("[id(int) primary key,name(varchar(100)),sex(varchar(1))]",columnInfos);
+    }
+
 }
