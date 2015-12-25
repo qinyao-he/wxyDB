@@ -5,7 +5,7 @@ package me.hqythu.object;
  */
 public class Column {
 
-    public static final int FLAG_NULL = 0x80000000;
+    public static final int FLAG_NOTNULL = 0x80000000;
     public static final int FLAG_PRIMARY = 0x40000000;
     public Column(String name, DataType type, short len) {
         this.name = name;
@@ -32,14 +32,14 @@ public class Column {
     public void setLen(short len) {
         this.len = len;
     }
-    public void setNull() {
-        prop |= FLAG_NULL;
+    public void setNotNull() {
+        prop |= FLAG_NOTNULL;
     }
-    public void clearNull() {
-        prop &= ~FLAG_NULL;
+    public void clearNotNull() {
+        prop &= ~FLAG_NOTNULL;
     }
-    public boolean isNull() {
-        return (prop & FLAG_NULL) != 0;
+    public boolean notNull() {
+        return (prop & FLAG_NOTNULL) != 0;
     }
     public void setPrimary() {
         prop |= FLAG_PRIMARY;

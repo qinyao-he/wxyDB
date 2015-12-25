@@ -1,5 +1,7 @@
 package me.hqythu;
 
+import me.hqythu.manager.QueryEngine;
+import me.hqythu.manager.RecordManager;
 import me.hqythu.pagefile.BufPageManager;
 import me.hqythu.sql.ParseResult;
 import me.hqythu.sql.SQLParser;
@@ -12,6 +14,8 @@ public class WXYDB {
     public WXYDB() {
         BufPageManager.getInstance(); // 加载类，完成初始化
         SystemManager.getInstance();  // 加载类，完成初始化
+        RecordManager.getInstance();
+        QueryEngine.getInstance();
     }
 
     public void go() {
@@ -47,6 +51,18 @@ public class WXYDB {
                     break;
             }
         }
+    }
+
+    public String excute(String sqlString) {
+        String result;
+        try {
+            ParseResult sql = SQLParser.parse(sqlString);
+            result = sql.execute();
+        } catch (Exception e) {
+            result = e.getMessage();
+            e.printStackTrace();
+        }
+        return result;
     }
 
     public static void main(String[] args) {

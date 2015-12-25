@@ -23,7 +23,7 @@ public class QueryEngine {
         return engine;
     }
 
-    public QuerySet query(SelectOption option, Where where) throws SQLExecException {
+    public QuerySet query(Where where) throws SQLExecException {
 
 //        Page dbPage = SystemManager.getInstance().getDbPage();
 //        int recordLen = 0;

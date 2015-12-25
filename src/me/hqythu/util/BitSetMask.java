@@ -30,4 +30,9 @@ public class BitSetMask {
         }
         return -1;
     }
+    public static boolean checkBit(byte[] data, int offset, int index) {
+        int pos = offset + index/8;
+        byte b = data[pos];
+        return (b & SET_MASK[index % 8]) != 0;
+    }
 }

@@ -14,15 +14,12 @@ public class Record {
     /**
      * 将内容转为byte[]
      */
-    public static byte[] valueToByte(Column[] columns, int recordLen, int[] cols, Object[] values) throws SQLRecordException {
+    public static byte[] valueToBytes(Table table, int recordLen, int[] cols, Object[] values) throws SQLRecordException {
 
         ByteBuffer buffer = ByteBuffer.allocate(recordLen);
-
-        int[] offsets = new int[columns.length+1];
-        offsets[0] = 0;
-        for (int i = 0; i < columns.length; i++) {
-            offsets[i+1] = offsets[i] + columns[i].len;
-        }
+        Column[] columns = table.columns;
+        int[] offsets = table.offsets;
+        int nullPos = offsets[columns.length];
 
         // 状态位AB
         buffer.clear();
@@ -35,10 +32,10 @@ public class Record {
         for (int i = 0; i < cols.length; i++) {
             Column column = columns[cols[i]];
             if (values[i] == null) {
-                if (!column.isNull()) {
+                if (column.notNull()) {
                     throw new SQLRecordException("not null try to null");
                 } else {
-                    BitSetMask.setBit(buffer.array(), recordLen, i);
+                    BitSetMask.setBit(buffer.array(), nullPos, i);
                 }
             } else {
                 switch (column.type) {
@@ -75,4 +72,43 @@ public class Record {
         return len;
     }
 
+    public static Object[] bytesToValues(Table table, byte[] record) {
+        Column[] columns = table.columns;
+        int[] offsets = table.offsets;
+        int nullPos = offsets[columns.length];
+        ByteBuffer buffer = ByteBuffer.wrap(record);
+        Object[] values = new Object[columns.length];
+
+        for (int i = 0; i < columns.length; i++) {
+            // NULL值
+            if ((!columns[i].notNull()) && BitSetMask.checkBit(record,nullPos,i)) {
+                values[i] = null;
+            } else {
+                switch (columns[i].type) {
+                    case UNKNOWN:
+                        values[i] = null;
+                        break;
+                    case INT:
+                        values[i] = buffer.getInt(Global.RECORD_STATIC_DATA_POS+offsets[i]);
+                        break;
+                    case VARCHAR:
+                        String temp = new String(record,Global.RECORD_STATIC_DATA_POS+offsets[i],columns[i].len);
+                        if (temp.indexOf(0) > 0) {
+                            temp = temp.substring(0,temp.indexOf(0));
+                        }
+                        values[i] = temp;
+                        break;
+                }
+            }
+        }
+        return values;
+    }
+
+    /**
+     * 检查某个列是否为null
+     */
+    public static boolean checkNull(Table table, byte[] record, int index) {
+        int offset = table.offsets[table.columns.length];
+        return BitSetMask.checkBit(record,offset,index);
+    }
 }

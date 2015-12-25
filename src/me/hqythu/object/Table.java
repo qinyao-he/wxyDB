@@ -16,12 +16,18 @@ public class Table {
     int pageId;         // 表页的id
     int len;          // 记录的长度
     Column[] columns;   // 列属性
+    int[] offsets;      // 列偏移
 
     public Table(String name, int index, int len, Column[] columns) {
         this.name = name;
         this.pageId = index;
         this.len = len;
         this.columns = columns;
+        offsets = new int[columns.length+1];
+        offsets[0] = 0;
+        for (int i = 0; i < columns.length; i++) {
+            offsets[i+1] = offsets[i] + columns[i].len;
+        }
     }
 
     public String getName() {
@@ -52,7 +58,7 @@ public class Table {
         if (values == null) throw new SQLTableException("insert none values");
         if (cols.length != values.length) throw new SQLTableException("insert none wrong data");
 
-        byte[] record = Record.valueToByte(columns, len, cols, values);
+        byte[] record = Record.valueToBytes(this, len, cols, values);
         insert(record);
     }
 
@@ -130,7 +136,10 @@ public class Table {
      * 用该页的最后一条记录取代被删除的记录
      * 每个数据页空则回收
      * 数据页之间不合并
-     * （未完成，Where没有实现）
+     *
+     * 未完成
+     * Where没有实现
+     * 未考虑primary key
      */
     public void remove(Where where) throws SQLTableException {
         Page dbPage = SystemManager.getInstance().getDbPage();
@@ -174,7 +183,9 @@ public class Table {
     /**
      * 更新记录
      * 先取出记录,将对应列的数据改写,再写回
-     * （未完成）
+     *
+     * 未完成
+     * 未考虑primary key
      */
     public void update(Where where, SetValue setValue) throws SQLTableException {
         int fileId = SystemManager.getInstance().getFileId();
@@ -192,11 +203,14 @@ public class Table {
                 int size = DataPageUser.getRecordSize(page);
                 for (int index = 0; index > size; index++) {
                     byte[] data = DataPageUser.readRecord(page, index);
+
+                    // 满足条件的进行更新
                     if (where.match(data, columns)) {
                         DataPageUser.removeRecord(page, index);
                         setValue.set(data, columns);
                         DataPageUser.writeRecord(page,index,data);
                     }
+
                 }
                 dataPageId = DataPageUser.getNextIndex(page);
             }

@@ -221,6 +221,11 @@ public class TablePageUser {
         flag &= ~TABLE_PROP_HAS_PRIMARY;
         buffer.putInt(Global.TBPAGE_PROP_POS,flag);
     }
+    public static boolean isHasPrimary(Page page) {
+        ByteBuffer buffer = page.getBuffer();
+        int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
+        return (flag & TABLE_PROP_HAS_PRIMARY) != 0;
+    }
     public static Column getColumn(Page page, int index) {
         ByteBuffer buffer = page.getBuffer();
         byte[] data = page.getData();
