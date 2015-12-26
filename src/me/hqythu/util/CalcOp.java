@@ -1,5 +1,5 @@
 package me.hqythu.util;
 
-enum CalcOp {
+public enum CalcOp {
     ADD, SUB, MUL, DIV
 }

@@ -4,10 +4,19 @@ import me.hqythu.manager.RecordManager;
 import me.hqythu.manager.SystemManager;
 import me.hqythu.object.Column;
 import me.hqythu.object.DataType;
+import me.hqythu.object.Table;
+import me.hqythu.util.BoolExpr;
+import me.hqythu.util.CalcOp;
+import me.hqythu.util.SetValue;
+import me.hqythu.util.Where;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -19,7 +28,7 @@ public class SetValueTest {
     public static final String TEST_NEWDB = "test_hello.db";
     public static final String TEST_TABLE1 = "Student";
     public static final String TEST_TABLE2 = "Customer";
-    public static final int NORMAL_NUM = 1000;
+    public static final int NORMAL_NUM = 10;
     public static final int BIG_NUM = 10000;
 
     @Before
@@ -58,6 +67,37 @@ public class SetValueTest {
 
     @Test
     public void testSetValue() throws Exception {
+        Table table;
+        List<Object[]> records;
+
+        // Where 初始化
+        Where where = new Where();
+        where.boolExprs.add(new BoolExpr());
+        List<SetValue> setValues = new ArrayList<>();
+
+        // 更新,set age = age+1
+        setValues.add(new SetValue("age",CalcOp.ADD,1,true));
+        RecordManager.getInstance().update(TEST_TABLE1,where,setValues);
+
+        table = SystemManager.getInstance().getTable(TEST_TABLE1);
+        records = table.getAllRecords();
+        Assert.assertEquals(NORMAL_NUM,records.size());
+
+        for (int i = 0; i < records.size(); i++) {
+            Assert.assertEquals(i+1,records.get(i)[1]);
+        }
+
+        // 更新,age = age+1
+        setValues.add(new SetValue("age",14));
+        RecordManager.getInstance().update(TEST_TABLE1, where, setValues);
+
+        table = SystemManager.getInstance().getTable(TEST_TABLE1);
+        records = table.getAllRecords();
+        Assert.assertEquals(NORMAL_NUM, records.size());
+
+        for (Object[] record : records) {
+            Assert.assertEquals(14, record[1]);
+        }
 
     }
 }

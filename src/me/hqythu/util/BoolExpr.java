@@ -28,7 +28,7 @@ public class BoolExpr {
         tableNameR = null; // null表示该值为常量
         valueR = 0;
     }
-    
+
     // 常用的表达式
     // if left : var op const   变量在左边
     // else : const op var      变量在右边

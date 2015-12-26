@@ -34,7 +34,6 @@ public class DataPageUser {
         ByteBuffer buffer = page.getBuffer();
         int recordLen = getRecordLen(page);
         int size = getRecordSize(page);
-
         if (index >= size) return null;
         int pos = Global.DTPAGE_DATA_POS + index * recordLen;
         byte[] record = new byte[recordLen];
@@ -74,7 +73,7 @@ public class DataPageUser {
         if (index >= size) return false;
         if (record.length != recordLen) return false;
         int pos = Global.DTPAGE_DATA_POS + index * recordLen;
-        System.arraycopy(data,pos,record,0,recordLen);
+        System.arraycopy(record,0,data,pos,recordLen);
 
         page.setDirty();
         return true;

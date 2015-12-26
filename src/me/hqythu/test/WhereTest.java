@@ -107,22 +107,11 @@ public class WhereTest {
         Assert.assertEquals(0,records.size());
     }
 
-    @Test
-    public void testWhere3() throws Exception {
-        Where where = new Where();
-        where.boolExprs.add(new BoolExpr());
-        RecordManager.getInstance().remove(TEST_TABLE1,where);
-
-        Table table = SystemManager.getInstance().getTable(TEST_TABLE1);
-        List<Object[]> records = table.getAllRecords();
-        Assert.assertEquals(0,records.size());
-    }
-
     /**
      * 删除,插入,再删除
      */
     @Test
-    public void testWhere4() throws Exception {
+    public void testWhere3() throws Exception {
         Table table;
         List<Object[]> records;
 

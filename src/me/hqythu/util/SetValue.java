@@ -18,6 +18,26 @@ public class SetValue {
     public SetValue() {
 
     }
+    // 赋值常数
+    public SetValue(String columnName, Object value) {
+        this.columnName = columnName;
+        calcOp = null;
+        value1 = value;
+    }
+    // var = var op value
+    public SetValue(String columnName, CalcOp op, Object value, boolean left) {
+        this.columnName = columnName;
+        calcOp = op;
+        if (left) {
+            isVar1 = true;
+            isVar2 = false;
+            value2 = value;
+        } else {
+            isVar1 = false;
+            value1 = value;
+            isVar2 = true;
+        }
+    }
 
     public Object calcValue(Object oldValue) {
         if (calcOp != null) {

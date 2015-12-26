@@ -7,10 +7,7 @@ import me.hqythu.exception.SQLTableException;
 import me.hqythu.util.SetValue;
 import me.hqythu.util.Where;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -202,7 +199,7 @@ public class Table {
 
                 // 每条记录
                 int size = DataPageUser.getRecordSize(page);
-                for (int index = 0; index > size; index++) {
+                for (int index = 0; index < size; index++) {
                     byte[] data = DataPageUser.readRecord(page, index);
                     Object[] values = Record.bytesToValues(this,data);
                     Map<Table,Object[]> records = new HashMap<>();
@@ -215,7 +212,7 @@ public class Table {
                         }
                         data = Record.valuesToBytes(this,values);
                         DataPageUser.writeRecord(page,index,data);
-                        DataPageUser.removeRecord(page, index);
+                        page.setDirty();
                     }
                 }
                 dataPageId = DataPageUser.getNextIndex(page);
