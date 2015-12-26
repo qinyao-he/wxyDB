@@ -17,13 +17,13 @@ public class Where {
 
     // 所需的表
     // 查询的时候,需要知道涉及的表,根据所需的表,传入相应的参数
-    public List<String> tables;
+    public List<String> tableNames;
 
     public List<BoolExpr> boolExprs;
     public List<BoolOp> boolOps;
 
     public Where() {
-        tables = new ArrayList<>();
+        tableNames = new ArrayList<>();
         boolExprs = new ArrayList<>();
         boolOps = new ArrayList<>();
     }
@@ -54,8 +54,8 @@ public class Where {
         }
     }
 
-    public List<String> getTables() {
-        return tables;
+    public List<String> getTableNames() {
+        return tableNames;
     }
 
     public void clear() {
