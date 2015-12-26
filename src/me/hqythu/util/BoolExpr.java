@@ -28,6 +28,19 @@ public class BoolExpr {
         tableNameR = null; // null表示该值为常量
         valueR = 0;
     }
+    // 0==0, true
+    // 0==1, false
+    public BoolExpr(boolean bool) {
+        tableNameL = null; // null表示该值为常量
+        valueL = 0;
+        compareOp = CompareOp.EQU;
+        tableNameR = null; // null表示该值为常量
+        if (bool) {
+            valueR = 0;
+        } else {
+            valueR = 1;
+        }
+    }
 
     // 常用的表达式
     // if left : var op const   变量在左边

@@ -58,12 +58,17 @@ DDL
     DELETE：
         tableNames.get(0)：表名
         Where
-            List<Object>
-                BoolExpr BoolOp
+            public List<Boolean> isExprs; // 这个容易漏!!!
+            public List<Object> boolExprsAndOps;
+                BoolExpr
+
+                BoolOp
     UPDATE：
         tableNames.get(0)：表名
+        List<SetValue>: 用于设置值
+            赋值常数: public SetValue(String columnName, Object value)
+            带参数: public SetValue(String columnName, CalcOp op, Object value, boolean left)
         Where
-        List<SetValue>
     SELECT：
         tableNames.get(0)：表名
         SelectOption:查询的列

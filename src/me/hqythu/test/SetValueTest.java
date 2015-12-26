@@ -72,7 +72,7 @@ public class SetValueTest {
 
         // Where 初始化
         Where where = new Where();
-        where.boolExprsAndOps.add(new BoolExpr());
+        where.boolExprsAndOps.add(new BoolExpr(true));
         where.isExprs.add(true);
 //        where.boolExprs.add(new BoolExpr());
         List<SetValue> setValues = new ArrayList<>();
