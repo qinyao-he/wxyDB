@@ -7,6 +7,7 @@ public class SQLTableException extends Exception {
     public SQLTableException() {
         super();
     }
+
     public SQLTableException(String msg) {
         super(msg);
     }

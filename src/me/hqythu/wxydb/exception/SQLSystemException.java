@@ -7,6 +7,7 @@ public class SQLSystemException extends Exception {
     public SQLSystemException() {
         super();
     }
+
     public SQLSystemException(String msg) {
         super(msg);
     }

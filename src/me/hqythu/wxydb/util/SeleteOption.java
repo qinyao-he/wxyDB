@@ -11,6 +11,7 @@ public class SeleteOption {
         columnNames = new ArrayList<>();
         fromTableNames = new HashSet<>();
     }
+
     public List<String> tableNames;
     public List<String> columnNames;
     public Set<String> fromTableNames;

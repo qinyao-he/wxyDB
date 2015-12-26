@@ -24,17 +24,17 @@ public class TablePageUser {
      */
     public static void initPage(Page page, String tableName, Column[] columns) {
 
-        setName(page,tableName);                // 表名 108
-        setFirstDataPage(page,-1);              // 首数据页索引 4
-        setTableIndex(page,page.getPageId());   // 表索引 4
-        setRecordLen(page,Record.calcRecordLen(columns)); // 记录长度 4
-        setRecordSize(page,0); // 记录个数
-        setColumnSize(page,(short) columns.length); // 列数 2
-        setPrimaryCol(page,-1);
+        setName(page, tableName);                // 表名 108
+        setFirstDataPage(page, -1);              // 首数据页索引 4
+        setTableIndex(page, page.getPageId());   // 表索引 4
+        setRecordLen(page, Record.calcRecordLen(columns)); // 记录长度 4
+        setRecordSize(page, 0); // 记录个数
+        setColumnSize(page, (short) columns.length); // 列数 2
+        setPrimaryCol(page, -1);
         for (int i = 0; i < columns.length; i++) {
-            setColumn(page,i,columns[i]);
+            setColumn(page, i, columns[i]);
             if (columns[i].isPrimary()) {
-                setPrimaryCol(page,i);
+                setPrimaryCol(page, i);
             }
         }
         page.setDirty();
@@ -54,13 +54,14 @@ public class TablePageUser {
         // 列信息
         Column[] cols = new Column[n];
         for (int i = 0; i < n; i++) {
-            cols[i] = getColumn(page,i);
+            cols[i] = getColumn(page, i);
         }
         return new Table(tableName, index, recordLen, cols);
     }
 
     /**
      * 按id获取某个记录所在的页
+     *
      * @param page
      * @param recordId
      * @return
@@ -84,6 +85,7 @@ public class TablePageUser {
 
     /**
      * 按id获取某个记录
+     *
      * @param page
      * @param recordId
      * @return
@@ -94,7 +96,7 @@ public class TablePageUser {
         try {
             Page dataPage = null;
             while (dataPageId != -1) {
-                dataPage = BufPageManager.getInstance().getPage(fileId,dataPageId);
+                dataPage = BufPageManager.getInstance().getPage(fileId, dataPageId);
                 int size = DataPageUser.getRecordSize(dataPage);
                 if (size >= recordId) {
                     break;
@@ -125,8 +127,8 @@ public class TablePageUser {
 
             // 每个数据页
             int firstPageId = TablePageUser.getFirstDataPage(page);
-            for (int dataPageId = firstPageId; dataPageId != -1;) {
-                Page dPage = BufPageManager.getInstance().getPage(fileId,dataPageId);
+            for (int dataPageId = firstPageId; dataPageId != -1; ) {
+                Page dPage = BufPageManager.getInstance().getPage(fileId, dataPageId);
 
                 // 每条记录
                 int size = DataPageUser.getRecordSize(dPage);
@@ -145,6 +147,7 @@ public class TablePageUser {
 
     /**
      * 删除所有记录
+     *
      * @param page
      */
     public static void removeAllRecord(Page page) {
@@ -157,8 +160,8 @@ public class TablePageUser {
                 DbPageUser.recyclePage(dbPage, dataPageId);
                 dataPageId = DataPageUser.getNextIndex(dataPage);
             }
-            setFirstDataPage(page,-1);
-            setRecordSize(page,0);
+            setFirstDataPage(page, -1);
+            setRecordSize(page, 0);
             page.setDirty();
         } catch (Exception e) {
             e.printStackTrace();
@@ -169,102 +172,121 @@ public class TablePageUser {
     //------------------------获取页信息------------------------
     public static String getName(Page page) {
         byte[] data = page.getData();
-        String temp = new String(data,Global.TBPAGE_NAME_POS,Global.TABLE_NAME_LEN);
-        return temp.substring(0,temp.indexOf(0));
+        String temp = new String(data, Global.TBPAGE_NAME_POS, Global.TABLE_NAME_LEN);
+        return temp.substring(0, temp.indexOf(0));
     }
+
     public static void setName(Page page, String name) {
         ByteBuffer buffer = page.getBuffer();
         buffer.position(Global.TBPAGE_NAME_POS);
         byte[] data = name.getBytes();
         if (data.length > Global.TABLE_NAME_LEN) {
-            buffer.put(data,0,Global.TABLE_NAME_LEN);
+            buffer.put(data, 0, Global.TABLE_NAME_LEN);
         } else {
             buffer.put(data);
         }
     }
+
     public static int getFirstDataPage(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.TBPAGE_DATAIDX_POS);
     }
+
     public static void setFirstDataPage(Page page, int dataPageId) {
         ByteBuffer buffer = page.getBuffer();
         buffer.putInt(Global.TBPAGE_DATAIDX_POS, dataPageId);
     }
+
     public static int getRecordSize(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.TBPAGE_RECORD_SIZE_POS);
     }
+
     public static void setRecordSize(Page page, int size) {
         ByteBuffer buffer = page.getBuffer();
         buffer.putInt(Global.TBPAGE_RECORD_SIZE_POS, size);
         page.setDirty();
     }
+
     public static void incRecordSize(Page page) {
         int size = getRecordSize(page);
-        setRecordSize(page,++size);
+        setRecordSize(page, ++size);
         page.setDirty();
     }
+
     public static void decRecordSize(Page page) {
         int size = getRecordSize(page);
-        setRecordSize(page,--size);
+        setRecordSize(page, --size);
     }
+
     public static int getTableIndex(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.TBPAGE_PAGEIDX_POS);
     }
+
     public static void setTableIndex(Page page, int index) {
         ByteBuffer buffer = page.getBuffer();
         buffer.putInt(Global.TBPAGE_PAGEIDX_POS, page.getPageId());
     }
+
     public static void setColumnSize(Page page, short size) {
         ByteBuffer buffer = page.getBuffer();
         buffer.putShort(Global.TBPAGE_COLUMN_POS, size);
     }
+
     public static short getColumnSize(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getShort(Global.TBPAGE_COLUMN_POS);
     }
+
     public static void setRecordLen(Page page, int len) {
         ByteBuffer buffer = page.getBuffer();
         buffer.putInt(Global.TBPAGE_RECORD_LEN_POS, len);
     }
+
     public static int getRecordLen(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.TBPAGE_RECORD_LEN_POS);
     }
+
     public static void setAllowNull(Page page) {
         ByteBuffer buffer = page.getBuffer();
         int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
         flag |= TABLE_PROP_ALLOW_NULL;
-        buffer.putInt(Global.TBPAGE_PROP_POS,flag);
+        buffer.putInt(Global.TBPAGE_PROP_POS, flag);
     }
+
     public static void clearAllowNull(Page page) {
         ByteBuffer buffer = page.getBuffer();
         int flag = buffer.getInt(Global.TBPAGE_PROP_POS);
         flag &= ~TABLE_PROP_ALLOW_NULL;
-        buffer.putInt(Global.TBPAGE_PROP_POS,flag);
+        buffer.putInt(Global.TBPAGE_PROP_POS, flag);
     }
+
     public static void setPrimaryCol(Page page, int col) {
         ByteBuffer buffer = page.getBuffer();
-        buffer.putInt(Global.TBPAGE_PRIMARY_POS,col);
+        buffer.putInt(Global.TBPAGE_PRIMARY_POS, col);
     }
+
     public static int getPrimaryCol(Page page) {
         ByteBuffer buffer = page.getBuffer();
         return buffer.getInt(Global.TBPAGE_PRIMARY_POS);
     }
+
     public static Column getColumn(Page page, int index) {
         ByteBuffer buffer = page.getBuffer();
         byte[] data = page.getData();
         int offset = Global.COL_INFO_POS + index * Global.PER_COL_INFO_LEN;
 
         String name = new String(data, offset + Global.COL_NAME_POS, Global.COL_NAME_LEN); // 列名
-        name = name.substring(0,name.indexOf(0)); // 去掉尾部的0
+        name = name.substring(0, name.indexOf(0)); // 去掉尾部的0
         int prop = buffer.getInt(offset + Global.COL_PROP_POS);                            // 列属性
         DataType type = DataType.valueOf(buffer.getShort(offset + Global.COL_TYPE_POS)); // 数据类型
         short len = buffer.getShort(offset + Global.COL_LEN_POS);                          // 数据列长
 
         return new Column(name, type, len, prop);
     }
+
     public static void setColumn(Page page, int index, Column col) {
         ByteBuffer buffer = page.getBuffer();
         int pos = Global.COL_INFO_POS + index * Global.PER_COL_INFO_LEN;
@@ -272,7 +294,7 @@ public class TablePageUser {
         buffer.position(pos);
         byte[] data = col.name.getBytes();
         if (data.length > Global.COL_NAME_LEN) { // 列名称
-            buffer.put(data,0,Global.COL_NAME_LEN);
+            buffer.put(data, 0, Global.COL_NAME_LEN);
         } else {
             buffer.put(data);
         }

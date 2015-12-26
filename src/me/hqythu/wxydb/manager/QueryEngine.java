@@ -56,7 +56,7 @@ public class QueryEngine {
             }
         } catch (SQLWhereException e) {
             e.printStackTrace();
-            throw new SQLQueryException("query error : "+e.getMessage());
+            throw new SQLQueryException("query error : " + e.getMessage());
         }
 
         return result;
@@ -74,12 +74,12 @@ public class QueryEngine {
         switch (func) {
             case SUM:
                 for (Object[] record : records) {
-                    result += (Integer)record[col];
+                    result += (Integer) record[col];
                 }
                 break;
             case AVG:
                 for (Object[] record : records) {
-                    result += (Integer)record[col];
+                    result += (Integer) record[col];
                 }
                 if (records.size() == 0) result = 0;
                 result /= records.size();
@@ -87,7 +87,7 @@ public class QueryEngine {
             case MAX:
                 result = Double.MIN_VALUE;
                 for (Object[] record : records) {
-                    temp = (Integer)record[col];
+                    temp = (Integer) record[col];
                     if (result < temp) result = temp;
                 }
                 if (records.size() == 0) result = 0;
@@ -95,7 +95,7 @@ public class QueryEngine {
             case MIN:
                 result = Double.MAX_VALUE;
                 for (Object[] record : records) {
-                    temp = (Integer)record[col];
+                    temp = (Integer) record[col];
                     if (result > temp) result = temp;
                 }
                 if (records.size() == 0) result = 0;

@@ -15,6 +15,7 @@ import java.util.List;
 //size         文件中记录总数
 //fieldSize    记录的字段个数
 //recordFieldPos 记录的每个字段的位置
+
 /**
  * RecordManager
  * 记录管理器
@@ -33,28 +34,28 @@ public class RecordManager {
 
     public void insert(String tableName, String[] fields, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: "+tableName);
-        table.insert(fields,values);
+        if (table == null) throw new SQLExecException("not have table: " + tableName);
+        table.insert(fields, values);
     }
 
     public void insert(String tableName, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: "+tableName);
+        if (table == null) throw new SQLExecException("not have table: " + tableName);
         table.insert(values);
     }
 
     public void remove(String tableName, Where where) throws SQLExecException, SQLTableException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: "+tableName);
+        if (table == null) throw new SQLExecException("not have table: " + tableName);
         table.remove(where);
     }
 
     public void update(String tableName, Where where, List<SetValue> setValues) throws SQLExecException, SQLTableException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: "+tableName);
-        table.update(where,setValues);
+        if (table == null) throw new SQLExecException("not have table: " + tableName);
+        table.update(where, setValues);
     }
-    
+
     private RecordManager() {
 
     }

@@ -9,18 +9,21 @@ public class BitSetMask {
 
     /**
      * 设置位图
-     * @param data byte字节数组
+     *
+     * @param data   byte字节数组
      * @param offset 偏移字节数
-     * @param index 设置的位
+     * @param index  设置的位
      */
     public static void setBit(byte[] data, int offset, int index) {
-        int pos = offset + index/8;
+        int pos = offset + index / 8;
         data[pos] |= SET_MASK[index % 8];
     }
+
     public static void clearBit(byte[] data, int offset, int index) {
-        int pos = offset + index/8;
-        data[pos] &= (byte)~SET_MASK[index % 8];
+        int pos = offset + index / 8;
+        data[pos] &= (byte) ~SET_MASK[index % 8];
     }
+
     public static int nextClearBit(byte[] data, int offset, int maxOffset) {
         for (int i = offset; i < maxOffset; i++) {
             byte b = data[i];
@@ -30,8 +33,9 @@ public class BitSetMask {
         }
         return -1;
     }
+
     public static boolean checkBit(byte[] data, int offset, int index) {
-        int pos = offset + index/8;
+        int pos = offset + index / 8;
         byte b = data[pos];
         return (b & SET_MASK[index % 8]) != 0;
     }

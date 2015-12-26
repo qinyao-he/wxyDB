@@ -7,6 +7,7 @@ public class SQLRecordException extends Exception {
     public SQLRecordException() {
         super();
     }
+
     public SQLRecordException(String msg) {
         super(msg);
     }

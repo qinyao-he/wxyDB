@@ -9,7 +9,8 @@ import java.nio.ByteBuffer;
 import static java.lang.Math.ceil;
 
 public class Record {
-    private Record(){}
+    private Record() {
+    }
 
     /**
      * Object[] 转 byte[]
@@ -24,11 +25,11 @@ public class Record {
 
         // 状态位AB
         buffer.clear();
-        buffer.putShort((short)0);
+        buffer.putShort((short) 0);
         // 列数
-        buffer.putShort((short)columns.length);
+        buffer.putShort((short) columns.length);
         // 定长部分长度
-        buffer.putShort((short)offsets[columns.length-1]);
+        buffer.putShort((short) offsets[columns.length - 1]);
         // 定长数据
         for (int i = 0; i < columns.length; i++) {
             Column column = columns[i];
@@ -44,14 +45,14 @@ public class Record {
                         throw new SQLRecordException("unknown data type");
                     case INT:
                         Integer ii = (Integer) values[i];
-                        buffer.putInt(offsets[i]+Global.RECORD_STATIC_DATA_POS,ii);
+                        buffer.putInt(offsets[i] + Global.RECORD_STATIC_DATA_POS, ii);
                         break;
                     case VARCHAR:
                         String ss = (String) values[i];
                         if (ss.length() > column.len) {
                             throw new SQLRecordException("column data too long");
                         }
-                        buffer.position(offsets[i]+Global.RECORD_STATIC_DATA_POS);
+                        buffer.position(offsets[i] + Global.RECORD_STATIC_DATA_POS);
                         buffer.put(ss.getBytes());
                         break;
                 }
@@ -73,7 +74,7 @@ public class Record {
 
         for (int i = 0; i < columns.length; i++) {
             // NULL值
-            if ((!columns[i].notNull()) && BitSetMask.checkBit(data,nullPos,i)) {
+            if ((!columns[i].notNull()) && BitSetMask.checkBit(data, nullPos, i)) {
                 values[i] = null;
             } else {
                 switch (columns[i].type) {
@@ -81,12 +82,12 @@ public class Record {
                         values[i] = null;
                         break;
                     case INT:
-                        values[i] = buffer.getInt(Global.RECORD_STATIC_DATA_POS+offsets[i]);
+                        values[i] = buffer.getInt(Global.RECORD_STATIC_DATA_POS + offsets[i]);
                         break;
                     case VARCHAR:
-                        String temp = new String(data,Global.RECORD_STATIC_DATA_POS+offsets[i],columns[i].len);
+                        String temp = new String(data, Global.RECORD_STATIC_DATA_POS + offsets[i], columns[i].len);
                         if (temp.indexOf(0) > 0) {
-                            temp = temp.substring(0,temp.indexOf(0));
+                            temp = temp.substring(0, temp.indexOf(0));
                         }
                         values[i] = temp;
                         break;
@@ -104,7 +105,7 @@ public class Record {
         for (Column column : columns) {
             len += column.len;
         }
-        len += Global.RECORD_STATUS_LEN + ceil((double)columns.length/8);
+        len += Global.RECORD_STATUS_LEN + ceil((double) columns.length / 8);
         return len;
     }
 
@@ -113,6 +114,6 @@ public class Record {
      */
     public static boolean checkNull(Table table, byte[] record, int index) {
         int offset = table.getOffsets()[table.getColumns().length];
-        return BitSetMask.checkBit(record,offset,index);
+        return BitSetMask.checkBit(record, offset, index);
     }
 }

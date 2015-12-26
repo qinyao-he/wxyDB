@@ -7,6 +7,7 @@ public class SQLWhereException extends Exception {
     public SQLWhereException() {
         super();
     }
+
     public SQLWhereException(String msg) {
         super(msg);
     }

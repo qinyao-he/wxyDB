@@ -18,6 +18,7 @@ public class SystemManager {
     Map<String, Table> tables = null;
     int fileId = -1;
     private static SystemManager manager = null;
+
     private SystemManager() {
     }
 
@@ -29,6 +30,7 @@ public class SystemManager {
     }
 
     //--------------------DML support--------------------
+
     /**
      * 创建DB
      */
@@ -167,7 +169,7 @@ public class SystemManager {
         builder.append('[');
         for (int i = 0; i < columns.length; i++) {
             builder.append(columns[i].toString());
-            if (i != columns.length-1) {
+            if (i != columns.length - 1) {
                 builder.append(',');
             }
         }
@@ -208,17 +210,20 @@ public class SystemManager {
         if (connectDB == null) return null;
         return tables.get(tableName);
     }
+
     public Map<String, Table> getTables() {
         return tables;
     }
+
     public Page getDbPage() {
         try {
-            return BufPageManager.getInstance().getPage(fileId,0);
+            return BufPageManager.getInstance().getPage(fileId, 0);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
+
     public int getFileId() {
         return fileId;
     }

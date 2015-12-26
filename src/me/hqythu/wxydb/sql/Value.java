@@ -1,7 +1,6 @@
 package me.hqythu.wxydb.sql;
 
-public class Value
-{
-	String left;
-	Object right;
+public class Value {
+    String left;
+    Object right;
 }

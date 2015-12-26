@@ -31,13 +31,13 @@ public class SQLParserTest {
 
         // create DataBase
         sql = SQLParser.parse("CREATE DATABASE orderDB;");
-        Assert.assertEquals(ParseResult.OrderType.CREATE_DATABASE,sql.type);
-        Assert.assertEquals("orderDB",sql.dataBaseName);
+        Assert.assertEquals(ParseResult.OrderType.CREATE_DATABASE, sql.type);
+        Assert.assertEquals("orderDB", sql.dataBaseName);
 
         // use DataBase
         sql = SQLParser.parse("USE orderDB");
-        Assert.assertEquals(ParseResult.OrderType.USE,sql.type);
-        Assert.assertEquals("orderDB",sql.dataBaseName);
+        Assert.assertEquals(ParseResult.OrderType.USE, sql.type);
+        Assert.assertEquals("orderDB", sql.dataBaseName);
 
         // drop DataBase
 //        sql = SQLParser.parse("DROP DATABASE "+TEST_DB+";");
@@ -50,15 +50,15 @@ public class SQLParserTest {
         ParseResult sql;
 
         sql = SQLParser.parse("DROP TABLE customer;");
-        Assert.assertEquals(ParseResult.OrderType.DROP_TABLE,sql.type);
-        Assert.assertEquals("customer",sql.tableNames.get(0));
+        Assert.assertEquals(ParseResult.OrderType.DROP_TABLE, sql.type);
+        Assert.assertEquals("customer", sql.tableNames.get(0));
 
         sql = SQLParser.parse("SHOW TABLES;");
-        Assert.assertEquals(ParseResult.OrderType.SHOW_TABLES,sql.type);
+        Assert.assertEquals(ParseResult.OrderType.SHOW_TABLES, sql.type);
 
         sql = SQLParser.parse("DESC customer;");
-        Assert.assertEquals(ParseResult.OrderType.DESC,sql.type);
-        Assert.assertEquals("customer",sql.tableNames.get(0));
+        Assert.assertEquals(ParseResult.OrderType.DESC, sql.type);
+        Assert.assertEquals("customer", sql.tableNames.get(0));
 
 //        sql = SQLParser.parse("CREATE TABLE customer( id int(10) NOT NULL," +
 //                "name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id)" +
@@ -72,17 +72,17 @@ public class SQLParserTest {
 
         sql = SQLParser.parse("INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’);");
         Assert.assertTrue(sql.type == ParseResult.OrderType.INSERT);
-        Assert.assertEquals("customer",sql.tableNames.get(0));
-        Assert.assertEquals(300001,sql.data.get(0));
-        Assert.assertEquals("CHAD CABELLO",sql.data.get(1));
-        Assert.assertEquals("F",sql.data.get(2));
+        Assert.assertEquals("customer", sql.tableNames.get(0));
+        Assert.assertEquals(300001, sql.data.get(0));
+        Assert.assertEquals("CHAD CABELLO", sql.data.get(1));
+        Assert.assertEquals("F", sql.data.get(2));
 
         sql = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
         Assert.assertTrue(sql.type == ParseResult.OrderType.INSERT);
-        Assert.assertEquals("orders",sql.tableNames.get(0));
-        Assert.assertEquals(315000,sql.data.get(0));
-        Assert.assertEquals(200001,sql.data.get(1));
-        Assert.assertEquals("eight",sql.data.get(2));
+        Assert.assertEquals("orders", sql.tableNames.get(0));
+        Assert.assertEquals(315000, sql.data.get(0));
+        Assert.assertEquals(200001, sql.data.get(1));
+        Assert.assertEquals("eight", sql.data.get(2));
 
     }
 }

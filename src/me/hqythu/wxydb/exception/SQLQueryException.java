@@ -7,6 +7,7 @@ public class SQLQueryException extends Exception {
     public SQLQueryException() {
         super();
     }
+
     public SQLQueryException(String msg) {
         super(msg);
     }

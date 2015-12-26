@@ -28,6 +28,7 @@ public class BoolExpr {
         tableNameR = null; // null表示该值为常量
         valueR = 0;
     }
+
     // 0==0, true
     // 0==1, false
     public BoolExpr(boolean bool) {
@@ -62,10 +63,21 @@ public class BoolExpr {
 
 
     //--------------------删除,更新,查询--------------------
-    public boolean isNeedValueL() {return tableNameL != null;}
-    public void setValueL(Object value) {valueL = value;}
-    public boolean isNeedValueR() {return tableNameR != null;}
-    public void setValueR(Object value) {valueR = value;}
+    public boolean isNeedValueL() {
+        return tableNameL != null;
+    }
+
+    public void setValueL(Object value) {
+        valueL = value;
+    }
+
+    public boolean isNeedValueR() {
+        return tableNameR != null;
+    }
+
+    public void setValueR(Object value) {
+        valueR = value;
+    }
 
     public boolean getResult() throws SQLWhereException {
         // 非 is null 操作结果,如果其中一个为null,则返回false
@@ -80,19 +92,19 @@ public class BoolExpr {
                 case NEQ:
                     return !valueL.equals(valueR);
                 case LES:
-                    return (Integer)valueL < (Integer)valueR;
+                    return (Integer) valueL < (Integer) valueR;
                 case LEQ:
-                    return (Integer)valueL <= (Integer)valueR;
+                    return (Integer) valueL <= (Integer) valueR;
                 case GTR:
-                    return (Integer)valueL > (Integer)valueR;
+                    return (Integer) valueL > (Integer) valueR;
                 case GEQ:
-                    return (Integer)valueL >= (Integer)valueR;
+                    return (Integer) valueL >= (Integer) valueR;
                 case IS:
                     return valueL == null;
             }
         } catch (Exception e) {
             e.printStackTrace();
-            throw new SQLWhereException("where error:"+e.getMessage());
+            throw new SQLWhereException("where error:" + e.getMessage());
         }
         return false;
     }

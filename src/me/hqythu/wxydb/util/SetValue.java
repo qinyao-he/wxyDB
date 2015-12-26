@@ -18,12 +18,14 @@ public class SetValue {
     public SetValue() {
 
     }
+
     // 赋值常数
     public SetValue(String columnName, Object value) {
         this.columnName = columnName;
         calcOp = null;
         value1 = value;
     }
+
     // var = var op value
     public SetValue(String columnName, CalcOp op, Object value, boolean left) {
         this.columnName = columnName;
@@ -46,16 +48,16 @@ public class SetValue {
             if (isVar2) value2 = oldValue;
             switch (calcOp) {
                 case ADD:
-                    newValue = (Integer)value1 + (Integer)value2;
+                    newValue = (Integer) value1 + (Integer) value2;
                     break;
                 case SUB:
-                    newValue = (Integer)value1 - (Integer)value2;
+                    newValue = (Integer) value1 - (Integer) value2;
                     break;
                 case MUL:
-                    newValue = (Integer)value1 * (Integer)value2;
+                    newValue = (Integer) value1 * (Integer) value2;
                     break;
                 case DIV:
-                    newValue = (Integer)value1 / (Integer)value2;
+                    newValue = (Integer) value1 / (Integer) value2;
                     break;
             }
             return newValue;

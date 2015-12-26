@@ -7,6 +7,7 @@ public class SQLParserException extends Exception {
     public SQLParserException() {
         super();
     }
+
     public SQLParserException(String msg) {
         super(msg);
     }

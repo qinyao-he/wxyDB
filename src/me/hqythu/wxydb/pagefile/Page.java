@@ -30,6 +30,7 @@ public class Page {
     public byte[] getData() {
         return data;
     }
+
     public ByteBuffer getBuffer() {
         return buffer;
     }

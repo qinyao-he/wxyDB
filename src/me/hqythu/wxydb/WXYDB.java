@@ -20,7 +20,7 @@ public class WXYDB {
 
     public void go() {
         Scanner scanner = new Scanner(System.in);
-        while(true) {
+        while (true) {
 
             // 读命令
             String sqlString = scanner.nextLine();
