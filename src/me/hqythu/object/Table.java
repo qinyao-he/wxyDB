@@ -201,19 +201,19 @@ public class Table {
                 int size = DataPageUser.getRecordSize(page);
                 for (int index = 0; index > size; index++) {
                     byte[] data = DataPageUser.readRecord(page, index);
-                    Object[] values =
+//                    Object[] values =
 
                     // 满足条件的进行更新
-                    if (where.match(data, columns)) {
-                        Object[] record = Record.bytesToValues(this,data);
-                        for (SetValue setValue : setValues) {
-                            int col = getColumnCol(setValue.columnName);
-                            record[col] = setValue.calcValue(record[col]);
-                        }
-//                        data = Record.valuesToBytes()
-//                        DataPageUser.writeRecord(page,index,data);
-//                        DataPageUser.removeRecord(page, index);
-                    }
+//                    if (where.match(data, columns)) {
+//                        Object[] record = Record.bytesToValues(this,data);
+//                        for (SetValue setValue : setValues) {
+//                            int col = getColumnCol(setValue.columnName);
+//                            record[col] = setValue.calcValue(record[col]);
+//                        }
+////                        data = Record.valuesToBytes()
+////                        DataPageUser.writeRecord(page,index,data);
+////                        DataPageUser.removeRecord(page, index);
+//                    }
 
                 }
                 dataPageId = DataPageUser.getNextIndex(page);
