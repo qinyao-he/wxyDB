@@ -62,3 +62,18 @@ Where的结构
 setValue
     用于update
     解析得到List<setValue>
+
+完成测试
+    CREATE_DATABASE
+    USE
+    DROP_TABLE
+    SHOW_TABLES
+    DESC
+    INSERT
+
+未测试
+    DROP_DATABASE
+    DELETE
+    UPDATE
+    SELECT
+    ERROR

@@ -14,10 +14,16 @@ public class Where {
 
     // SQL解析得到boolExprs和boolOps
     // 如果不考虑NOT,则boolExpr的个数一定比boolOps个数多1
+
+    // 所需的表
+    // 查询的时候,需要知道涉及的表,根据所需的表,传入相应的参数
+    public List<String> tables;
+
     public List<BoolExpr> boolExprs;
     public List<BoolOp> boolOps;
 
     public Where() {
+        tables = new ArrayList<>();
         boolExprs = new ArrayList<>();
         boolOps = new ArrayList<>();
     }
@@ -46,6 +52,10 @@ public class Where {
             e.printStackTrace();
             throw new SQLWhereException("where error : set value failed "+e.getMessage());
         }
+    }
+
+    public List<String> getTables() {
+        return tables;
     }
 
     public void clear() {

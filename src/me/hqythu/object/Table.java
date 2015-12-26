@@ -124,13 +124,11 @@ public class Table {
 
     /**
      * 删除记录
-     * 删除策略:
-     * 遍历:每个数据页的每个记录
-     * 用该页的最后一条记录取代被删除的记录
-     * 每个数据页空则回收
-     * 数据页之间不合并
      *
-     * 未完成
+     * 删除策略:
+     * 遍历每个数据页的每个记录
+     * 用该页的最后一条记录取代被删除的记录
+     * 每个数据页空则回收,数据页之间不合并
      */
     public void remove(Where where) throws SQLTableException {
         Page dbPage = SystemManager.getInstance().getDbPage();
