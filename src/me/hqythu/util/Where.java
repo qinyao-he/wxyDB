@@ -6,6 +6,7 @@ import me.hqythu.object.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * where条件
@@ -19,22 +20,37 @@ public class Where {
     // 查询的时候,需要知道涉及的表,根据所需的表,传入相应的参数
     public List<String> tableNames;
 
-    public List<BoolExpr> boolExprs;
-    public List<BoolOp> boolOps;
+    public List<Boolean> isExprs; // 这个容易漏!!!
+    public List<Object> boolExprsAndOps;
+
+    public Stack<Boolean> forCalc; // 求值用,SQL不用管
 
     public Where() {
         tableNames = new ArrayList<>();
-        boolExprs = new ArrayList<>();
-        boolOps = new ArrayList<>();
+        isExprs = new ArrayList<>();
+        boolExprsAndOps = new ArrayList<>();
+        forCalc = new Stack<>();
     }
 
-    //-------------------外部置参和使用-------------------
-    public void setValues(Map<Table,Object[]> records, Map<String,Table> tables) throws SQLWhereException {
+    //-------------------外部调用-------------------
+    public List<String> getTableNames() {
+        return tableNames;
+    }
+
+    public void clear() {
+        isExprs.clear();
+        boolExprsAndOps.clear();
+    }
+
+    public boolean match(Map<Table, Object[]> records, Map<String, Table> tables) throws SQLWhereException {
         Table table;
         Object[] record;
         int col;
-        try {
-            for (BoolExpr boolExpr : boolExprs) {
+
+//        forCalc.clear();
+        for (int i = 0; i < isExprs.size(); i++) {
+            if (isExprs.get(i)) {
+                BoolExpr boolExpr = (BoolExpr) boolExprsAndOps.get(i);
                 if (boolExpr.isNeedValueL()) {
                     table = tables.get(boolExpr.tableNameL);
                     record = records.get(table);
@@ -47,37 +63,24 @@ public class Where {
                     col = table.getColumnCol(boolExpr.columnNameR);
                     boolExpr.setValueR(record[col]);
                 }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new SQLWhereException("where error : set value failed "+e.getMessage());
-        }
-    }
-
-    public List<String> getTableNames() {
-        return tableNames;
-    }
-
-    public void clear() {
-        boolExprs.clear();
-        boolOps.clear();
-    }
-
-    public boolean match(Map<Table,Object[]> records, Map<String,Table> tables) throws SQLWhereException {
-        setValues(records, tables);
-        boolean temp = boolExprs.get(0).getResult();
-        for (int i = 1; i < boolExprs.size(); i++) {
-            switch (boolOps.get(i-1)) {
-                case AND:
-                    temp = temp && boolExprs.get(i).getResult();
-                    break;
-                case OR:
-                    temp = temp || boolExprs.get(i).getResult();
-                    break;
+                forCalc.push(boolExpr.getResult());
+            } else {
+                BoolOp boolOp = (BoolOp) boolExprsAndOps.get(i);
+                Boolean bools1 = forCalc.pop();
+                Boolean bools2 = forCalc.pop();
+                Boolean boold = false;
+                switch (boolOp) {
+                    case AND:
+                        boold = bools1 && bools2;
+                        break;
+                    case OR:
+                        boold = bools1 || bools2;
+                        break;
+                }
+                forCalc.push(boold);
             }
         }
-        return temp;
+        return forCalc.pop();
     }
-
 
 }

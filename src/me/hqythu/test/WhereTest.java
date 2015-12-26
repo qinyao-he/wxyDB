@@ -69,7 +69,9 @@ public class WhereTest {
     public void testWhere1() throws Exception {
         Where where = new Where();
         // age >= 5
-        where.boolExprs.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ,5,true));
+        where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ,5,true));
+        where.isExprs.add(true);
+//        where.boolExprs.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ,5,true));
         RecordManager.getInstance().remove(TEST_TABLE1,where);
 
         Table table = SystemManager.getInstance().getTable(TEST_TABLE1);
@@ -89,9 +91,15 @@ public class WhereTest {
         Where where = new Where();
 
         // 删除 age < 18 || age >= 25
-        where.boolExprs.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.LES,18,true));
-        where.boolExprs.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ,25,true));
-        where.boolOps.add(BoolOp.OR);
+        where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.LES,18,true));
+        where.isExprs.add(true);
+        where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ,25,true));
+        where.isExprs.add(true);
+        where.boolExprsAndOps.add(BoolOp.OR);
+        where.isExprs.add(false);
+//        where.boolExprs.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.LES,18,true));
+//        where.boolExprs.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ,25,true));
+//        where.boolOps.add(BoolOp.OR);
         RecordManager.getInstance().remove(TEST_TABLE1,where);
 
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
@@ -99,7 +107,9 @@ public class WhereTest {
         Assert.assertEquals(7,records.size());
 
         where.clear();
-        where.boolExprs.add(new BoolExpr());
+//        where.boolExprs.add(new BoolExpr());
+        where.boolExprsAndOps.add(new BoolExpr());
+        where.isExprs.add(true);
         RecordManager.getInstance().remove(TEST_TABLE1,where);
 
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
@@ -122,11 +132,13 @@ public class WhereTest {
         // 删除 age大于等于10
         Where where = new Where();
         BoolExpr expr = new BoolExpr();
-        expr.tableNameL = TEST_TABLE1;
-        expr.columnNameL = "age";
-        expr.compareOp = CompareOp.GEQ; // <
-        expr.valueR = 10;
-        where.boolExprs.add(expr);
+//        expr.tableNameL = TEST_TABLE1;
+//        expr.columnNameL = "age";
+//        expr.compareOp = CompareOp.GEQ; // <
+//        expr.valueR = 10;
+//        where.boolExprs.add(expr);
+        where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ,10,true));
+        where.isExprs.add(true);
         RecordManager.getInstance().remove(TEST_TABLE1,where);
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
         records = table.getAllRecords();

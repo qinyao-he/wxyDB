@@ -39,7 +39,7 @@ DDL
         dataBaseName：数据库名
     USE：
         dataBaseName：数据库名
-    SHOW_TABLES：z
+    SHOW_TABLES：
         无
     DROP_TABLE:
         tableNames.get(0)：表名
