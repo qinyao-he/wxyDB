@@ -18,14 +18,14 @@ public class Table {
 
     private String name;        // 表名
     private int pageId;         // 表页的id
-    private int len;          // 记录的长度
+    private int recordLen;          // 记录的长度
     private Column[] columns;   // 列属性
     private int[] offsets;      // 列偏移
 
-    public Table(String name, int index, int len, Column[] columns) {
+    public Table(String name, int index, int recordLen, Column[] columns) {
         this.name = name;
         this.pageId = index;
-        this.len = len;
+        this.recordLen = recordLen;
         this.columns = columns;
         offsets = new int[columns.length+1];
         offsets[0] = 0;
@@ -36,6 +36,7 @@ public class Table {
     public String getName() {
         return name;
     }
+    public int getRecordLen() {return recordLen;}
     public int getPageId() {
         return pageId;
     }
@@ -47,21 +48,26 @@ public class Table {
     // 插入预处理
     // 将参数转为byte[]
 
+    // values个数不足,需要补null
     public void insert(String[] fields, Object[] values) throws SQLTableException, SQLRecordException {
+
         if (fields == null) throw new SQLTableException("insert none fields");
 
-        // 对应列
-        int[] cols = fieldsToCols(fields);
-
-        insert(cols, values);
+        Object[] newValues = new Object[columns.length];
+        for (int i = 0; i < newValues.length; i++) {
+            newValues[i] = null;
+        }
+        for (int i = 0; i < fields.length; i++) {
+            int col = fieldToCol(fields[i]);
+            newValues[col] = values[i];
+        }
+        insert(newValues);
     }
 
-    public void insert(int[] cols, Object[] values) throws SQLTableException, SQLRecordException {
-        if (cols == null) throw new SQLTableException("insert none cols");
-        if (values == null) throw new SQLTableException("insert none values");
-        if (cols.length != values.length) throw new SQLTableException("insert none wrong data");
-
-        byte[] record = Record.valueToBytes(this, len, cols, values);
+    // values的个数
+    public void insert(Object[] values) throws SQLRecordException, SQLTableException {
+        if (values.length != columns.length) throw new SQLTableException("insert columns size not enough");
+        byte[] record = Record.valuesToBytes(this, values);
         insert(record);
     }
 
@@ -69,7 +75,7 @@ public class Table {
     /**
      * 插入记录，处理数据页
      */
-    protected void insert(byte[] record) throws SQLTableException {
+    public void insert(byte[] record) throws SQLTableException {
 
         Page dbPage = SystemManager.getInstance().getDbPage();
         int fileId = dbPage.getFileId();
@@ -134,6 +140,7 @@ public class Table {
         if (fileId == -1) throw new SQLTableException("have not open database");
         try {
             Page tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
+            int total = TablePageUser.getRecordSize(tablePage);
 
             // 每个数据页
             int firstPageId = TablePageUser.getFirstDataPage(tablePage);
@@ -144,22 +151,27 @@ public class Table {
                 int size = DataPageUser.getRecordSize(page);
                 for (int index = 0; index < size; ) {
                     byte[] data = DataPageUser.readRecord(page, index);
-                    if (where.match(data, columns)) {
+                    Object[] values = Record.bytesToValues(this,data);
+                    if (where.match(values)) {
                         DataPageUser.removeRecord(page, index);
                         size--;
+                        total--;
                     } else {
                         index++;
                     }
                 }
-
                 dataPageId = DataPageUser.getNextIndex(page);
                 if (size == 0 && page.getPageId() != firstPageId) { // 该页已清空，无记录
                     DataPageUser.removeConnectPage(page);            // 断开连接
                     DbPageUser.recyclePage(dbPage,page.getPageId()); // 回收该页
                 } else {
                     DataPageUser.setRecordSize(page,size);
+                    page.setDirty();
                 }
             }
+
+            TablePageUser.setRecordSize(tablePage,total);
+            tablePage.setDirty();
         } catch (Exception e) {
             e.printStackTrace();
             throw new SQLTableException("remove failed");
@@ -173,7 +185,7 @@ public class Table {
      * 未完成
      * 未考虑primary key
      */
-    public void update(Where where, SetValue setValue) throws SQLTableException {
+    public void update(Where where, List<SetValue> setValues) throws SQLTableException {
         int fileId = SystemManager.getInstance().getFileId();
         if (fileId == -1) throw new SQLTableException("have not open database");
 
@@ -189,12 +201,18 @@ public class Table {
                 int size = DataPageUser.getRecordSize(page);
                 for (int index = 0; index > size; index++) {
                     byte[] data = DataPageUser.readRecord(page, index);
+                    Object[] values =
 
                     // 满足条件的进行更新
                     if (where.match(data, columns)) {
-                        DataPageUser.removeRecord(page, index);
-                        setValue.set(data, columns);
-                        DataPageUser.writeRecord(page,index,data);
+                        Object[] record = Record.bytesToValues(this,data);
+                        for (SetValue setValue : setValues) {
+                            int col = getColumnCol(setValue.columnName);
+                            record[col] = setValue.calcValue(record[col]);
+                        }
+//                        data = Record.valuesToBytes()
+//                        DataPageUser.writeRecord(page,index,data);
+//                        DataPageUser.removeRecord(page, index);
                     }
 
                 }
@@ -243,6 +261,20 @@ public class Table {
         }
     }
 
+    public int getColumnCol(String columnName) {
+        for (int i = 0; i < columns.length; i++) {
+            if (columns[i].name.equals(columnName)) return i;
+        }
+        return -1;
+    }
+
+    public Column getColumn(String columnName) {
+        for (int i = 0; i < columns.length; i++) {
+            if (columns[i].name.equals(columnName)) return columns[i];
+        }
+        return null;
+    }
+
     //-------------------辅助函数-------------------
     //检查是否与primary key冲突
     protected boolean checkPrimaryOk(byte[] data) throws SQLTableException {
@@ -269,18 +301,19 @@ public class Table {
     protected int[] fieldsToCols(String[] fields) throws SQLTableException {
         int cols[] = new int[fields.length];
         for (int i = 0; i < cols.length; i++) {
-            cols[i] = -1;
-            for (int j = 0; j < columns.length; j++) {
-                if (fields[i].equals(columns[j].name)) {
-                    cols[i] = j;
-                    break;
-                }
-            }
+            cols[i] = fieldToCol(fields[i]);
             if (cols[i] == -1) {
                 throw new SQLTableException("not have column: " + fields[i]);
             }
         }
         return cols;
     }
-
+    protected int fieldToCol(String field) {
+        for (int j = 0; j < columns.length; j++) {
+            if (field.equals(columns[j].name)) {
+                return j;
+            }
+        }
+        return -1;
+    }
 }

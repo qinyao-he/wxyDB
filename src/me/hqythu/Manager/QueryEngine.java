@@ -2,9 +2,6 @@ package me.hqythu.manager;
 
 import me.hqythu.exception.SQLExecException;
 import me.hqythu.object.Table;
-import me.hqythu.object.QuerySet;
-import me.hqythu.pagefile.Page;
-import me.hqythu.util.SelectOption;
 import me.hqythu.util.Where;
 
 import java.util.List;

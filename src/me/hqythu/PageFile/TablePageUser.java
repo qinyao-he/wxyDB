@@ -27,7 +27,7 @@ public class TablePageUser {
         setName(page,tableName);                // 表名 108
         setFirstDataPage(page,-1);              // 首数据页索引 4
         setTableIndex(page,page.getPageId());   // 表索引 4
-        setRecordLen(page,Record.getRecordLen(columns)); // 记录长度 4
+        setRecordLen(page,Record.calcRecordLen(columns)); // 记录长度 4
         setRecordSize(page,0); // 记录个数
         setColumnSize(page,(short) columns.length); // 列数 2
         setPrimaryCol(page,-1);
@@ -197,10 +197,12 @@ public class TablePageUser {
     public static void setRecordSize(Page page, int size) {
         ByteBuffer buffer = page.getBuffer();
         buffer.putInt(Global.TBPAGE_RECORD_SIZE_POS, size);
+        page.setDirty();
     }
     public static void incRecordSize(Page page) {
         int size = getRecordSize(page);
         setRecordSize(page,++size);
+        page.setDirty();
     }
     public static void decRecordSize(Page page) {
         int size = getRecordSize(page);

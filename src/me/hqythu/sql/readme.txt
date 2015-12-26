@@ -47,3 +47,18 @@ DDL
         tableNames.get(0)：表名
     ERROR:
         语句错误
+
+
+Where的结构
+    where条件
+    内部类
+        boolOp 布尔操作:and,or
+        CalcOp 计算操作:==,!=,<,<=,>,>=,is
+        BoolExpr 布尔表达式 LValue, CompareOp, RValue
+    解析得到一个逆波兰表达式
+        List<BoolExpr> boolExprs = new ArrayList<>();
+        List<boolOp> boolOps = new ArrayList<>();
+
+setValue
+    用于update
+    解析得到List<setValue>

@@ -1,7 +1,6 @@
 package me.hqythu.sql;
 
 import me.hqythu.exception.SQLExecException;
-import me.hqythu.util.SelectOption;
 import me.hqythu.util.Where;
 
 import java.util.function.Function;
@@ -22,9 +21,6 @@ public class SQL {
 
     // TABLE_NAME
     String tableName = null;
-
-    // SELECT
-    SelectOption selectOption = null;
 
     // WHERE
     Where where = null;

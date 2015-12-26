@@ -92,8 +92,6 @@ public class RecordManagerTest {
         RecordManager.getInstance().insert(TEST_TABLE1,record);
         record[1] = 19;
         RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
-        record[1] = 20;
-        RecordManager.getInstance().insert(TEST_TABLE1,cols,record);
 
         // 检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
@@ -102,14 +100,15 @@ public class RecordManagerTest {
         Assert.assertTrue(pageId != -1);
         Assert.assertTrue(fileId != -1);
         tPage = BufPageManager.getInstance().getPage(fileId,pageId);
-        Assert.assertEquals(3,TablePageUser.getRecordSize(tPage));
+        Assert.assertEquals(2,TablePageUser.getRecordSize(tPage));
 
         // 检查数据页的写入情况
         pageId = TablePageUser.getFirstDataPage(tPage);
         Assert.assertTrue(pageId != -1);
         dPage = BufPageManager.getInstance().getPage(fileId,pageId);
-        Assert.assertEquals(3,DataPageUser.getRecordSize(dPage));
+        Assert.assertEquals(2,DataPageUser.getRecordSize(dPage));
         data = DataPageUser.readRecord(dPage,0);
+        Assert.assertNotEquals(null,data);
         str = new String(data,6,40);
         if (str.indexOf(0) > 0) {
             str = str.substring(0,str.indexOf(0));
@@ -128,7 +127,7 @@ public class RecordManagerTest {
         fileId = SystemManager.getInstance().getFileId();
         Assert.assertTrue(pageId != -1);
         Assert.assertTrue(fileId != -1);
-        Assert.assertEquals(3,TablePageUser.getRecordSize(tPage));
+        Assert.assertEquals(2,TablePageUser.getRecordSize(tPage));
 
         // 非法的插入
         record[0] = "LiuXiaoHong";
@@ -140,9 +139,6 @@ public class RecordManagerTest {
         thrown.expect(SQLRecordException.class);
         thrown.expectMessage("not null try to null");
         RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
-        thrown.expect(SQLRecordException.class);
-        thrown.expectMessage("not null try to null");
-        RecordManager.getInstance().insert(TEST_TABLE1,cols,record);
 
     }
 

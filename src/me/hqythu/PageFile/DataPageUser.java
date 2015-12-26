@@ -64,8 +64,7 @@ public class DataPageUser {
     }
 
     /**
-     * 删除记录
-     * 最后一个挪到被删除位置
+     * 写记录
      */
     public static boolean writeRecord(Page page, int index, byte[] record) {
         byte[] data = page.getData();
@@ -109,6 +108,8 @@ public class DataPageUser {
         setPreIndex(page2,page1.getPageId());
         page1.setDirty();
         page2.setDirty();
+        page1.setDirty();
+        page2.setDirty();
     }
 
     /**
@@ -127,6 +128,7 @@ public class DataPageUser {
                 Page nextPage = BufPageManager.getInstance().getPage(fileId,nextPageIndex);
                 setPreIndex(nextPage,lastPageIndex);
             }
+            page.setDirty();
         } catch (Exception e) {
             e.printStackTrace();
         }
