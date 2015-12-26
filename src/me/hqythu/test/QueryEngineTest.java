@@ -6,15 +6,15 @@ import me.hqythu.manager.SystemManager;
 import me.hqythu.object.Column;
 import me.hqythu.object.DataType;
 import me.hqythu.object.Table;
+import me.hqythu.util.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static java.lang.Math.abs;
 import static org.junit.Assert.*;
 
 /**
@@ -58,11 +58,14 @@ public class QueryEngineTest {
         SystemManager.getInstance().dropDatabase(TEST_DB);
     }
 
+    /**
+     * 测试多表连接,小数据
+     */
     @Test
     public void testTableJoin() throws Exception {
         Object[] record;
         List<Map<Table,Object[]>> results;
-        List<String> tableNames;
+        Set<String> tableNames;
 
         // 初始化插入数据
         // 表1
@@ -81,7 +84,7 @@ public class QueryEngineTest {
             RecordManager.getInstance().insert(TEST_TABLE2,record);
         }
 
-        tableNames = new ArrayList<>();
+        tableNames = new HashSet<>();
 
         tableNames.add(TEST_TABLE1);
         results = QueryEngine.getInstance().tableJoinRecords(tableNames);
@@ -93,11 +96,14 @@ public class QueryEngineTest {
 
     }
 
+    /**
+     * 测试多表连接,一个表为空
+     */
     @Test
     public void testNormal() throws Exception {
         Object[] record;
         List<Map<Table,Object[]>> results;
-        List<String> tableNames;
+        Set<String> tableNames;
 
         // 初始化插入数据
         // 表1
@@ -108,7 +114,7 @@ public class QueryEngineTest {
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
 
-        tableNames = new ArrayList<>();
+        tableNames = new HashSet<>();
 
         tableNames.add(TEST_TABLE1);
         results = QueryEngine.getInstance().tableJoinRecords(tableNames);
@@ -117,5 +123,95 @@ public class QueryEngineTest {
         tableNames.add(TEST_TABLE2);
         results = QueryEngine.getInstance().tableJoinRecords(tableNames);
         Assert.assertEquals(0,results.size());
+    }
+
+    /**
+     * 测试查询
+     */
+    @Test
+    public void testQuery() throws Exception {
+        Object[] record;
+        List<Map<Table,Object[]>> results;
+        List<Object[]> queryset;
+        Set<String> tableNames;
+        SeleteOption select;
+        Where where;
+
+        // 初始化插入数据
+        // 表1
+        record = new Object[2];
+        record[0] = "LiuXiaoHong";
+        for (int i = 0; i < 10; i++) {
+            record[1] = i;
+            RecordManager.getInstance().insert(TEST_TABLE1,record);
+        }
+
+        record = new Object[3];
+        record[1] = "LiuXiaoHong";
+        record[2] = "F";
+        for (int i = 0; i < 2; i++) {
+            record[0] = i;
+            RecordManager.getInstance().insert(TEST_TABLE2,record);
+        }
+
+        select = new SeleteOption();
+        select.tableNames.add(TEST_TABLE1);
+        select.fromTableNames.add(TEST_TABLE1);
+        select.columnNames.add("age");
+        select.tableNames.add(TEST_TABLE2);
+        select.fromTableNames.add(TEST_TABLE2);
+        select.columnNames.add("id");
+
+        where = new Where();
+        where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ, 7, true));
+        where.isExprs.add(true);
+        queryset = QueryEngine.getInstance().query(select, where);
+        Assert.assertEquals(6,queryset.size());
+    }
+
+    /**
+     * 测试聚集查询
+     */
+    @Test
+    public void testFunc() throws Exception {
+        Object[] record;
+        double temp;
+        double avg,sum,min,max;
+        Func func;
+
+        // 初始化插入数据
+        // 表1
+        record = new Object[2];
+        record[0] = "LiuXiaoHong";
+        avg = 0;
+        sum = 0;
+        for (int i = 0; i < 10; i++) {
+            avg += i;
+            sum += i;
+            record[1] = i;
+            RecordManager.getInstance().insert(TEST_TABLE1,record);
+        }
+        avg /= 10;
+
+        record = new Object[3];
+        record[0] = 0;
+        record[1] = "LiuXiaoHong";
+        record[2] = "F";
+        RecordManager.getInstance().insert(TEST_TABLE2,record);
+
+        func = Func.AVG;
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        Assert.assertTrue(abs(avg-temp) < 1e6);
+        func = Func.SUM;
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        Assert.assertTrue(abs(sum-temp) < 1e6);
+        max = 9;
+        func = Func.MAX;
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        Assert.assertTrue(abs(max-temp) < 1e6);
+        min = 0;
+        func = Func.MIN;
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        Assert.assertTrue(abs(min-temp) < 1e6);
     }
 }

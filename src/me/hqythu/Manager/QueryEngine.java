@@ -1,9 +1,10 @@
 package me.hqythu.manager;
 
 import me.hqythu.exception.SQLQueryException;
+import me.hqythu.exception.SQLTableException;
 import me.hqythu.exception.SQLWhereException;
-import me.hqythu.object.Column;
 import me.hqythu.object.Table;
+import me.hqythu.util.Func;
 import me.hqythu.util.SeleteOption;
 import me.hqythu.util.Where;
 
@@ -31,17 +32,26 @@ public class QueryEngine {
      */
     public List<Object[]> query(SeleteOption select, Where where) throws SQLQueryException {
         Map<String, Table> tables = SystemManager.getInstance().getTables();
-        List<String> tableNames = where.getTableNames();
-        List<Map<Table, Object[]>> temps = tableJoinRecords(tableNames);
-        List<Object[]> result = new ArrayList<>(temps.size());
 
+        List<Map<Table, Object[]>> temps = tableJoinRecords(select.fromTableNames);
+
+        int nCol = select.tableNames.size();    // 查询结果的列数
+        Table[] t = new Table[nCol];            // select对应的表
+        int[] c = new int[nCol];                // select对应的列号
+        for (int i = 0; i < t.length; i++) {
+            t[i] = tables.get(select.tableNames.get(i));
+            c[i] = t[i].getColumnCol(select.columnNames.get(i));
+        }
+
+        List<Object[]> result = new ArrayList<>(temps.size());
         try {
-//            Table[] t = new Table[select.tableNames.size()];
-//            int[] c = new int[select.columnNames.size()];
             for (Map<Table, Object[]> temp : temps) {
                 if (where.match(temp, tables)) {
-//                    temp.get(t)
-//                    result.add()\
+                    Object[] record = new Object[nCol];
+                    for (int i = 0; i < nCol; i++) {
+                        record[i] = temp.get(t[i])[c[i]];
+                    }
+                    result.add(record);
                 }
             }
         } catch (SQLWhereException e) {
@@ -49,17 +59,56 @@ public class QueryEngine {
             throw new SQLQueryException("query error : "+e.getMessage());
         }
 
-        return null;
+        return result;
+    }
+
+    public double func(Func func, String tableName, String columnName) throws SQLTableException {
+//        Set<String> tablesNames = new HashSet<>();
+//        tablesNames.add(tableName);
+//        List<Map<Table, Object[]>> temps = tableJoinRecords(new HashSet<>().add(tableName));
+        Table table = SystemManager.getInstance().getTable(tableName);
+        List<Object[]> records = table.getAllRecords();
+        int col = table.getColumnCol(columnName);
+        Integer temp;
+        double result = 0;
+        switch (func) {
+            case SUM:
+                for (Object[] record : records) {
+                    result += (Integer)record[col];
+                }
+                break;
+            case AVG:
+                for (Object[] record : records) {
+                    result += (Integer)record[col];
+                }
+                if (records.size() == 0) result = 0;
+                result /= records.size();
+                break;
+            case MAX:
+                result = Double.MIN_VALUE;
+                for (Object[] record : records) {
+                    temp = (Integer)record[col];
+                    if (result < temp) result = temp;
+                }
+                if (records.size() == 0) result = 0;
+                break;
+            case MIN:
+                result = Double.MAX_VALUE;
+                for (Object[] record : records) {
+                    temp = (Integer)record[col];
+                    if (result > temp) result = temp;
+                }
+                if (records.size() == 0) result = 0;
+                break;
+        }
+        return result;
     }
 
     /**
      * 表的联合
-     * 未检查tableNames的重复
-     *
-     * @param tableNames
-     * @return
+     * 内部使用
      */
-    public List<Map<Table, Object[]>> tableJoinRecords(List<String> tableNames) {
+    public List<Map<Table, Object[]>> tableJoinRecords(Set<String> tableNames) {
         Table table;
         List<Object[]> tempRecords;
 
