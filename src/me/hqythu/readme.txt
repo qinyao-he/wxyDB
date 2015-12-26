@@ -53,65 +53,60 @@
 
 ----------------------进度----------------------
 已完成
-    SystemManage测试
+    SystemManage及其测试
         创建、切换、删除数据库
         创建、删除、显示表
-    SQL大部分语句的解析
+    Table及其测试
+        insert,remove,update
     TablePage测试
-    Table部分测试
-        插入
     Record测试
-    NULL的检查
+    NULL的检查,主键的支持
+    Where类的设计
+    SQL大部分语句的解析
+    表的联合TableJoin
+        支持任意多表,但机器性能可能无法支持
+
+    命令
+        CREATE DATABASE orderDB; 创建名为 orderDB 的数据库
+        DROP DATABASE orderDB; 删除名为 orderDB 的数据库
+        USE orderDB; 当前数据库切换为 orderDB
+        SHOW TABLES; 列出当前数据库包含的所有表
+        DROP TABLE customer; 删除名为 customer 的表
+        DESC customer; 列出该表的信息
 
 未完成
-    Where类的设计
-    Table
-        update
-        remove
-    Where
     测试 INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’);
         如果主键出现重复，应报错
     测试 INSERT INTO orders VALUES (315000,200001,’eight’);
         如果数据类型不符合，应报错
-    主键的支持的测试
-    页式文件系统测试
     Query模块
-    Table测试
-        插入、删除、更新
+        query, function, TableJoin
+    主键的支持的测试
     Query测试
-        查询
+        query, function
     SQL语句的执行
-    
+    SQL基本功能展示
+        三个表的联合查询例程
+    GUI界面
+
+    命令
+        CREATE TABLE customer( id int(10) NOT NULL,
+        name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id));
+            创建名为 customer 的表,它包含三个字段 id、name 和 gender,其中 id 是主键。
+            这三 字段的数据类型分别为整型、字符串和字符串,并且都不允许为空。
+
+        DELETE FROM publisher WHERE state=’CA’;
+            删除所有加州的出版商
+        UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;
+            把作者 Anthony Boucher 的书的书名改为 Nine Times Nine
+
+        SELECT * FROM publisher WHERE nation=’CA’; 列出所有加州出版商的信息。
+        SELECT title FROM book WHERE authors is null; 列出 authors 字段为空的记录的书名。
+        SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;
+
 可能存在的问题
-    PageFile测试
-    
-可以实现的功能
-    CREATE DATABASE orderDB; 创建名为 orderDB 的数据库
-    DROP DATABASE orderDB; 删除名为 orderDB 的数据库
-    USE orderDB; 当前数据库切换为 orderDB
-    SHOW TABLES; 列出当前数据库包含的所有表
-    DROP TABLE customer; 删除名为 customer 的表
-    DESC customer; 列出该表的信息
+    页式文件系统PageFile测试
 
-    null的检查
-    primary key主键的支持
-
-未能实现的功能
-
-    CREATE TABLE customer( id int(10) NOT NULL,
-    name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id));
-        创建名为 customer 的表,它包含三个字段 id、name 和 gender,其中 id 是主键。
-        这三 字段的数据类型分别为整型、字符串和字符串,并且都不允许为空。
-
-    DELETE FROM publisher WHERE state=’CA’;
-        删除所有加州的出版商
-    UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;
-        把作者 Anthony Boucher 的书的书名改为 Nine Times Nine
-
-    SELECT * FROM publisher WHERE nation=’CA’; 列出所有加州出版商的信息。
-    SELECT title FROM book WHERE authors is null; 列出 authors 字段为空的记录的书名。
-    SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;
-    
 ----------------------基本框架----------------------
 业务逻辑
     1、WXYDB启动数据库软件

@@ -25,6 +25,10 @@ public class QueryEngine {
         return engine;
     }
 
+    /**
+     * 查询
+     * (未完成)
+     */
     public List<Object[]> query(SeleteOption select, Where where) throws SQLQueryException {
         Map<String, Table> tables = SystemManager.getInstance().getTables();
         List<String> tableNames = where.getTableNames();
@@ -37,7 +41,7 @@ public class QueryEngine {
             for (Map<Table, Object[]> temp : temps) {
                 if (where.match(temp, tables)) {
 //                    temp.get(t)
-//                    result.add()
+//                    result.add()\
                 }
             }
         } catch (SQLWhereException e) {

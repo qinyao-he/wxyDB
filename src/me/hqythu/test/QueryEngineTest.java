@@ -26,8 +26,8 @@ public class QueryEngineTest {
     public static final String TEST_DB = "test_query.db";
     public static final String TEST_TABLE1 = "Student";
     public static final String TEST_TABLE2 = "Customer";
-    public static final int NORMAL_NUM = 100;
     public static final int BIG_NUM = 10000;
+    public static final int NORMAL_NUM = 100;
     public static final int NUM1 = 100;
     public static final int NUM2 = 200;
 
@@ -91,5 +91,31 @@ public class QueryEngineTest {
         results = QueryEngine.getInstance().tableJoinRecords(tableNames);
         Assert.assertEquals(NUM1*NUM2,results.size());
 
+    }
+
+    @Test
+    public void testNormal() throws Exception {
+        Object[] record;
+        List<Map<Table,Object[]>> results;
+        List<String> tableNames;
+
+        // 初始化插入数据
+        // 表1
+        record = new Object[2];
+        record[0] = "LiuXiaoHong";
+        for (int i = 0; i < BIG_NUM; i++) {
+            record[1] = i;
+            RecordManager.getInstance().insert(TEST_TABLE1,record);
+        }
+
+        tableNames = new ArrayList<>();
+
+        tableNames.add(TEST_TABLE1);
+        results = QueryEngine.getInstance().tableJoinRecords(tableNames);
+        Assert.assertEquals(BIG_NUM,results.size());
+
+        tableNames.add(TEST_TABLE2);
+        results = QueryEngine.getInstance().tableJoinRecords(tableNames);
+        Assert.assertEquals(0,results.size());
     }
 }

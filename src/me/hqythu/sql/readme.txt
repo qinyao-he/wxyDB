@@ -48,6 +48,46 @@ DDL
     ERROR:
         语句错误
 
+查询结果说明 by lxhlxhlxh555：
+    ParseResult
+    type：该语句的类型
+    对于每种类型：
+    INSERT：
+        tableNames.get(0)：表名
+        List<Object> data：表示其中的数据
+    DELETE：
+        tableNames.get(0)：表名
+        Where
+            List<Object>
+                BoolExpr BoolOp
+    UPDATE：
+        tableNames.get(0)：表名
+        Where
+        List<SetValue>
+    SELECT：
+        tableNames.get(0)：表名
+        SelectOption:查询的列
+            List<String> tableNames
+            List<String> columnNames
+        Where
+    CREATE_DATABASE：
+        dataBaseName：数据库名
+    DROP_DATABASE：
+        dataBaseName：数据库名
+    USE：
+        dataBaseName：数据库名
+    SHOW_TABLES:
+        无
+    CREATE_TABLE:
+        tableNames.get(0)：表名
+        List<Column> columns
+    DROP_TABLE:
+        tableNames.get(0)：表名
+    DESC:
+        tableNames.get(0)：表名
+    ERROR:
+        语句错误
+
 
 Where的结构
     where条件
