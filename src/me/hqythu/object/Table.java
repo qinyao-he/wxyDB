@@ -8,7 +8,9 @@ import me.hqythu.util.SetValue;
 import me.hqythu.util.Where;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -132,7 +134,6 @@ public class Table {
      * 数据页之间不合并
      *
      * 未完成
-     * Where没有实现
      */
     public void remove(Where where) throws SQLTableException {
         Page dbPage = SystemManager.getInstance().getDbPage();
@@ -152,7 +153,9 @@ public class Table {
                 for (int index = 0; index < size; ) {
                     byte[] data = DataPageUser.readRecord(page, index);
                     Object[] values = Record.bytesToValues(this,data);
-                    if (where.match(values)) {
+                    Map<Table,Object[]> records = new HashMap<>();
+                    records.put(this,values);
+                    if (where.match(records,SystemManager.getInstance().getTables())) {
                         DataPageUser.removeRecord(page, index);
                         size--;
                         total--;
@@ -201,20 +204,19 @@ public class Table {
                 int size = DataPageUser.getRecordSize(page);
                 for (int index = 0; index > size; index++) {
                     byte[] data = DataPageUser.readRecord(page, index);
-//                    Object[] values =
-
+                    Object[] values = Record.bytesToValues(this,data);
+                    Map<Table,Object[]> records = new HashMap<>();
+                    records.put(this,values);
                     // 满足条件的进行更新
-//                    if (where.match(data, columns)) {
-//                        Object[] record = Record.bytesToValues(this,data);
-//                        for (SetValue setValue : setValues) {
-//                            int col = getColumnCol(setValue.columnName);
-//                            record[col] = setValue.calcValue(record[col]);
-//                        }
-////                        data = Record.valuesToBytes()
-////                        DataPageUser.writeRecord(page,index,data);
-////                        DataPageUser.removeRecord(page, index);
-//                    }
-
+                    if (where.match(records,SystemManager.getInstance().getTables())) {
+                        for (SetValue setValue : setValues) {
+                            int col = getColumnCol(setValue.columnName);
+                            values[col] = setValue.calcValue(values[col]);
+                        }
+                        data = Record.valuesToBytes(this,values);
+                        DataPageUser.writeRecord(page,index,data);
+                        DataPageUser.removeRecord(page, index);
+                    }
                 }
                 dataPageId = DataPageUser.getNextIndex(page);
             }

@@ -73,4 +73,17 @@ public class Global {
     public static final int RECORD_COLNUM_POS = 4;
     public static final int RECORD_STATIC_DATA_POS = 6;
     public static final int RECORD_STATUS_LEN = RECORD_STATIC_DATA_POS - RECORD_STATUSA_POS;
+
+    /**
+     * where条件运算
+     */
+    public static final String AND = "and";
+    public static final String OR = "or";
+    public static final String EQU = "equ"; // ==
+    public static final String NEQ = "neq"; // !=
+    public static final String LES = "les"; // <
+    public static final String LEQ = "leq"; // <=
+    public static final String GTR = "gtr"; // >
+    public static final String GEQ = "geq"; // >=
+    public static final String IS = "is";
 }
