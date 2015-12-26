@@ -12,18 +12,14 @@ import java.util.Map;
  */
 public class Where {
 
-    enum BoolOp {
-        AND,OR
-    }
-
     // SQL解析得到boolExprs和boolOps
     // 如果不考虑NOT,则boolExpr的个数一定比boolOps个数多1
     public List<BoolExpr> boolExprs;
     public List<BoolOp> boolOps;
 
     public Where() {
-        List<BoolExpr> boolExprs = new ArrayList<>();
-        List<BoolOp> boolOps = new ArrayList<>();
+        boolExprs = new ArrayList<>();
+        boolOps = new ArrayList<>();
     }
 
     //-------------------外部置参和使用-------------------
@@ -52,11 +48,16 @@ public class Where {
         }
     }
 
+    public void clear() {
+        boolExprs.clear();
+        boolOps.clear();
+    }
+
     public boolean match(Map<Table,Object[]> records, Map<String,Table> tables) throws SQLWhereException {
         setValues(records, tables);
         boolean temp = boolExprs.get(0).getResult();
         for (int i = 1; i < boolExprs.size(); i++) {
-            switch (boolOps.get(i)) {
+            switch (boolOps.get(i-1)) {
                 case AND:
                     temp = temp && boolExprs.get(i).getResult();
                     break;

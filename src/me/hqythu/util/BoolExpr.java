@@ -10,20 +10,45 @@ import me.hqythu.exception.SQLWhereException;
  */
 public class BoolExpr {
 
-    enum CompareOp {
-        EQU,NEQ,LES,LEQ,GTR,GEQ,IS
+    public String tableNameL;       // 解析得到(必须有)
+    public String columnNameL;      // 解析得到
+    public Object valueL;           // 解析得到
+
+    public CompareOp compareOp;     // 解析得到(必须有)
+
+    public String tableNameR;       // 解析得到(必须有)
+    public String columnNameR;      // 解析得到
+    public Object valueR;           // 解析得到
+
+    // 0==0, true
+    public BoolExpr() {
+        tableNameL = null; // null表示该值为常量
+        valueL = 0;
+        compareOp = CompareOp.EQU;
+        tableNameR = null; // null表示该值为常量
+        valueR = 0;
+    }
+    
+    // 常用的表达式
+    // if left : var op const   变量在左边
+    // else : const op var      变量在右边
+    public BoolExpr(String tableName, String columnName, CompareOp op, Object value, boolean left) {
+        if (left) {
+            tableNameL = tableName;
+            columnNameL = columnName;
+            tableNameR = null;
+            valueR = value;
+        } else {
+            tableNameL = null;
+            valueL = value;
+            tableNameR = tableName;
+            columnNameR = columnName;
+        }
+        compareOp = op;
     }
 
-    public String tableNameL = null;        // 解析得到
-    public String columnNameL = null;       // 解析得到
-    public Object valueL = null;
 
-    public CompareOp compareOp;                   // 解析得到
-
-    public String tableNameR = null;        // 解析得到
-    public String columnNameR = null;       // 解析得到
-    public Object valueR = null;            // 解析得到
-
+    //--------------------删除,更新,查询--------------------
     public boolean isNeedValueL() {return tableNameL != null;}
     public void setValueL(Object value) {valueL = value;}
     public boolean isNeedValueR() {return tableNameR != null;}

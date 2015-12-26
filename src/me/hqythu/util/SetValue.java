@@ -1,15 +1,6 @@
 package me.hqythu.util;
 
-import me.hqythu.object.Column;
-import me.hqythu.object.Table;
-
-import java.util.List;
-
 public class SetValue {
-
-    enum CalcOp {
-        ADD,SUB,MUL,DIV
-    }
 
     // 认为表达式右边如果有变量,只能为表达式左边这个值
     // 即只支持
