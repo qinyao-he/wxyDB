@@ -693,6 +693,7 @@ public class SQLParser
 				}
 			}
 		}
+		result.type = OrderType.CREATE_TABLE;
 		return result;
 	}
 	public static void main(String[] args)
