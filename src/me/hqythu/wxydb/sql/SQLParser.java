@@ -1,16 +1,18 @@
 package me.hqythu.wxydb.sql;
 
+import me.hqythu.wxydb.object.Column;
+import me.hqythu.wxydb.object.DataType;
+import me.hqythu.wxydb.sql.ParseResult.OrderType;
+import me.hqythu.wxydb.util.CalcOp;
+import me.hqythu.wxydb.util.SelectOption;
+import me.hqythu.wxydb.util.SetValue;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-
 //import query.Condition.Type;
-import me.hqythu.wxydb.util.CalcOp;
-import me.hqythu.wxydb.util.SelectOption;
-import me.hqythu.wxydb.util.SetValue;
-import  me.hqythu.wxydb.sql.ParseResult.OrderType;
 
 public class SQLParser
 {
@@ -107,6 +109,101 @@ public class SQLParser
 			}
 		}
 		return resultObject;
+	}
+	static DoubleReturn<DataType, String> readType(String sql)
+	{
+		DoubleReturn<DataType, String> result = new DoubleReturn<DataType, String>();
+		if (sql.toUpperCase().startsWith("INT") && sql.charAt(3) == ' ')
+		{
+			result.first = DataType.INT;
+			result.second = sql.substring(3);
+		}
+		else if (sql.toUpperCase().startsWith("VARCHAR") && sql.charAt(7) == ' ')
+		{
+			result.first = DataType.VARCHAR;
+			result.second = sql.substring(7);
+		}
+		return result;
+	}
+	static DoubleReturn<Column, String> readColumn(String sql)
+	{
+		String id = "";
+		DataType type = DataType.UNKNOWN;
+		Integer length = 0;
+		boolean notNull = false;
+		int status = 0;
+		sql = sql.trim();
+		while(sql.length() > 0)
+		{
+			if (status == 0)
+			{
+				if (sql.charAt(0) == ' ')
+				{
+					sql = sql.trim();
+					status = 1;
+				}
+				else
+				{
+					id += sql.charAt(0);
+					sql = sql.substring(1);
+				}
+			}
+			else if (status == 1)
+			{
+				sql = sql.trim();
+				DoubleReturn<DataType, String> r = readType(sql);
+				type = r.first;
+				sql = r.second;
+				status = 2;
+			}
+			else if (status == 2)
+			{
+				sql = sql.trim();
+				sql = sql.substring(1);
+				status = 3;
+			}
+			else if (status == 3)
+			{
+				sql = sql.trim();
+				DoubleReturn<Integer, String> r = readNum(sql);
+				length = r.first;
+				sql = r.second;
+				status = 4;
+			}
+			else if (status == 4)
+			{
+				sql = sql.trim();
+				sql = sql.substring(1);
+				status = 5;
+			}
+			else if (status == 5)
+			{
+				sql = sql.trim();
+				if (sql.toUpperCase().startsWith("NOT NULL"))
+				{
+					notNull = true;
+					sql = sql.substring(8);
+					sql = sql.trim();
+					sql = sql.substring(1);
+					sql = sql.trim();
+					break;
+				}
+				else
+				{
+					sql = sql.trim();
+					sql = sql.substring(1);
+					sql = sql.trim();
+					notNull = false;
+					break;
+				}
+			}
+		}
+		Column column = new Column(id, type, length.shortValue());
+		if (notNull)
+		{
+			column.setNotNull();
+		}
+		return new DoubleReturn<Column, String>(column, sql);
 	}
 	static DoubleReturn<String, String> readString(String sql)
 	{
@@ -248,7 +345,7 @@ public class SQLParser
 		result.second = str;
 		return result;
 	}
-//	static List<Condition> parseConditions(List<String> conds)
+	//	static List<Condition> parseConditions(List<String> conds)
 //	{
 //		List<Condition> conditions = new ArrayList<Condition>();
 //		int num = 0;
@@ -276,7 +373,7 @@ public class SQLParser
 //			}
 //			else
 //			{
-//				if (conds.get(i).endsWith("\'") || conds.get(i).endsWith("��") || conds.get(i).endsWith("��") || conds.get(i+1).equals(";") || conds.get(i+1).toUpperCase().equals("AND") ||conds.get(i+1).toUpperCase().equals("OR") )
+//				if (conds.get(i).endsWith("\'") || conds.get(i).endsWith("‘") || conds.get(i).endsWith("’") || conds.get(i+1).equals(";") || conds.get(i+1).toUpperCase().equals("AND") ||conds.get(i+1).toUpperCase().equals("OR") )
 //				{
 //					String v = conds.get(i);
 //					value += v;
@@ -320,7 +417,7 @@ public class SQLParser
 				result.data.add(exchange(currentString));
 				currentString = "";
 			}
-			else 
+			else
 			{
 				currentString += ' ';
 			}
@@ -379,7 +476,7 @@ public class SQLParser
 					num = 1;
 					continue;
 				}
-				else if (num == 1) 
+				else if (num == 1)
 				{
 					if (sql[i+1].equals(",") || sql[i+1].toUpperCase().equals("WHERE"))
 					{
@@ -449,9 +546,9 @@ public class SQLParser
 				{
 					result.tableNames.add(sql[i]);
 				}
-				
+
 			}
-			else 
+			else
 			{
 				conds += sql[i]+' ';
 			}
@@ -511,12 +608,13 @@ public class SQLParser
 		result.dataBaseName = sql[1];
 		return result;
 	}
-	static ParseResult parseSHOW_TABLES(String sqlString)
-	{
+
+	static ParseResult parseSHOW_TABLES(String sqlString) {
 		ParseResult result = new ParseResult();
 		result.type = OrderType.SHOW_TABLES;
 		return result;
 	}
+
 	static ParseResult parseDROP_TABLE(String sqlString)
 	{
 		sqlString = sqlString.replaceAll(";", " ;");
@@ -535,57 +633,81 @@ public class SQLParser
 		result.tableNames.add(sql[1]);
 		return result;
 	}
-//	static ParseResult parseCREATE_TABLE(String sqlString)
-//	{
-//		sqlString = sqlString.replaceAll(";", " ;");
-//		sqlString = sqlString.replaceAll("\\( ", "(");
-//		sqlString = sqlString.replaceAll(" \\(", "(");
-//		sqlString = sqlString.replaceAll("\\(", " ( ");
-//		sqlString = sqlString.replaceAll("\\) ", ")");
-//		sqlString = sqlString.replaceAll(" \\)", ")");
-//		sqlString = sqlString.replaceAll("\\)", " ) ");
-//		String sql[] =  sqlString.split(" ");
-//		ParseResult result = new ParseResult();
-//		result.tableNames.add(sql[2]);
-//		sqlString = "";
-//		for (int i = 2; i < sql.length; i++)
-//		{
-//			sqlString += sql[i] + ' ';
-//		}
-//		System.out.println(sqlString);
-////		return null;
-//		int status = 0;
-//		while(sqlString.length() > 0)
-//		{
-//			if (status == 0)
-//			{
-//				sqlString = sqlString.trim();
-//				DoubleReturn<String, String> r = readString(sqlString);
-//				result.tableNames.add(r.first);
-//				sqlString = r.second;
-//				status = -1;
-//			}
-//			else if (status == -1)
-//			{
-//				sqlString = sqlString.trim();
-//				sqlString = sqlString.substring(1);
-//				status = 1;
-//			}
-//		}
-//	}
+	static ParseResult parseCREATE_TABLE(String sql)
+	{
+		sql = sql.replaceAll(";", " ;");
+		sql = sql.replaceAll("\\( ", "(");
+		sql = sql.replaceAll(" \\(", "(");
+		sql = sql.replaceAll("\\(", " ( ");
+		sql = sql.replaceAll("\\) ", ")");
+		sql = sql.replaceAll(" \\)", ")");
+		sql = sql.replaceAll("\\)", " ) ");
+		String sqlS[] =  sql.split(" ");
+		ParseResult result = new ParseResult();
+//		result.tableNames.add(sqlS[2]);
+		sql = "";
+		for (int i = 2; i < sqlS.length; i++)
+		{
+			sql += sqlS[i] + ' ';
+		}
+		System.out.println(sql);
+//		return null;
+		int status = 0;
+		while(sql.length() > 0)
+		{
+			if (status == 0)
+			{
+				sql = sql.trim();
+				DoubleReturn<String, String> r = readString(sql);
+				result.tableNames.add(r.first);
+				sql = r.second;
+				sql = sql.trim();
+				sql = sql.substring(1);
+				status = 1;
+			}
+			else if (status == 1)
+			{
+				if (!sql.toUpperCase().startsWith("PRIMARY KEY"))
+				{
+					DoubleReturn<Column, String> r = readColumn(sql);
+					result.columns.add(r.first);
+					sql = r.second;
+				}
+				else
+				{
+					sql = sql.substring(11);
+					sql = sql.trim();
+					sql = sql.substring(1);
+					sql = sql.trim();
+					sql = sql.trim();
+					DoubleReturn<String, String> r = readString(sql);
+					for (int i = 0; i < result.columns.size(); i++)
+					{
+						if (result.columns.get(i).name.equals(r.first))
+						{
+							result.columns.get(i).setPrimary();
+							break;
+						}
+					}
+					break;
+				}
+			}
+		}
+		return result;
+	}
 	public static void main(String[] args)
 	{
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
 		ParseResult result = parse("CREATE TABLE customer(\n"+
-										"id int(10) NOT NULL,\n"+
-										"name varchar(25) NOT NULL,\n"+
-										"gender varchar(1) NOT NULL,\n"+
-										"PRIMARY KEY(id)\n"+
-										");");
+				"id int(10) NOT NULL,\n"+
+				"name varchar(25) NOT NULL,\n"+
+				"gender varchar(1) NOT NULL,\n"+
+				"PRIMARY KEY(id)\n"+
+				");");
 //		System.out.print("123");
 	}
-	public static ParseResult parse(String sql)
+	static ParseResult parse(String sql)
 	{
 		sql = sql.replaceAll("\\, ", ",");
 		sql = sql.replaceAll(" \\,", ",");
@@ -607,7 +729,7 @@ public class SQLParser
 			{
 				result = parseINSERT(sql);
 			}
-			else if (ss[0].toUpperCase().equals("DELETE")) 
+			else if (ss[0].toUpperCase().equals("DELETE"))
 			{
 				result = parseDELETE(sql);
 			}
@@ -635,10 +757,10 @@ public class SQLParser
 			{
 				result = parseSHOW_TABLES(sql);
 			}
-//			else if (ss[0].toUpperCase().equals("CREATE") && ss[1].toUpperCase().equals("TABLE"))
-//			{
-//				result = parseCREATE_TABLE(sql);
-//			}
+			else if (ss[0].toUpperCase().equals("CREATE") && ss[1].toUpperCase().equals("TABLE"))
+			{
+				result = parseCREATE_TABLE(sql);
+			}
 			else if (ss[0].toUpperCase().equals("DROP") && ss[1].toUpperCase().equals("TABLE"))
 			{
 				result = parseDROP_TABLE(sql);
@@ -657,5 +779,4 @@ public class SQLParser
 		}
 		return result;
 	}
-	
 }
