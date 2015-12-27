@@ -154,13 +154,8 @@ public class QueryEngineTest {
         }
 
         select = new SelectOption();
-        select.tableNames.add(TEST_TABLE1);
-        select.fromTableNames.add(TEST_TABLE1);
-        select.columnNames.add("age");
-        select.tableNames.add(TEST_TABLE2);
-        select.fromTableNames.add(TEST_TABLE2);
-        select.columnNames.add("id");
-
+        select.add(TEST_TABLE1,"age");
+        select.add(TEST_TABLE2,"id");
         where = new Where();
         where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ, 7, true));
         where.isExprs.add(true);
