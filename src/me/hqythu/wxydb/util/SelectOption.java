@@ -38,7 +38,6 @@ public class SelectOption {
     }
     public void add(String tableName, String columnName) {
         tableNames.add(tableName);
-        fromTableNames.add(tableName);
         columnNames.add(columnName);
     }
 }
