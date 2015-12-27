@@ -32,15 +32,31 @@ public class RecordManager {
         return manager;
     }
 
-    public void insert(String tableName, String[] fields, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
+    public void insert(String tableName, List<String> fields, List<Object> values) throws SQLTableException {
+        int nCol = fields.size();
+        String[] mfields = new String[nCol];
+        Object[] mvalues = new Object[nCol];
+        fields.toArray(mfields);
+        values.toArray(mvalues);
+        insert(tableName,mfields,mvalues);
+    }
+
+    public void insert(String tableName, List<Object> values) throws SQLTableException {
+        int nCol = values.size();
+        Object[] mvalues = new Object[nCol];
+        values.toArray(mvalues);
+        insert(tableName,mvalues);
+    }
+
+    protected void insert(String tableName, String[] fields, Object[] values) throws SQLTableException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: " + tableName);
+        if (table == null) throw new SQLTableException("not have table: " + tableName);
         table.insert(fields, values);
     }
 
-    public void insert(String tableName, Object[] values) throws SQLExecException, SQLTableException, SQLRecordException {
+    protected void insert(String tableName, Object[] values) throws SQLTableException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: " + tableName);
+        if (table == null) throw new SQLTableException("not have table: " + tableName);
         table.insert(values);
     }
 

@@ -1,6 +1,7 @@
 package me.hqythu.wxydb.test;
 
 import me.hqythu.wxydb.exception.SQLRecordException;
+import me.hqythu.wxydb.exception.SQLTableException;
 import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
@@ -27,7 +28,7 @@ public class RecordManagerTest {
     public static final String TEST_NEWDB = "test_hello.db";
     public static final String TEST_TABLE1 = "Student";
     public static final String TEST_TABLE2 = "Customer";
-    public static final int BIG_NUM = 50000;
+    public static final int BIG_NUM = 10000;
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -69,29 +70,25 @@ public class RecordManagerTest {
     public void testInsert() throws Exception {
         Table table;
         int pageId,fileId;
-        Object[] record;
-        String fields[];
-        int[] cols;
+        List<String> fields;
+        List<Object> record;
         Page dbPage,tPage,dPage;
         byte[] data;
-        ByteBuffer buffer;
         String str;
-        Map<String,Table> tables;
-        int size;
 
         // 初始化插入数据
-        record = new Object[2];
-        fields = new String[]{"name","age"};
-        cols = new int[]{0,1};
+        fields = new ArrayList<>();
+        fields.add("name");
+        fields.add("age");
 
         dbPage = SystemManager.getInstance().getDbPage();
+        record = new ArrayList<>();
         // 3种插入方式
-        record[0] = "LiuXiaoHong";
-        record[1] = 18;
+        record.add("LiuXiaoHong");
+        record.add(18);
         RecordManager.getInstance().insert(TEST_TABLE1,record);
-        record[1] = 19;
+        record.set(1,19);
         RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
-        dbPage = SystemManager.getInstance().getDbPage();
 
         // 检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
@@ -114,8 +111,7 @@ public class RecordManagerTest {
         }
         Assert.assertTrue(str.equals("LiuXiaoHong"));
 
-        tables = SystemManager.getInstance().getTables();
-        dbPage = BufPageManager.getInstance().getPage(fileId,0);
+        dbPage = SystemManager.getInstance().getDbPage();
         // 切换数据库
         Assert.assertTrue(SystemManager.getInstance().createDatabase(TEST_NEWDB));
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_NEWDB));
@@ -124,7 +120,6 @@ public class RecordManagerTest {
 
         //切换数据库之后,再检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
-        tables = SystemManager.getInstance().getTables();
         pageId = table.getPageId();
         fileId = SystemManager.getInstance().getFileId();
         Assert.assertTrue(pageId != -1);
@@ -132,15 +127,16 @@ public class RecordManagerTest {
         Assert.assertEquals(2,TablePageUser.getRecordSize(tPage));
 
         // 非法的插入
-        record[0] = "LiuXiaoHong";
-        record[1] = null;
+        record.clear();
+        record.add("LiuXiaoHong");
+        record.add(null);
 
-        thrown.expect(SQLRecordException.class);
+        thrown.expect(SQLTableException.class);
         thrown.expectMessage("not null try to null");
         RecordManager.getInstance().insert(TEST_TABLE1,record);
-        thrown.expect(SQLRecordException.class);
-        thrown.expectMessage("not null try to null");
-        RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
+//        thrown.expect(SQLTableException.class);
+//        thrown.expectMessage("not null try to null");
+//        RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
 
     }
 
@@ -153,16 +149,16 @@ public class RecordManagerTest {
         Table table;
         int pageId;
         int fileId;
-        Object[] record;
         Page tPage;
         Page dPage;
         int total;
 
         // 初始化插入数据
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < BIG_NUM; i++) {
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
 
@@ -218,16 +214,16 @@ public class RecordManagerTest {
         Table table;
         int pageId;
         int fileId;
-        Object[] record;
         Object[] values;
         Page tPage;
         byte[] data;
 
         // 初始化插入数据
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < 10; i++) {
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
 
@@ -247,7 +243,7 @@ public class RecordManagerTest {
         for (int i = 0; i < 10; i++) {
             data = TablePageUser.getRecord(tPage,i);
             values = Record.bytesToValues(table,data);
-            Assert.assertEquals(values[0],record[0]);
+            Assert.assertEquals(values[0],record.get(0));
             Assert.assertEquals(values[1],i);
         }
 

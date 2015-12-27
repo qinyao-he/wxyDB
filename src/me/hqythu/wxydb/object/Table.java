@@ -59,7 +59,7 @@ public class Table {
     // 将参数转为byte[]
 
     // values个数不足,需要补null
-    public void insert(String[] fields, Object[] values) throws SQLTableException, SQLRecordException {
+    public void insert(String[] fields, Object[] values) throws SQLTableException {
 
         if (fields == null) throw new SQLTableException("insert none fields");
 
@@ -75,10 +75,15 @@ public class Table {
     }
 
     // values的个数
-    public void insert(Object[] values) throws SQLRecordException, SQLTableException {
+    public void insert(Object[] values) throws SQLTableException {
         if (values.length != columns.length) throw new SQLTableException("insert columns size not enough");
-        byte[] record = Record.valuesToBytes(this, values);
-        insert(record);
+        try {
+            byte[] record = Record.valuesToBytes(this, values);
+            insert(record);
+        } catch (Exception e) {
+//            e.printStackTrace();
+            throw new SQLTableException(e.getMessage());
+        }
     }
 
     //------------------------实际主函数------------------------

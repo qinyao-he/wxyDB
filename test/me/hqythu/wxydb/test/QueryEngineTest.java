@@ -61,24 +61,25 @@ public class QueryEngineTest {
      */
     @Test
     public void testTableJoin() throws Exception {
-        Object[] record;
         List<Map<Table,Object[]>> results;
         Set<String> tableNames;
 
         // 初始化插入数据
         // 表1
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < NUM1; i++) {
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
         // 表2
-        record = new Object[3];
-        record[1] = "LiuXiaoHong";
-        record[2] = "F";
+        record.clear();
+        record.add(0);
+        record.add("LiuXiaoHong");
+        record.add("F");
         for (int i = 0; i < NUM2; i++) {
-            record[0] = i;
+            record.set(0,i);
             RecordManager.getInstance().insert(TEST_TABLE2,record);
         }
 
@@ -99,16 +100,16 @@ public class QueryEngineTest {
      */
     @Test
     public void testNormal() throws Exception {
-        Object[] record;
         List<Map<Table,Object[]>> results;
         Set<String> tableNames;
 
         // 初始化插入数据
         // 表1
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < BIG_NUM; i++) {
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
 
@@ -128,7 +129,6 @@ public class QueryEngineTest {
      */
     @Test
     public void testQuery() throws Exception {
-        Object[] record;
         List<Map<Table,Object[]>> results;
         List<Object[]> queryset;
         Set<String> tableNames;
@@ -137,18 +137,20 @@ public class QueryEngineTest {
 
         // 初始化插入数据
         // 表1
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < 10; i++) {
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
 
-        record = new Object[3];
-        record[1] = "LiuXiaoHong";
-        record[2] = "F";
+        record.clear();
+        record.add(0);
+        record.add("LiuXiaoHong");
+        record.add("F");
         for (int i = 0; i < 2; i++) {
-            record[0] = i;
+            record.set(0,i);
             RecordManager.getInstance().insert(TEST_TABLE2,record);
         }
 
@@ -169,29 +171,29 @@ public class QueryEngineTest {
      */
     @Test
     public void testFunc() throws Exception {
-        Object[] record;
         double temp;
         double avg,sum,min,max;
         Func func;
 
-        // 初始化插入数据
-        // 表1
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
         avg = 0;
         sum = 0;
+        // 初始化插入数据
+        // 表1
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < 10; i++) {
             avg += i;
             sum += i;
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
         avg /= 10;
 
-        record = new Object[3];
-        record[0] = 0;
-        record[1] = "LiuXiaoHong";
-        record[2] = "F";
+        record.clear();
+        record.add(0);
+        record.add("LiuXiaoHong");
+        record.add("F");
         RecordManager.getInstance().insert(TEST_TABLE2,record);
 
         func = Func.AVG;
@@ -212,26 +214,27 @@ public class QueryEngineTest {
 
     @Test
     public void testSelectAll() throws Exception {
-        Object[] record;
         List<Map<Table,Object[]>> results;
         List<Object[]> queryset;
         Set<String> tableNames;
         SelectOption select;
         Where where;
 
+
         // 初始化插入数据
         // 表1
-        record = new Object[2];
-        record[0] = "LiuXiaoHong";
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < 10; i++) {
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
         // 表2
-        record = new Object[3];
-        record[0] = 0;
-        record[1] = "LiuXiaoHong";
-        record[2] = "F";
+        record.clear();
+        record.add(0);
+        record.add("LiuXiaoHong");
+        record.add("F");
         RecordManager.getInstance().insert(TEST_TABLE2,record);
         select = new SelectOption(true);
         select.addFromTable(TEST_TABLE1);

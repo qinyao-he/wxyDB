@@ -50,10 +50,11 @@ public class SetValueTest {
         Assert.assertTrue(SystemManager.getInstance().createTable("Customer",columns));
 
         // 初始化插入数据
-        Object[] record = new Object[2];
-        record[0] = "LiuXiaoHong";
+        List<Object> record = new ArrayList<>();
+        record.add("LiuXiaoHong");
+        record.add(0);
         for (int i = 0; i < NORMAL_NUM; i++) {
-            record[1] = i;
+            record.set(1,i);
             RecordManager.getInstance().insert(TEST_TABLE1,record);
         }
     }

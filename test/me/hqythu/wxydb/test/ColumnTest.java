@@ -22,6 +22,7 @@ public class ColumnTest {
     @Before
     public void setUp() throws Exception {
         SystemManager.getInstance().createDatabase(TEST_DB);
+        SystemManager.getInstance().useDatabase(TEST_DB);
     }
 
     @After
@@ -34,11 +35,10 @@ public class ColumnTest {
         List<Column> columns = new ArrayList<>();
         // 创建表
         columns.clear();
-        columns.add(new Column("id", DataType.INT,(short)4));
-        columns.add(new Column("name",DataType.VARCHAR,(short)100));
+        columns.add(new Column("id", DataType.INT,(short)4).setPrimary());
+        columns.add(new Column("name",DataType.VARCHAR,(short)100).setNotNull());
         columns.add(new Column("sex",DataType.VARCHAR,(short)1));
         Assert.assertTrue(SystemManager.getInstance().createTable("Customer",columns));
     }
-
 
 }
