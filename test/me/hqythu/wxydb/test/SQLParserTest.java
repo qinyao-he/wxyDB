@@ -27,6 +27,7 @@ public class SQLParserTest {
 
     }
 
+    // Create DB, Drop DB, Use DB
     @Test
     public void testDataBase() {
         ParseResult sql;
@@ -42,11 +43,12 @@ public class SQLParserTest {
         Assert.assertEquals("orderDB", sql.dataBaseName);
 
         // drop DataBase
-//        sql = SQLParser.parse("DROP DATABASE "+TEST_DB+";");
-//        Assert.assertTrue(sql.type == ParseResult.OrderType.DROP_DATABASE);
-//        Assert.assertEquals(TEST_DB,sql.dataBaseName);
+        sql = SQLParser.parse("DROP DATABASE "+TEST_DB+";");
+        Assert.assertTrue(sql.type == ParseResult.OrderType.DROP_DATABASE);
+        Assert.assertEquals(TEST_DB,sql.dataBaseName);
     }
 
+    // Create Table, Drop Table, Show Tables, DESC Column
     @Test
     public void testTable() {
         ParseResult sql;
@@ -62,12 +64,14 @@ public class SQLParserTest {
         Assert.assertEquals(ParseResult.OrderType.DESC, sql.type);
         Assert.assertEquals("customer", sql.tableNames.get(0));
 
-//        sql = SQLParser.parse("CREATE TABLE customer( id int(10) NOT NULL," +
-//                "name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id)" +
-//                ");");
+        sql = SQLParser.parse("CREATE TABLE customer( id int(10) NOT NULL," +
+                "name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id)" +
+                ");");
+//        System.out.println(sql.tableNames.get(0));
 //        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
     }
 
+    // INSERT
     @Test
     public void testInsert() {
         ParseResult sql;
@@ -85,6 +89,23 @@ public class SQLParserTest {
         Assert.assertEquals(315000, sql.data.get(0));
         Assert.assertEquals(200001, sql.data.get(1));
         Assert.assertEquals("eight", sql.data.get(2));
+
+    }
+
+    // DELETE
+    @Test
+    public void testDelete() {
+
+    }
+
+    // UPDATE
+    @Test
+    public void testUpdate() {
+
+    }
+
+    // SELECT
+    public void testSelect() {
 
     }
 }
