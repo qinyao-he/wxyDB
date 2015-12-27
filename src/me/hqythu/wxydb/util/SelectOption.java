@@ -13,13 +13,13 @@ public class SelectOption {
         fromTableNames = new HashSet<>();
     }
     public SelectOption(boolean all) {
+        fromTableNames = new HashSet<>();
         if (all) {
             this.all = true;
         } else {
             this.all = false;
             tableNames = new ArrayList<>();
             columnNames = new ArrayList<>();
-            fromTableNames = new HashSet<>();
         }
     }
     public boolean all;
@@ -30,6 +30,12 @@ public class SelectOption {
     public void setAll() {all = true;}
     public void clear() {all = false;}
     public boolean isAll() {return all;}
+    public Set<String> getFromTableNames() {
+        return fromTableNames;
+    }
+    public void addFromTable(String tableName) {
+        fromTableNames.add(tableName);
+    }
     public void add(String tableName, String columnName) {
         tableNames.add(tableName);
         fromTableNames.add(tableName);
