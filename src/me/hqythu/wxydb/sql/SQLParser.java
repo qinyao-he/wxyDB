@@ -650,7 +650,7 @@ public class SQLParser
 		{
 			sql += sqlS[i] + ' ';
 		}
-		System.out.println(sql);
+//		System.out.println(sql);
 //		return null;
 		int status = 0;
 		while(sql.length() > 0)
@@ -693,7 +693,7 @@ public class SQLParser
 				}
 			}
 		}
-		result.type = OrderType.CREATE_TABLE;
+        result.type = OrderType.CREATE_TABLE;
 		return result;
 	}
 	public static void main(String[] args)
@@ -724,8 +724,8 @@ public class SQLParser
 		sql = sql.replaceAll(">", " > ");
 		String ss[] =  sql.split(" ");
 		ParseResult result = new ParseResult();
-		try
-		{
+//		try
+//		{
 			if (ss[0].toUpperCase().equals("INSERT"))
 			{
 				result = parseINSERT(sql);
@@ -774,10 +774,10 @@ public class SQLParser
 			{
 				result.type = OrderType.ERROR;
 			}
-		} catch (Exception e)
-		{
-			result.type = OrderType.ERROR;
-		}
+//		} catch (Exception e)
+//		{
+//			result.type = OrderType.ERROR;
+//		}
 		return result;
 	}
 }

@@ -64,11 +64,14 @@ public class SQLParserTest {
         Assert.assertEquals(ParseResult.OrderType.DESC, sql.type);
         Assert.assertEquals("customer", sql.tableNames.get(0));
 
-        sql = SQLParser.parse("CREATE TABLE customer( id int(10) NOT NULL," +
-                "name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id)" +
+        sql = SQLParser.parse("CREATE TABLE customer ( id int (10) ) ");
+        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
+
+        sql = SQLParser.parse("CREATE TABLE customer ( id int(10) NOT NULL ," +
+                "name varchar(25) NOT NULL , gender varchar(1) NOT NULL , PRIMARY KEY(id)" +
                 ");");
-//        System.out.println(sql.tableNames.get(0));
-//        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
+        Assert.assertEquals("customer",sql.tableNames.get(0));
+        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
     }
 
     // INSERT

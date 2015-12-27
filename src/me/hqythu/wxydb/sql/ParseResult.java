@@ -49,6 +49,7 @@ public class ParseResult
 		rowNames = new ArrayList<String>();
 		data = new ArrayList<Object>();
 		values = new ArrayList<SetValue>();
+        columns = new ArrayList<>();
 	}
     public String execute() throws SQLExecException {
         String result = "hello world";
