@@ -36,8 +36,8 @@ public class ParseResult
 	Where where;
 
     // 需要修改
-	List<String> tableNames;            // String tableName
-    List<Column> columns;               // create table
+	public List<String> tableNames;            // String tableName
+    public List<Column> columns;               // create table
 
     // 不可见
 	protected List<String> rowNames;

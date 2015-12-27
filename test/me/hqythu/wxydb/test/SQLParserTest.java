@@ -1,5 +1,7 @@
-package me.hqythu.wxydb.sql;
+package me.hqythu.wxydb.test;
 
+import me.hqythu.wxydb.sql.ParseResult;
+import me.hqythu.wxydb.sql.SQLParser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
