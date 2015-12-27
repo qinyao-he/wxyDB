@@ -63,7 +63,12 @@ public class QueryEngine {
                 if (where.match(temp, tables)) {
                     Object[] record = new Object[nCol];
                     if (select.isAll()) {
-                        
+                        int ii = 0;
+                        for (Object[] objects : temp.values()) {
+                            for (int i = 0; i < objects.length; i++,ii++) {
+                                record[ii] = objects[i];
+                            }
+                        }
                     } else {
                         for (int i = 0; i < nCol; i++) {
                             record[i] = temp.get(t[i])[c[i]];

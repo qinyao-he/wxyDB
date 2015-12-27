@@ -210,4 +210,38 @@ public class QueryEngineTest {
         temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
         Assert.assertTrue(abs(min-temp) < 1e6);
     }
+
+    @Test
+    public void testSelectAll() throws Exception {
+        Object[] record;
+        List<Map<Table,Object[]>> results;
+        List<Object[]> queryset;
+        Set<String> tableNames;
+        SelectOption select;
+        Where where;
+
+        // 初始化插入数据
+        // 表1
+        record = new Object[2];
+        record[0] = "LiuXiaoHong";
+        for (int i = 0; i < 10; i++) {
+            record[1] = i;
+            RecordManager.getInstance().insert(TEST_TABLE1,record);
+        }
+        // 表2
+        record = new Object[3];
+        record[0] = 0;
+        record[1] = "LiuXiaoHong";
+        record[2] = "F";
+        RecordManager.getInstance().insert(TEST_TABLE2,record);
+        select = new SelectOption(true);
+        select.addFromTable(TEST_TABLE1);
+        select.addFromTable(TEST_TABLE2);
+        where = new Where();
+        where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1,"age", CompareOp.GEQ, 7, true));
+        where.isExprs.add(true);
+        queryset = QueryEngine.getInstance().query(select, where);
+        Assert.assertEquals(3,queryset.size());
+        Assert.assertEquals(5,queryset.get(0).length);
+    }
 }
