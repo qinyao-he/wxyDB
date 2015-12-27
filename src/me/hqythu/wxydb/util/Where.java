@@ -24,13 +24,21 @@ public class Where {
         forCalc = new Stack<>();
     }
 
-    //-------------------外部调用-------------------
+    public void addExpr(BoolExpr boolExpr) {
+        isExprs.add(true);
+        boolExprsAndOps.add(boolExpr);
+    }
 
+    public void addOp(BoolOp boolOp) {
+        isExprs.add(false);
+        boolExprsAndOps.add(boolOp);
+    }
+
+    //-------------------外部调用-------------------
     public void clear() {
         isExprs.clear();
         boolExprsAndOps.clear();
     }
-
     public boolean match(Map<Table, Object[]> records, Map<String, Table> tables) throws SQLWhereException {
         Table table;
         Object[] record;

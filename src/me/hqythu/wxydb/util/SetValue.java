@@ -41,6 +41,16 @@ public class SetValue {
         }
     }
 
+    // var = var op var
+    public SetValue(String columnName, CalcOp op, Object valueL, Object valueR) {
+        this.columnName = columnName;
+        calcOp = op;
+        isVar1 = true;
+        value1 = valueL;
+        isVar2 = true;
+        value2 = valueR;
+    }
+
     public Object calcValue(Object oldValue) {
         if (calcOp != null) {
             Integer newValue = 0;

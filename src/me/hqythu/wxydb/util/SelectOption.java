@@ -15,4 +15,10 @@ public class SelectOption {
     public List<String> tableNames;
     public List<String> columnNames;
     public Set<String> fromTableNames;
+
+    public void add(String tableName, String columnName) {
+        tableNames.add(tableName);
+        fromTableNames.add(tableName);
+        columnNames.add(columnName);
+    }
 }
