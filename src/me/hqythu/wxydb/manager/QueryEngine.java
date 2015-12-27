@@ -5,7 +5,7 @@ import me.hqythu.wxydb.exception.SQLTableException;
 import me.hqythu.wxydb.exception.SQLWhereException;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.util.Func;
-import me.hqythu.wxydb.util.SeleteOption;
+import me.hqythu.wxydb.util.SelectOption;
 import me.hqythu.wxydb.util.Where;
 
 import java.util.*;
@@ -30,7 +30,7 @@ public class QueryEngine {
      * 查询
      * (未完成)
      */
-    public List<Object[]> query(SeleteOption select, Where where) throws SQLQueryException {
+    public List<Object[]> query(SelectOption select, Where where) throws SQLQueryException {
         Map<String, Table> tables = SystemManager.getInstance().getTables();
 
         List<Map<Table, Object[]>> temps = tableJoinRecords(select.fromTableNames);

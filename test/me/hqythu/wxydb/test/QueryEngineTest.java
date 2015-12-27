@@ -7,7 +7,6 @@ import me.hqythu.wxydb.object.Column;
 import me.hqythu.wxydb.object.DataType;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.util.*;
-import me.hqythu.wxydb.util.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,7 +15,6 @@ import org.junit.Test;
 import java.util.*;
 
 import static java.lang.Math.abs;
-import static org.junit.Assert.*;
 
 /**
  * Created by apple on 15/12/26.
@@ -135,7 +133,7 @@ public class QueryEngineTest {
         List<Map<Table,Object[]>> results;
         List<Object[]> queryset;
         Set<String> tableNames;
-        SeleteOption select;
+        SelectOption select;
         Where where;
 
         // 初始化插入数据
@@ -155,7 +153,7 @@ public class QueryEngineTest {
             RecordManager.getInstance().insert(TEST_TABLE2,record);
         }
 
-        select = new SeleteOption();
+        select = new SelectOption();
         select.tableNames.add(TEST_TABLE1);
         select.fromTableNames.add(TEST_TABLE1);
         select.columnNames.add("age");

@@ -20,19 +20,16 @@ public class LRUCache {
 
     public LRUCache(int capacity) {
         this.capacity = capacity;
-        this.size = 0;
         this.nodes = new Hashtable<>(capacity);
     }
 
     public void put(Long key, Page value) {
         CacheNode node = nodes.get(key);
         if (node == null) {
-            if (size >= capacity) {
+            if (nodes.size() >= capacity) {
                 if (last != null) { // 删除最少使用
                     remove(last.key);
                 }
-            } else {
-                size++;
             }
             node = new CacheNode();
         }
@@ -56,19 +53,15 @@ public class LRUCache {
      * 删除
      * 从缓存区中删除
      */
-    public Page remove(Long key) {
+    public void remove(Long key) {
         CacheNode node = nodes.remove(key);
         if (node != null) {
-            size--;
             link(node.prev, node.next);
             if (last == node)
                 last = node.prev;
             if (first == node)
                 first = node.next;
             node.value.writeBack();
-            return node.value;
-        } else {
-            return null;
         }
     }
 
@@ -82,7 +75,6 @@ public class LRUCache {
         nodes.clear();
         first = null;
         last = null;
-
     }
 
     private void link(CacheNode prev, CacheNode next) {
@@ -110,7 +102,6 @@ public class LRUCache {
 
     private int capacity;
     private Hashtable<Long, CacheNode> nodes; //缓存容器
-    private int size;
     private CacheNode first; //链表头
     private CacheNode last; //链表尾
 

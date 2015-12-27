@@ -7,15 +7,13 @@ import me.hqythu.wxydb.object.Column;
 import me.hqythu.wxydb.object.DataType;
 import me.hqythu.wxydb.object.Record;
 import me.hqythu.wxydb.object.Table;
-import me.hqythu.wxydb.pagefile.BufPageManager;
-import me.hqythu.wxydb.pagefile.DataPageUser;
-import me.hqythu.wxydb.pagefile.Page;
-import me.hqythu.wxydb.pagefile.TablePageUser;
+import me.hqythu.wxydb.pagefile.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -69,28 +67,30 @@ public class RecordManagerTest {
     @Test
     public void testInsert() throws Exception {
         Table table;
-        int pageId;
-        int fileId;
+        int pageId,fileId;
         Object[] record;
         String fields[];
         int[] cols;
-        Page tPage;
-        Page dPage;
+        Page dbPage,tPage,dPage;
         byte[] data;
         ByteBuffer buffer;
         String str;
+        Map<String,Table> tables;
+        int size;
 
         // 初始化插入数据
         record = new Object[2];
         fields = new String[]{"name","age"};
         cols = new int[]{0,1};
 
+        dbPage = SystemManager.getInstance().getDbPage();
         // 3种插入方式
         record[0] = "LiuXiaoHong";
         record[1] = 18;
         RecordManager.getInstance().insert(TEST_TABLE1,record);
         record[1] = 19;
         RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
+        dbPage = SystemManager.getInstance().getDbPage();
 
         // 检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
@@ -100,7 +100,6 @@ public class RecordManagerTest {
         Assert.assertTrue(fileId != -1);
         tPage = BufPageManager.getInstance().getPage(fileId,pageId);
         Assert.assertEquals(2,TablePageUser.getRecordSize(tPage));
-
         // 检查数据页的写入情况
         pageId = TablePageUser.getFirstDataPage(tPage);
         Assert.assertTrue(pageId != -1);
@@ -114,6 +113,8 @@ public class RecordManagerTest {
         }
         Assert.assertTrue(str.equals("LiuXiaoHong"));
 
+        tables = SystemManager.getInstance().getTables();
+        dbPage = BufPageManager.getInstance().getPage(fileId,0);
         // 切换数据库
         Assert.assertTrue(SystemManager.getInstance().createDatabase(TEST_NEWDB));
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_NEWDB));
@@ -122,6 +123,7 @@ public class RecordManagerTest {
 
         //切换数据库之后,再检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
+        tables = SystemManager.getInstance().getTables();
         pageId = table.getPageId();
         fileId = SystemManager.getInstance().getFileId();
         Assert.assertTrue(pageId != -1);

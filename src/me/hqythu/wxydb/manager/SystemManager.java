@@ -35,6 +35,9 @@ public class SystemManager {
      * 创建DB
      */
     public boolean createDatabase(String DBname) {
+        if (connectDB != null && connectDB.equals(DBname)) { // 已经存在
+            return false;
+        }
         try {
             File file = new File(DBname);
             if (!file.createNewFile()) return false;
@@ -98,7 +101,7 @@ public class SystemManager {
         }
 
         try {
-            Page dbPage = BufPageManager.getInstance().getPage(fileId, 0);
+            Page dbPage = getDbPage();
 
             // 分配新页
             Page tablePage = DbPageUser.getNewPage(dbPage);
@@ -132,7 +135,7 @@ public class SystemManager {
         if (table == null) return false;
 
         try {
-            Page dbPage = BufPageManager.getInstance().getPage(fileId, 0);
+            Page dbPage = getDbPage();
 
             // 清空表的记录
             table.removeAll();

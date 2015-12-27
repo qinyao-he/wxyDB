@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class BufPageManager {
 
-    LRUCache cache;
+    public LRUCache cache;
 
     private static BufPageManager manager = null;
 
@@ -22,6 +22,8 @@ public class BufPageManager {
 
     private BufPageManager() {
         cache = new LRUCache(Global.MAX_CACHE_SIZE);
+        // for test
+//        cache = new LRUCache(100);
     }
 
     /**

@@ -44,6 +44,13 @@ public class Page {
     }
 
     /**
+     * 是否为dirty
+     */
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    /**
      * 写回
      * 建议在页释放的时候执行
      *
