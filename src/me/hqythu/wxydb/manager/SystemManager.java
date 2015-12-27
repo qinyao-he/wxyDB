@@ -9,6 +9,7 @@ import me.hqythu.wxydb.object.Column;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SystemManager {
@@ -87,42 +88,10 @@ public class SystemManager {
     /**
      * 创建表
      */
-    public boolean createTable(String tableName, Column[] columns) {
-        if (connectDB == null) return false;
-        if (tables.size() >= Global.TABLE_MAX_SIZE) return false; // 限制一个库的表数
-        if (tableName.length() > Global.TABLE_NAME_LEN) { // 表名
-            return false;
-        }
-        if (tables.containsKey(tableName)) { // 已经存在
-            return false;
-        }
-        for (Column column : columns) {
-            if (column.name.length() > Global.COL_NAME_LEN) return false;
-        }
-
-        try {
-            Page dbPage = getDbPage();
-
-            // 分配新页
-            Page tablePage = DbPageUser.getNewPage(dbPage);
-
-            // 数据库页中增加一个表信息
-            assert tablePage != null;
-            DbPageUser.addTableInfo(dbPage, tableName, tablePage.getPageId());
-
-            // 初始化表首页
-            TablePageUser.initPage(tablePage, tableName, columns);
-
-            // 系统管理添加表
-            Table table = TablePageUser.getTable(tablePage);
-            tables.put(tableName, table);
-
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
+    public boolean createTable(String tableName, List<Column> columns) {
+        Column[] cols = new Column[columns.size()];
+        columns.toArray(cols);
+        return createTable(tableName, cols);
     }
 
     /**
@@ -180,6 +149,28 @@ public class SystemManager {
         return builder.toString();
     }
 
+    //--------------------为其他模块提供系统管理--------------------
+    public Table getTable(String tableName) {
+        if (connectDB == null) return null;
+        return tables.get(tableName);
+    }
+
+    public Map<String, Table> getTables() {
+        return tables;
+    }
+
+    public Page getDbPage() {
+        try {
+            return BufPageManager.getInstance().getPage(fileId, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public int getFileId() {
+        return fileId;
+    }
+
     //--------------------内部辅助函数--------------------
     protected void closeDatabase() {
         if (connectDB != null) {
@@ -208,26 +199,35 @@ public class SystemManager {
         }
     }
 
-    //--------------------为其他模块提供系统管理--------------------
-    public Table getTable(String tableName) {
-        if (connectDB == null) return null;
-        return tables.get(tableName);
-    }
-
-    public Map<String, Table> getTables() {
-        return tables;
-    }
-
-    public Page getDbPage() {
+    protected boolean createTable(String tableName, Column[] columns) {
+        if (connectDB == null) return false;
+        if (tables.size() >= Global.TABLE_MAX_SIZE) return false; // 限制一个库的表数
+        if (tableName.length() > Global.TABLE_NAME_LEN) { // 表名
+            return false;
+        }
+        if (tables.containsKey(tableName)) { // 已经存在
+            return false;
+        }
+        for (Column column : columns) {
+            if (column.name.length() > Global.COL_NAME_LEN) return false;
+        }
         try {
-            return BufPageManager.getInstance().getPage(fileId, 0);
+            Page dbPage = getDbPage();
+            // 分配新页
+            Page tablePage = DbPageUser.getNewPage(dbPage);
+            // 数据库页中增加一个表信息
+            assert tablePage != null;
+            DbPageUser.addTableInfo(dbPage, tableName, tablePage.getPageId());
+            // 初始化表首页
+            TablePageUser.initPage(tablePage, tableName, columns);
+            // 系统管理添加表
+            Table table = TablePageUser.getTable(tablePage);
+            tables.put(tableName, table);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 
-    public int getFileId() {
-        return fileId;
-    }
 }

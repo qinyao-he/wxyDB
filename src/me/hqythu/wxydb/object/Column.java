@@ -38,8 +38,8 @@ public class Column {
         this.len = len;
     }
 
-    public void setNotNull() {
-        prop |= FLAG_NOTNULL;
+    public Column setNotNull() {
+        prop |= FLAG_NOTNULL; return this;
     }
 
     public void clearNotNull() {
@@ -50,8 +50,8 @@ public class Column {
         return (prop & FLAG_NOTNULL) != 0;
     }
 
-    public void setPrimary() {
-        prop |= FLAG_PRIMARY;
+    public Column setPrimary() {
+        prop |= FLAG_PRIMARY; return this;
     }
 
     public void clearPrimary() {

@@ -12,6 +12,7 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class RecordManagerTest {
     public static final String TEST_NEWDB = "test_hello.db";
     public static final String TEST_TABLE1 = "Student";
     public static final String TEST_TABLE2 = "Customer";
-    public static final int BIG_NUM = 10000;
+    public static final int BIG_NUM = 50000;
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -36,20 +37,20 @@ public class RecordManagerTest {
         SystemManager.getInstance().createDatabase(TEST_DB);
         SystemManager.getInstance().useDatabase(TEST_DB);
 
+        List<Column> columns = new ArrayList<>();
         // 创建表
-        Column cols[] = new Column[2];
-        // Student: name:varchar(40), age:int not null
-        cols[0] = new Column("name", DataType.VARCHAR,(short)40);
-        cols[1] = new Column("age",DataType.INT,(short)4);
-        cols[1].setNotNull();
-        Assert.assertTrue(SystemManager.getInstance().createTable(TEST_TABLE1,cols));
+        columns.clear();
+        columns.add(new Column("name",DataType.VARCHAR,(short)40));
+        columns.add(new Column("age",DataType.INT,(short)4).setNotNull());
+        Assert.assertTrue(SystemManager.getInstance().createTable("Student",columns));
 
         // 创建表
-        Column cols2[] = new Column[3];
-        cols2[0] = new Column("id",DataType.INT,(short)4);
-        cols2[1] = new Column("name",DataType.VARCHAR,(short)100);
-        cols2[2] = new Column("sex",DataType.VARCHAR,(short)1);
-        Assert.assertTrue(SystemManager.getInstance().createTable(TEST_TABLE2,cols2));
+        columns.clear();
+        columns.add(new Column("id",DataType.INT,(short)4));
+        columns.add(new Column("name",DataType.VARCHAR,(short)100));
+        columns.add(new Column("sex",DataType.VARCHAR,(short)1));
+        Assert.assertTrue(SystemManager.getInstance().createTable("Customer",columns));
+
     }
 
     @After

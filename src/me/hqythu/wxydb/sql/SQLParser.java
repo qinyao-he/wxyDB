@@ -2,18 +2,8 @@ package me.hqythu.wxydb.sql;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Stack;
-import java.util.concurrent.Exchanger;
-
-import javax.sound.midi.MidiChannel;
-
-
-
-
 
 
 //import query.Condition.Type;
@@ -587,7 +577,7 @@ public class SQLParser
 	{
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
-		ParseResult result = handleSQL("CREATE TABLE customer(\n"+
+		ParseResult result = parse("CREATE TABLE customer(\n"+
 										"id int(10) NOT NULL,\n"+
 										"name varchar(25) NOT NULL,\n"+
 										"gender varchar(1) NOT NULL,\n"+
@@ -595,7 +585,7 @@ public class SQLParser
 										");");
 //		System.out.print("123");
 	}
-	static ParseResult handleSQL(String sql)
+	public static ParseResult parse(String sql)
 	{
 		sql = sql.replaceAll("\\, ", ",");
 		sql = sql.replaceAll(" \\,", ",");

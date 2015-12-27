@@ -22,6 +22,7 @@ public class Table {
     private Column[] columns;   // 列属性
     private int[] offsets;      // 列偏移
 
+
     public Table(String name, int index, int recordLen, Column[] columns) {
         this.name = name;
         this.pageId = index;
@@ -256,11 +257,26 @@ public class Table {
     }
 
     /**
+     * 获得所有记录的id
+     */
+    public List<Integer> getAllRecordIds() throws SQLTableException {
+        int size = getRecordSize();
+        if (size < 0) {
+            throw new SQLTableException("get table record size failed");
+        } else {
+            List<Integer> ids = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                ids.add(i);
+            }
+            return ids;
+        }
+    }
+
+    /**
      * 删除所有记录
      */
     public void removeAll() throws SQLTableException {
-        Page dbPage = SystemManager.getInstance().getDbPage();
-        int fileId = dbPage.getFileId();
+        int fileId = SystemManager.getInstance().getFileId();
         try {
             Page page = BufPageManager.getInstance().getPage(fileId, pageId);
             TablePageUser.removeAllRecord(page);
@@ -282,6 +298,29 @@ public class Table {
             if (columns[i].name.equals(columnName)) return columns[i];
         }
         return null;
+    }
+
+    public int getRecordSize() {
+        int fileId = SystemManager.getInstance().getFileId();
+        try {
+            Page page = BufPageManager.getInstance().getPage(fileId, pageId);
+            return TablePageUser.getRecordSize(page);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public Object[] getRecord(int index) {
+        int fileId = SystemManager.getInstance().getFileId();
+        try {
+            Page page = BufPageManager.getInstance().getPage(fileId, pageId);
+            byte[] data = TablePageUser.getRecord(page,index);
+            return Record.bytesToValues(this,data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     //-------------------辅助函数-------------------

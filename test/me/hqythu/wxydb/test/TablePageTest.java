@@ -12,6 +12,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by apple on 15/12/24.
  */
@@ -37,11 +40,12 @@ public class TablePageTest {
     @Test
     public void testTablePage() throws Exception {
 
+        List<Column> columns = new ArrayList<>();
         // 创建表
-        Column columns[] = new Column[2];
-        columns[0] = new Column("name", DataType.VARCHAR,(short)40);
-        columns[1] = new Column("age",DataType.INT,(short)4);
-        Assert.assertTrue(SystemManager.getInstance().createTable(TEST_TABLE1,columns));
+        columns.clear();
+        columns.add(new Column("name",DataType.VARCHAR,(short)40));
+        columns.add(new Column("age",DataType.INT,(short)4));
+        Assert.assertTrue(SystemManager.getInstance().createTable("Student",columns));
 
         Table table;
         int pageId;
