@@ -108,6 +108,7 @@ setValue
 
 完成测试
     CREATE_DATABASE
+    DROP_DATABASE
     USE
     DROP_TABLE
     SHOW_TABLES
@@ -115,7 +116,6 @@ setValue
     INSERT
 
 未测试
-    DROP_DATABASE
     DELETE
     UPDATE
     SELECT

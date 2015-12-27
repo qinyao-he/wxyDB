@@ -707,7 +707,7 @@ public class SQLParser
 				");");
 //		System.out.print("123");
 	}
-	static ParseResult parse(String sql)
+	public static ParseResult parse(String sql)
 	{
 		sql = sql.replaceAll("\\, ", ",");
 		sql = sql.replaceAll(" \\,", ",");
@@ -747,7 +747,7 @@ public class SQLParser
 			}
 			else if (ss[0].toUpperCase().equals("DROP") && ss[1].toUpperCase().equals("DATABASE"))
 			{
-				result = parseDROP_TABLE(sql);
+				result = parseDROP_DATABASE(sql);
 			}
 			else if (ss[0].toUpperCase().equals("USE"))
 			{
