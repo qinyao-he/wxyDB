@@ -3,6 +3,7 @@ package me.hqythu.wxydb.manager;
 import me.hqythu.wxydb.exception.SQLQueryException;
 import me.hqythu.wxydb.exception.SQLTableException;
 import me.hqythu.wxydb.exception.SQLWhereException;
+import me.hqythu.wxydb.object.Column;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.util.Func;
 import me.hqythu.wxydb.util.SelectOption;
@@ -35,12 +36,25 @@ public class QueryEngine {
 
         List<Map<Table, Object[]>> temps = tableJoinRecords(select.fromTableNames);
 
-        int nCol = select.tableNames.size();    // 查询结果的列数
-        Table[] t = new Table[nCol];            // select对应的表
-        int[] c = new int[nCol];                // select对应的列号
-        for (int i = 0; i < t.length; i++) {
-            t[i] = tables.get(select.tableNames.get(i));
-            c[i] = t[i].getColumnCol(select.columnNames.get(i));
+        Table[] t; // select对应的表
+        int[] c;   // select对应的列号
+        int nCol;
+        if (select.isAll()) {
+            nCol = 0;
+            for (String tableName : select.getFromTableNames()) {
+                Table table = tables.get(tableName);
+                nCol += table.getColumns().length;
+            }
+            t = new Table[nCol];
+            c = new int[nCol];
+        } else {
+            nCol = select.tableNames.size();    // 查询结果的列数
+            t = new Table[nCol];            // select对应的表
+            c = new int[nCol];                // select对应的列号
+            for (int i = 0; i < t.length; i++) {
+                t[i] = tables.get(select.tableNames.get(i));
+                c[i] = t[i].getColumnCol(select.columnNames.get(i));
+            }
         }
 
         List<Object[]> result = new ArrayList<>(temps.size());
@@ -48,8 +62,12 @@ public class QueryEngine {
             for (Map<Table, Object[]> temp : temps) {
                 if (where.match(temp, tables)) {
                     Object[] record = new Object[nCol];
-                    for (int i = 0; i < nCol; i++) {
-                        record[i] = temp.get(t[i])[c[i]];
+                    if (select.isAll()) {
+                        
+                    } else {
+                        for (int i = 0; i < nCol; i++) {
+                            record[i] = temp.get(t[i])[c[i]];
+                        }
                     }
                     result.add(record);
                 }
