@@ -35,8 +35,8 @@ public class ParseResult
 	public List<Object> data;           // insert
 	public List<SetValue> values;       // update
 	public SelectOption selectOption;   // select
-	Where where;
-    Func func;
+    public Where where;
+    public Func func;
 
     // 需要修改
 	public List<String> tableNames;            // String tableName
