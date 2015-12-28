@@ -41,7 +41,7 @@ public class RealSQLExcuteTest {
         result = parseResult.execute();
     }
 
-//    @Test
+    @Test
     public void testInsertCheck() throws Exception {
         ParseResult parseResult;
         List<String> results;
@@ -49,20 +49,23 @@ public class RealSQLExcuteTest {
 
         parseResult = SQLParser.parse("INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’);");
         result = parseResult.execute();
-        System.out.println(result);
+        Assert.assertEquals("insert success",result);
+
         parseResult = SQLParser.parse("INSERT INTO customer VALUES(300002, 'FAUSTO VANNORMAN','F');");
         result = parseResult.execute();
-        System.out.println(result);
+        Assert.assertEquals("insert success",result);
+
         parseResult = SQLParser.parse("INSERT INTO customer VALUES(300001,'JO CANNADY','M');");
+
         result = parseResult.execute();
-        System.out.println(result);
+
 
         parseResult = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
         result = parseResult.execute();
         System.out.println(result);
     }
 
-    @Test
+//    @Test
     public void testDelete() throws Exception {
         ParseResult parseResult;
         List<String> results;
@@ -95,7 +98,7 @@ public class RealSQLExcuteTest {
         // 初始化数据数据
         results = wxydb.excuteFile(BOOK_FILE);
         for (String temp : results) {
-            Assert.assertNotEquals(temp,"insert success");
+            Assert.assertEquals(temp,"insert success");
         }
 
         parseResult = SQLParser.parse("UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;");
