@@ -37,7 +37,7 @@ public class ParseResult
 	public List<Object> data;           // insert
 	public List<SetValue> values;       // update
 	public SelectOption selectOption;   // select
-    public Where where;
+	public Where where;
     public Func func;
 
     // 需要修改
@@ -56,11 +56,11 @@ public class ParseResult
 		values = new ArrayList<SetValue>();
         columns = new ArrayList<>();
 	}
-    public String execute() throws SQLExecException, SQLSystemException, SQLRecordException {
+    public String execute() throws SQLExecException {
         String result = "error";
         Object[] objects;
         boolean ok;
-//        try {
+        try {
             switch (type) {
                 case INSERT:
                     ok = RecordManager.getInstance().insert(tableNames.get(0),data);
@@ -119,9 +119,9 @@ public class ParseResult
                     result = "parse sql error";
                     break;
             }
-//        } catch (Exception e) {
-//            throw new SQLExecException(e.getMessage());
-//        }
+        } catch (Exception e) {
+            throw new SQLExecException(e.getMessage());
+        }
 
         return result;
     }

@@ -95,7 +95,7 @@ public class QueryEngineTest {
     /**
      * 测试多表连接,一个表为空
      */
-    @Test
+//    @Test
     public void testJoinHasOneEmpty() throws Exception {
         List<Map<Table, Object[]>> results;
         Set<String> tableNames;
@@ -287,7 +287,7 @@ public class QueryEngineTest {
         Assert.assertEquals(0, results.size());
     }
 
-    @Test
+//    @Test
     public void testJoinBigThenSelectById() throws Exception {
         List<Map<Table, Integer>> results;
         Set<String> tableNames;

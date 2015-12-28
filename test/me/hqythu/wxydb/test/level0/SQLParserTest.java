@@ -83,7 +83,6 @@ public class SQLParserTest {
                 "  book_id int(10) NOT NULL," +
                 "  quantity int(10) NOT NULL" +
                 ");");
-        System.out.println(parseResult.columns);
         Assert.assertEquals(3,parseResult.columns.size());
 
     }
@@ -130,7 +129,13 @@ public class SQLParserTest {
         Assert.assertEquals(5991, sql.data.get(4));
         Assert.assertEquals(2530, sql.data.get(5));
 
-
+        sql = SQLParser.parse("INSERT INTO publisher VALUES(100050,'Carlton Books, Ltd.','CA');");
+        System.out.println(sql.data);
+        Assert.assertEquals("publisher", sql.tableNames.get(0));
+        Assert.assertEquals(3,sql.data.size());
+        Assert.assertEquals(100044, sql.data.get(0));
+        Assert.assertEquals("Brooks/Cole Pub. Co", sql.data.get(1));
+        Assert.assertEquals("CA", sql.data.get(2));
 
     }
 

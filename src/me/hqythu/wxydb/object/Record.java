@@ -44,11 +44,20 @@ public class Record {
                     case UNKNOWN:
                         throw new SQLRecordException("unknown data type");
                     case INT:
-                        Integer ii = (Integer) values[i];
-                        buffer.putInt(offsets[i] + Global.RECORD_STATIC_DATA_POS, ii);
+                        try {
+                            Integer ii = (Integer) values[i];
+                            buffer.putInt(offsets[i] + Global.RECORD_STATIC_DATA_POS, ii);
+                        } catch (Exception e) {
+                            throw new SQLRecordException("insert error type at "+ i + " column");
+                        }
                         break;
                     case VARCHAR:
-                        String ss = (String) values[i];
+                        String ss;
+                        try {
+                            ss = (String) values[i];
+                        } catch (Exception e) {
+                            throw new SQLRecordException("insert error type at "+ i + " column");
+                        }
                         if (ss.length() > column.len) {
                             throw new SQLRecordException("column data too long");
                         }

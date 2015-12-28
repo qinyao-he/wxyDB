@@ -63,14 +63,13 @@ public class RealSQLExcuteTest {
         parseResult = SQLParser.parse("INSERT INTO customer VALUES(300001,'JO CANNADY','M');");
         result = parseResult.execute();
 
-
-//        parseResult = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
-//        System.out.println(parseResult.data);
-//        result = parseResult.execute();
-//        System.out.println(result);
+        thrown.expect(SQLExecException.class);
+        thrown.expectMessage("insert error type at 2 column");
+        parseResult = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
+        result = parseResult.execute();
     }
 
-//    @Test
+    @Test
     public void testDelete() throws Exception {
         ParseResult parseResult;
         List<String> results;
