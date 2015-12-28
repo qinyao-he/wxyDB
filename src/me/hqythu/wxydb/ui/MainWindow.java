@@ -1,5 +1,7 @@
 package me.hqythu.wxydb.ui;
 
+import me.hqythu.wxydb.manager.SystemManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -15,6 +17,13 @@ public class MainWindow extends JFrame {
     private JButton newDatabaseButton;
     private JButton openDatabaseButton;
     private JLabel label;
+
+    private JTabbedPane tabbedPane;
+    private StructureTab structureTab;
+    private DataTab dataTab;
+    private ExeSQLTab exeSQLTab;
+
+    private SystemManager dbSystemManager;
 
     public MainWindow() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -33,10 +42,12 @@ public class MainWindow extends JFrame {
         setLayout(new BorderLayout());
 
         label = new JLabel("Hello World");
-        getContentPane().add(label);
 
         createToolbar();
         getContentPane().add(toolBar, BorderLayout.NORTH);
+
+        createTabView();
+        getContentPane().add(tabbedPane, BorderLayout.CENTER);
     }
 
     private void createToolbar() {
@@ -48,6 +59,11 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String filePath = UiUtilities.chooseFile(mainwindow);
                 label.setText(filePath);
+                try {
+                    SystemManager.getInstance().createDatabase(filePath);
+                } catch (Exception exception) {
+                    label.setText("create database fail");
+                }
             }
         });
         openDatabaseButton = new JButton("Open Database");
@@ -56,11 +72,28 @@ public class MainWindow extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String filePath = UiUtilities.chooseFile(mainwindow);
                 label.setText(filePath);
+                SystemManager.getInstance().useDatabase(filePath);
             }
         });
 
         toolBar.add(newDatabaseButton);
         toolBar.add(openDatabaseButton);
+    }
+
+    private void createTabView() {
+        structureTab = new StructureTab();
+        dataTab = new DataTab();
+        exeSQLTab = new ExeSQLTab();
+
+        tabbedPane = new JTabbedPane();
+
+        tabbedPane.addTab("Database Structure", structureTab);
+        tabbedPane.addTab("Browser Data", dataTab);
+        tabbedPane.addTab("Execute SQL", exeSQLTab);
+    }
+
+    private void refreshDatabase() {
+
     }
 
 }
