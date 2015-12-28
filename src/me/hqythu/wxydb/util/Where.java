@@ -24,6 +24,16 @@ public class Where {
         forCalc = new Stack<>();
     }
 
+    public Where(boolean bool) {
+        isExprs = new ArrayList<>();
+        boolExprsAndOps = new ArrayList<>();
+        forCalc = new Stack<>();
+
+        boolExprsAndOps.add(new BoolExpr(bool));
+        isExprs.add(true);
+    }
+
+
     public void addExpr(BoolExpr boolExpr) {
         isExprs.add(true);
         boolExprsAndOps.add(boolExpr);
@@ -57,6 +67,40 @@ public class Where {
                 if (boolExpr.isNeedValueR()) {
                     table = tables.get(boolExpr.tableNameR);
                     record = records.get(table);
+                    col = table.getColumnCol(boolExpr.columnNameR);
+                    boolExpr.setValueR(record[col]);
+                }
+                forCalc.push(boolExpr.getResult());
+            } else {
+                BoolOp boolOp = (BoolOp) boolExprsAndOps.get(i);
+                Boolean bools1 = forCalc.pop();
+                Boolean bools2 = forCalc.pop();
+                Boolean boold = false;
+                switch (boolOp) {
+                    case AND:
+                        boold = bools1 && bools2;
+                        break;
+                    case OR:
+                        boold = bools1 || bools2;
+                        break;
+                }
+                forCalc.push(boold);
+            }
+        }
+        return forCalc.pop();
+    }
+    public boolean match(Object[] record, Table table) throws SQLWhereException {
+        int col;
+
+//        forCalc.clear();
+        for (int i = 0; i < isExprs.size(); i++) {
+            if (isExprs.get(i)) {
+                BoolExpr boolExpr = (BoolExpr) boolExprsAndOps.get(i);
+                if (boolExpr.isNeedValueL()) {
+                    col = table.getColumnCol(boolExpr.columnNameL);
+                    boolExpr.setValueL(record[col]);
+                }
+                if (boolExpr.isNeedValueR()) {
                     col = table.getColumnCol(boolExpr.columnNameR);
                     boolExpr.setValueR(record[col]);
                 }

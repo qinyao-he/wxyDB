@@ -83,15 +83,17 @@ public class QueryEngine {
         return result;
     }
 
-    public double func(Func func, String tableName, String columnName) throws SQLTableException {
-//        Set<String> tablesNames = new HashSet<>();
-//        tablesNames.add(tableName);
+    public double func(Func func, String tableName, String columnName, Where where) throws SQLTableException {
+        Set<String> tablesNames = new HashSet<>();
+        tablesNames.add(tableName);
 //        List<Map<Table, Object[]>> temps = tableJoinRecords(new HashSet<>().add(tableName));
         Table table = SystemManager.getInstance().getTable(tableName);
         List<Object[]> records = table.getAllRecords();
+
         int col = table.getColumnCol(columnName);
         Integer temp;
         double result = 0;
+        int size;
         switch (func) {
             case SUM:
                 for (Object[] record : records) {
@@ -99,11 +101,13 @@ public class QueryEngine {
                 }
                 break;
             case AVG:
+                size = 0;
                 for (Object[] record : records) {
+                    size++;
                     result += (Integer) record[col];
                 }
-                if (records.size() == 0) result = 0;
-                result /= records.size();
+                if (size == 0) result = 0;
+                else result /= size;
                 break;
             case MAX:
                 result = Double.MIN_VALUE;

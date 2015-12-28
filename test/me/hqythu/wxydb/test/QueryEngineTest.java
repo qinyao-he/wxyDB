@@ -197,18 +197,18 @@ public class QueryEngineTest {
         RecordManager.getInstance().insert(TEST_TABLE2,record);
 
         func = Func.AVG;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
         Assert.assertTrue(abs(avg-temp) < 1e6);
         func = Func.SUM;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
         Assert.assertTrue(abs(sum-temp) < 1e6);
         max = 9;
         func = Func.MAX;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
         Assert.assertTrue(abs(max-temp) < 1e6);
         min = 0;
         func = Func.MIN;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age");
+        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
         Assert.assertTrue(abs(min-temp) < 1e6);
     }
 
