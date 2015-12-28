@@ -83,10 +83,13 @@ public class QueryEngine {
         return result;
     }
 
-    public double func(Func func, String tableName, String columnName, Where where) throws SQLTableException {
+    public double func(Func func, SelectOption option, Where where) throws SQLTableException {
+
+        String tableName = option.tableNames.get(0);
+        String columnName = option.columnNames.get(0);
+
         Set<String> tablesNames = new HashSet<>();
         tablesNames.add(tableName);
-//        List<Map<Table, Object[]>> temps = tableJoinRecords(new HashSet<>().add(tableName));
         Table table = SystemManager.getInstance().getTable(tableName);
         List<Object[]> records = table.getAllRecords();
 

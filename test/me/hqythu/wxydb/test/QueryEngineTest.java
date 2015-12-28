@@ -174,6 +174,7 @@ public class QueryEngineTest {
         double temp;
         double avg,sum,min,max;
         Func func;
+        SelectOption select;
 
         avg = 0;
         sum = 0;
@@ -196,19 +197,21 @@ public class QueryEngineTest {
         record.add("F");
         RecordManager.getInstance().insert(TEST_TABLE2,record);
 
+        select = new SelectOption();
+        select.add(TEST_TABLE1,"age");
         func = Func.AVG;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
+        temp = QueryEngine.getInstance().func(func,select,new Where(true));
         Assert.assertTrue(abs(avg-temp) < 1e6);
         func = Func.SUM;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
+        temp = QueryEngine.getInstance().func(func,select,new Where(true));
         Assert.assertTrue(abs(sum-temp) < 1e6);
         max = 9;
         func = Func.MAX;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
+        temp = QueryEngine.getInstance().func(func,select,new Where(true));
         Assert.assertTrue(abs(max-temp) < 1e6);
         min = 0;
         func = Func.MIN;
-        temp = QueryEngine.getInstance().func(func,TEST_TABLE1, "age",new Where(true));
+        temp = QueryEngine.getInstance().func(func,select,new Where(true));
         Assert.assertTrue(abs(min-temp) < 1e6);
     }
 
