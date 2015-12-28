@@ -1,6 +1,7 @@
 package me.hqythu.wxydb.sql;
 
-import me.hqythu.wxydb.exception.SQLExecException;
+import me.hqythu.wxydb.exception.level0.SQLExecException;
+import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
 import me.hqythu.wxydb.util.Func;
@@ -54,55 +55,72 @@ public class ParseResult
         columns = new ArrayList<>();
 	}
     public String execute() throws SQLExecException {
-        String result = "hello world";
+        String result = "error";
         Object[] objects;
         boolean ok;
-        switch (type) {
-            case INSERT:
-                break;
-            case DELETE:
-                break;
-            case UPDATE:
-                break;
-            case SELECT:
-                break;
-            case CREATE_DATABASE:
-                ok = SystemManager.getInstance().createDatabase(dataBaseName);
-                if (ok) {
-                    result = "create database " + dataBaseName + " success";
-                } else {
-                    result = "create database " + dataBaseName + " failed";
-                }
-                break;
-            case DROP_DATABASE:
-                ok = SystemManager.getInstance().dropDatabase(dataBaseName);
-                if (ok) {
-                    result = "drop database " + dataBaseName + " success";
-                } else {
-                    result = "drop database " + dataBaseName + " failed";
-                }
-                break;
-            case USE:
-                ok = SystemManager.getInstance().useDatabase(dataBaseName);
-                if (ok) {
-                    result = "use database " + dataBaseName + " success";
-                } else {
-                    result = "use database " + dataBaseName + " failed";
-                }
-                break;
-            case SHOW_TABLES:
-                result = SystemManager.getInstance().showTables();
-                break;
-            case CREATE_TABLE:
-                break;
-            case DROP_TABLE:
-                break;
-            case DESC:
-                break;
-            case ERROR:
-                result = "parse sql error";
-                break;
+        try {
+            switch (type) {
+                case INSERT:
+                    ok = RecordManager.getInstance().insert(tableNames.get(0),data);
+                    if (ok) {
+                        result = "insert success";
+                    } else {
+                        result = "insert failed";
+                    }
+                    break;
+                case DELETE:
+                    break;
+                case UPDATE:
+                    break;
+                case SELECT:
+                    break;
+                case CREATE_DATABASE:
+                    ok = SystemManager.getInstance().createDatabase(dataBaseName);
+                    if (ok) {
+                        result = "create database " + dataBaseName + " success";
+                    } else {
+                        result = "create database " + dataBaseName + " failed";
+                    }
+                    break;
+                case DROP_DATABASE:
+                    ok = SystemManager.getInstance().dropDatabase(dataBaseName);
+                    if (ok) {
+                        result = "drop database " + dataBaseName + " success";
+                    } else {
+                        result = "drop database " + dataBaseName + " failed";
+                    }
+                    break;
+                case USE:
+                    ok = SystemManager.getInstance().useDatabase(dataBaseName);
+                    if (ok) {
+                        result = "use database " + dataBaseName + " success";
+                    } else {
+                        result = "use database " + dataBaseName + " failed";
+                    }
+                    break;
+                case SHOW_TABLES:
+                    result = SystemManager.getInstance().showTables();
+                    break;
+                case CREATE_TABLE:
+                    ok = SystemManager.getInstance().createTable(tableNames.get(0),columns);
+                    if (ok) {
+                        result = "create table " + tableNames.get(0) + " success";
+                    } else {
+                        result = "create table " + tableNames.get(0) + " failed";
+                    }
+                    break;
+                case DROP_TABLE:
+                    break;
+                case DESC:
+                    break;
+                case ERROR:
+                    result = "parse sql error";
+                    break;
+            }
+        } catch (Exception e) {
+            throw new SQLExecException(e.getMessage());
         }
+
         return result;
     }
 }

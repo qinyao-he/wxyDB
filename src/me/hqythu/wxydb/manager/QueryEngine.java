@@ -1,8 +1,7 @@
 package me.hqythu.wxydb.manager;
 
-import me.hqythu.wxydb.exception.SQLQueryException;
-import me.hqythu.wxydb.exception.SQLTableException;
-import me.hqythu.wxydb.exception.SQLWhereException;
+import me.hqythu.wxydb.exception.level1.SQLQueryException;
+import me.hqythu.wxydb.exception.level2.SQLWhereException;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.util.Func;
 import me.hqythu.wxydb.util.SelectOption;
@@ -75,59 +74,76 @@ public class QueryEngine {
                     result.add(record);
                 }
             }
-        } catch (SQLWhereException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             throw new SQLQueryException("query error : " + e.getMessage());
         }
 
         return result;
     }
 
-    public double func(Func func, SelectOption option, Where where) throws SQLTableException {
+    public double func(Func func, SelectOption option, Where where) throws SQLQueryException {
 
-        String tableName = option.tableNames.get(0);
-        String columnName = option.columnNames.get(0);
+        String tableName;
+        String columnName;
+        Table table;
+        List<Object[]> records;
 
-        Set<String> tablesNames = new HashSet<>();
-        tablesNames.add(tableName);
-        Table table = SystemManager.getInstance().getTable(tableName);
-        List<Object[]> records = table.getAllRecords();
+        try {
+            tableName = option.tableNames.get(0);
+            columnName = option.columnNames.get(0);
+            table = SystemManager.getInstance().getTable(tableName);
+            records = table.getAllRecords();
+        } catch (Exception e) {
+            throw new SQLQueryException(e.getMessage());
+        }
 
         int col = table.getColumnCol(columnName);
         Integer temp;
         double result = 0;
         int size;
-        switch (func) {
-            case SUM:
-                for (Object[] record : records) {
-                    result += (Integer) record[col];
-                }
-                break;
-            case AVG:
-                size = 0;
-                for (Object[] record : records) {
-                    size++;
-                    result += (Integer) record[col];
-                }
-                if (size == 0) result = 0;
-                else result /= size;
-                break;
-            case MAX:
-                result = Double.MIN_VALUE;
-                for (Object[] record : records) {
-                    temp = (Integer) record[col];
-                    if (result < temp) result = temp;
-                }
-                if (records.size() == 0) result = 0;
-                break;
-            case MIN:
-                result = Double.MAX_VALUE;
-                for (Object[] record : records) {
-                    temp = (Integer) record[col];
-                    if (result > temp) result = temp;
-                }
-                if (records.size() == 0) result = 0;
-                break;
+        try {
+            switch (func) {
+                case SUM:
+                    for (Object[] record : records) {
+                        if (where.match(record,table) && record[col] != null) {
+                            result += (Integer) record[col];
+                        }
+                    }
+                    break;
+                case AVG:
+                    size = 0;
+                    for (Object[] record : records) {
+                        if (where.match(record,table) && record[col] != null) {
+                            size++;
+                            result += (Integer) record[col];
+                        }
+                    }
+                    if (size == 0) result = 0;
+                    else result /= size;
+                    break;
+                case MAX:
+                    result = Double.MIN_VALUE;
+                    for (Object[] record : records) {
+                        if (where.match(record,table) && record[col] != null) {
+                            temp = (Integer) record[col];
+                            if (result < temp) result = temp;
+                        }
+                    }
+                    if (records.size() == 0) result = 0;
+                    break;
+                case MIN:
+                    result = Double.MAX_VALUE;
+                    for (Object[] record : records) {
+                        if (where.match(record,table) && record[col] != null) {
+                            temp = (Integer) record[col];
+                            if (result > temp) result = temp;
+                        }
+                    }
+                    if (records.size() == 0) result = 0;
+                    break;
+            }
+        } catch (Exception e) {
+            throw new SQLQueryException(e.getMessage());
         }
         return result;
     }
@@ -251,7 +267,7 @@ public class QueryEngine {
     /**
      *
      */
-    public List<Object[]> queryById(SelectOption select, Where where) throws SQLQueryException {
+    public List<Object[]> queryById(SelectOption select, Where where) throws SQLQueryException, SQLWhereException {
         Map<String, Table> tables = SystemManager.getInstance().getTables();
 
         List<Map<Table, Integer>> tempIds = tableJoinRecordIds(select.fromTableNames);
@@ -278,7 +294,7 @@ public class QueryEngine {
         }
 
         List<Object[]> result = new ArrayList<>(tempIds.size());
-        try {
+//        try {
             for (Map<Table, Integer> tempId : tempIds) {
                 Map<Table, Object[]> temp = new HashMap<>();
                 for (Map.Entry<Table,Integer> id : tempId.entrySet() ) {
@@ -302,10 +318,9 @@ public class QueryEngine {
                     result.add(record);
                 }
             }
-        } catch (SQLWhereException e) {
-            e.printStackTrace();
-            throw new SQLQueryException("query error : " + e.getMessage());
-        }
+//        } catch (Exception e) {
+//            throw new SQLQueryException("query error : " + e.getMessage());
+//        }
 
         return result;
     }

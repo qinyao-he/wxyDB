@@ -1,6 +1,6 @@
 package me.hqythu.wxydb.util;
 
-import me.hqythu.wxydb.exception.SQLWhereException;
+import me.hqythu.wxydb.exception.level2.SQLWhereException;
 import me.hqythu.wxydb.object.Table;
 
 import java.util.*;

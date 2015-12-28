@@ -43,13 +43,16 @@
     实现primary key 检查
     实现null检查
 
-下次开始
-    Table的remove
-        Where
-    Table的update
-        Where SetValue
-    QueryEngine的query
-        Where Tables
+2015年12月26日
+    完成 remove,update
+
+2015年12月27日
+    完成query
+
+2015年12月28日
+    重新设计Exception Chain
+
+
 
 ----------------------进度----------------------
 已完成
@@ -65,6 +68,8 @@
     SQL大部分语句的解析
     表的联合TableJoin
         支持任意多表,但机器性能可能无法支持
+    Query模块及其测试
+        query, function, TableJoin
 
     命令
         CREATE DATABASE orderDB; 创建名为 orderDB 的数据库
@@ -73,28 +78,23 @@
         SHOW TABLES; 列出当前数据库包含的所有表
         DROP TABLE customer; 删除名为 customer 的表
         DESC customer; 列出该表的信息
+        CREATE TABLE customer( id int(10) NOT NULL,
+                name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id));
+                    创建名为 customer 的表,它包含三个字段 id、name 和 gender,其中 id 是主键。
+                    这三 字段的数据类型分别为整型、字符串和字符串,并且都不允许为空。
 
 未完成
     测试 INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’);
         如果主键出现重复，应报错
     测试 INSERT INTO orders VALUES (315000,200001,’eight’);
         如果数据类型不符合，应报错
-    Query模块
-        query, function, TableJoin
     主键的支持的测试
-    Query测试
-        query, function
     SQL语句的执行
     SQL基本功能展示
         三个表的联合查询例程
     GUI界面
 
     命令
-        CREATE TABLE customer( id int(10) NOT NULL,
-        name varchar(25) NOT NULL, gender varchar(1) NOT NULL, PRIMARY KEY(id));
-            创建名为 customer 的表,它包含三个字段 id、name 和 gender,其中 id 是主键。
-            这三 字段的数据类型分别为整型、字符串和字符串,并且都不允许为空。
-
         DELETE FROM publisher WHERE state=’CA’;
             删除所有加州的出版商
         UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;

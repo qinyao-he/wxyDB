@@ -98,7 +98,7 @@ public class TablePageUser {
             while (dataPageId != -1) {
                 dataPage = BufPageManager.getInstance().getPage(fileId, dataPageId);
                 int size = DataPageUser.getRecordSize(dataPage);
-                if (size >= recordId) {
+                if (size > recordId) {
                     break;
                 } else {
                     recordId -= size;

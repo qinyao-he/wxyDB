@@ -2,9 +2,7 @@ package me.hqythu.wxydb.object;
 
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.pagefile.*;
-import me.hqythu.wxydb.exception.SQLRecordException;
-import me.hqythu.wxydb.exception.SQLTableException;
-import me.hqythu.wxydb.pagefile.*;
+import me.hqythu.wxydb.exception.level2.SQLTableException;
 import me.hqythu.wxydb.util.SetValue;
 import me.hqythu.wxydb.util.Where;
 
@@ -81,7 +79,6 @@ public class Table {
             byte[] record = Record.valuesToBytes(this, values);
             insert(record);
         } catch (Exception e) {
-//            e.printStackTrace();
             throw new SQLTableException(e.getMessage());
         }
     }
@@ -134,14 +131,13 @@ public class Table {
             DataPageUser.addRecord(dataPage, record);
             TablePageUser.incRecordSize(tablePage);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new SQLTableException("insert failed: " + e.getMessage());
+            throw new SQLTableException(e.getMessage());
         }
     }
 
     /**
      * 删除记录
-     * <p>
+     *
      * 删除策略:
      * 遍历每个数据页的每个记录
      * 用该页的最后一条记录取代被删除的记录
@@ -188,15 +184,14 @@ public class Table {
             TablePageUser.setRecordSize(tablePage, total);
             tablePage.setDirty();
         } catch (Exception e) {
-            e.printStackTrace();
             throw new SQLTableException("remove failed");
         }
     }
 
     /**
      * 更新记录
+     *
      * 先取出记录,将对应列的数据改写,再写回
-     * <p>
      * 未完成
      * 未考虑primary key
      */
@@ -233,16 +228,12 @@ public class Table {
                 dataPageId = DataPageUser.getNextIndex(page);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new SQLTableException("update failed");
         }
     }
 
     /**
      * 获取所有记录
-     *
-     * @return
-     * @throws SQLTableException
      */
     public List<Object[]> getAllRecords() throws SQLTableException {
         int fileId = SystemManager.getInstance().getFileId();
@@ -286,7 +277,6 @@ public class Table {
             Page page = BufPageManager.getInstance().getPage(fileId, pageId);
             TablePageUser.removeAllRecord(page);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new SQLTableException("remove all fialed");
         }
     }
@@ -311,7 +301,7 @@ public class Table {
             Page page = BufPageManager.getInstance().getPage(fileId, pageId);
             return TablePageUser.getRecordSize(page);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return -1;
         }
     }
