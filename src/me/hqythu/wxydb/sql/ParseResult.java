@@ -3,6 +3,7 @@ package me.hqythu.wxydb.sql;
 import me.hqythu.wxydb.exception.SQLExecException;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
+import me.hqythu.wxydb.util.Func;
 import me.hqythu.wxydb.util.SelectOption;
 import me.hqythu.wxydb.util.SetValue;
 import me.hqythu.wxydb.util.Where;
@@ -34,6 +35,7 @@ public class ParseResult
 	public List<SetValue> values;       // update
 	public SelectOption selectOption;   // select
 	Where where;
+    Func func;
 
     // 需要修改
 	public List<String> tableNames;            // String tableName

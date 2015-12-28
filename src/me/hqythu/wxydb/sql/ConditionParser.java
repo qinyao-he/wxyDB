@@ -1,15 +1,15 @@
 package me.hqythu.wxydb.sql;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Stack;
-
 import me.hqythu.wxydb.sql.Node.Type;
 import me.hqythu.wxydb.util.BoolExpr;
 import me.hqythu.wxydb.util.BoolOp;
 import me.hqythu.wxydb.util.CompareOp;
 import me.hqythu.wxydb.util.Where;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 public class ConditionParser
 {
@@ -198,7 +198,7 @@ public class ConditionParser
 		resultList = new ArrayList<Node>();
 		List<Boolean> isExprs = new ArrayList<Boolean>();
 		List<Object> boolExprsAndOps = new ArrayList<Object>();
-		System.out.println(sql);
+//		System.out.println(sql);
 		HashMap<String, Integer> rank = new HashMap<String, Integer>();
 		rank.put("OR", 0);
 		rank.put("AND", 1);
