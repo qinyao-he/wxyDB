@@ -10,9 +10,11 @@ import java.awt.event.ActionListener;
  */
 public class MainWindow extends JFrame {
 
+    private JFrame mainwindow;
     private JToolBar toolBar;
     private JButton newDatabaseButton;
     private JButton openDatabaseButton;
+    private JLabel label;
 
     public MainWindow() {
         SwingUtilities.invokeLater(new Runnable() {
@@ -24,19 +26,17 @@ public class MainWindow extends JFrame {
     }
 
     private void createUi() {
-        JFrame frame = new JFrame("wxyDB");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(640, 480);
-        frame.setLayout(new BorderLayout());
+        mainwindow = this;
+        setTitle("wxyDB");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(640, 480);
+        setLayout(new BorderLayout());
 
-        JLabel label = new JLabel("Hello World");
-        frame.getContentPane().add(label);
+        label = new JLabel("Hello World");
+        getContentPane().add(label);
 
         createToolbar();
-        frame.getContentPane().add(toolBar, BorderLayout.NORTH);
-
-//        frame.pack();
-        frame.setVisible(true);
+        getContentPane().add(toolBar, BorderLayout.NORTH);
     }
 
     private void createToolbar() {
@@ -46,14 +46,16 @@ public class MainWindow extends JFrame {
         newDatabaseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                String filePath = UiUtilities.chooseFile(mainwindow);
+                label.setText(filePath);
             }
         });
         openDatabaseButton = new JButton("Open Database");
         openDatabaseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                String filePath = UiUtilities.chooseFile(mainwindow);
+                label.setText(filePath);
             }
         });
 
