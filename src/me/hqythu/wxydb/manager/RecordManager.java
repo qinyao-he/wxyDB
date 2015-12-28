@@ -41,11 +41,17 @@ public class RecordManager {
         insert(tableName,mfields,mvalues);
     }
 
-    public void insert(String tableName, List<Object> values) throws SQLTableException {
-        int nCol = values.size();
-        Object[] mvalues = new Object[nCol];
-        values.toArray(mvalues);
-        insert(tableName,mvalues);
+    public boolean insert(String tableName, List<Object> values) {
+        try {
+            int nCol = values.size();
+            Object[] mvalues = new Object[nCol];
+            values.toArray(mvalues);
+            insert(tableName,mvalues);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     protected void insert(String tableName, String[] fields, Object[] values) throws SQLTableException {

@@ -1,6 +1,7 @@
 package me.hqythu.wxydb.sql;
 
 import me.hqythu.wxydb.exception.SQLExecException;
+import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
 import me.hqythu.wxydb.util.SelectOption;
@@ -57,6 +58,12 @@ public class ParseResult
         boolean ok;
         switch (type) {
             case INSERT:
+                ok = RecordManager.getInstance().insert(tableNames.get(0),data);
+                if (ok) {
+                    result = "insert success";
+                } else {
+                    result = "insert failed";
+                }
                 break;
             case DELETE:
                 break;
@@ -92,6 +99,14 @@ public class ParseResult
                 result = SystemManager.getInstance().showTables();
                 break;
             case CREATE_TABLE:
+                ok = SystemManager.getInstance().createTable(tableNames.get(0),columns);
+                if (ok) {
+                    result = "create table " + tableNames.get(0) + " success";
+                } else {
+                    result = "create table " + tableNames.get(0) + " failed";
+                }
+//                System.out.println(SystemManager.getInstance().getTables().size());
+
                 break;
             case DROP_TABLE:
                 break;

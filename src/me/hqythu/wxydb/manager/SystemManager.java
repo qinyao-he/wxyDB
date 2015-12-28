@@ -149,6 +149,13 @@ public class SystemManager {
         return builder.toString();
     }
 
+//    /**
+//     * 结束,写回
+//     */
+//    public void close() {
+//        closeDatabase();
+//    }
+
     //--------------------为其他模块提供系统管理--------------------
     public Table getTable(String tableName) {
         if (connectDB == null) return null;

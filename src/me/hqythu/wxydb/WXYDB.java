@@ -7,6 +7,9 @@ import me.hqythu.wxydb.sql.ParseResult;
 import me.hqythu.wxydb.sql.SQLParser;
 import me.hqythu.wxydb.manager.SystemManager;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class WXYDB {
@@ -14,8 +17,8 @@ public class WXYDB {
     public WXYDB() {
         BufPageManager.getInstance(); // 加载类，完成初始化
         SystemManager.getInstance();  // 加载类，完成初始化
-        RecordManager.getInstance();
-        QueryEngine.getInstance();
+        RecordManager.getInstance(); // 加载类，完成初始化
+        QueryEngine.getInstance(); // 加载类，完成初始化
     }
 
     public void go() {
@@ -63,6 +66,35 @@ public class WXYDB {
             e.printStackTrace();
         }
         return result;
+    }
+
+    public List<String> excuteFile(String fileName) {
+        List<String> results = new ArrayList<>();
+        File file  = new File((fileName));
+        if (!file.exists()) return results;
+        try {
+            Scanner scanner = new Scanner(file);
+            StringBuilder builder = new StringBuilder();
+            while (scanner.hasNext()) {
+                String temp = scanner.nextLine();
+                builder.append(temp);
+                if (temp.indexOf(';') != -1) {
+                    String sql = builder.toString();
+//                    System.out.println(sql);
+                    ParseResult parseResult = SQLParser.parse(sql);
+                    String result = parseResult.execute();
+                    results.add(result);
+                    builder.setLength(0);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    public void writeBack() {
+        BufPageManager.getInstance().clear();
     }
 
     public static void main(String[] args) {

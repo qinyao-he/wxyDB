@@ -72,6 +72,11 @@ public class SQLParserTest {
                 ");");
         Assert.assertEquals("customer",sql.tableNames.get(0));
         Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
+
+        sql = SQLParser.parse("CREATE TABLE publisher (  id int(10) NOT NULL,  name varchar(100) NOT NULL,  state varchar(2),  PRIMARY KEY  (id));");
+        Assert.assertEquals("publisher",sql.tableNames.get(0));
+        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
+
     }
 
     // INSERT
@@ -92,6 +97,13 @@ public class SQLParserTest {
         Assert.assertEquals(315000, sql.data.get(0));
         Assert.assertEquals(200001, sql.data.get(1));
         Assert.assertEquals("eight", sql.data.get(2));
+
+        sql = SQLParser.parse("INSERT INTO publisher VALUES(100008,'Oxbow Books Limited','CA');");
+        Assert.assertTrue(sql.type == ParseResult.OrderType.INSERT);
+        Assert.assertEquals("publisher", sql.tableNames.get(0));
+        Assert.assertEquals(100008, sql.data.get(0));
+        Assert.assertEquals("Oxbow Books Limited", sql.data.get(1));
+        Assert.assertEquals("CA", sql.data.get(2));
 
     }
 
