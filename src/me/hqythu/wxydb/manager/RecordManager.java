@@ -1,9 +1,7 @@
 package me.hqythu.wxydb.manager;
 
+import me.hqythu.wxydb.exception.level1.SQLRecordException;
 import me.hqythu.wxydb.object.Table;
-import me.hqythu.wxydb.exception.SQLExecException;
-import me.hqythu.wxydb.exception.SQLRecordException;
-import me.hqythu.wxydb.exception.SQLTableException;
 import me.hqythu.wxydb.util.SetValue;
 import me.hqythu.wxydb.util.Where;
 
@@ -32,50 +30,52 @@ public class RecordManager {
         return manager;
     }
 
-    public void insert(String tableName, List<String> fields, List<Object> values) throws SQLTableException {
-        int nCol = fields.size();
-        String[] mfields = new String[nCol];
+    /**
+     * INSERT
+     */
+    public boolean insert(String tableName, List<Object> values) throws SQLRecordException {
+        int nCol = values.size();
         Object[] mvalues = new Object[nCol];
-        fields.toArray(mfields);
         values.toArray(mvalues);
-        insert(tableName,mfields,mvalues);
+        insert(tableName, mvalues);
+        return true;
     }
 
-    public boolean insert(String tableName, List<Object> values) {
+    /**
+     * DELETE
+     */
+    public void remove(String tableName, Where where) throws SQLRecordException {
+        Table table = SystemManager.getInstance().getTable(tableName);
+        if (table == null) throw new SQLRecordException("not have table: " + tableName);
         try {
-            int nCol = values.size();
-            Object[] mvalues = new Object[nCol];
-            values.toArray(mvalues);
-            insert(tableName,mvalues);
-            return true;
+            table.remove(where);
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new SQLRecordException(e.getMessage());
         }
     }
 
-    protected void insert(String tableName, String[] fields, Object[] values) throws SQLTableException {
+    /**
+     * UPDATE
+     */
+    public void update(String tableName, Where where, List<SetValue> setValues) throws SQLRecordException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLTableException("not have table: " + tableName);
-        table.insert(fields, values);
+        if (table == null) throw new SQLRecordException("not have table: " + tableName);
+        try {
+            table.update(where, setValues);
+        } catch (Exception e) {
+            throw new SQLRecordException(e.getMessage());
+        }
     }
 
-    protected void insert(String tableName, Object[] values) throws SQLTableException {
+    //--------------------内部辅助函数--------------------
+    protected void insert(String tableName, Object[] values) throws SQLRecordException {
         Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLTableException("not have table: " + tableName);
-        table.insert(values);
-    }
-
-    public void remove(String tableName, Where where) throws SQLExecException, SQLTableException {
-        Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: " + tableName);
-        table.remove(where);
-    }
-
-    public void update(String tableName, Where where, List<SetValue> setValues) throws SQLExecException, SQLTableException {
-        Table table = SystemManager.getInstance().getTable(tableName);
-        if (table == null) throw new SQLExecException("not have table: " + tableName);
-        table.update(where, setValues);
+        if (table == null) throw new SQLRecordException("not have table: " + tableName);
+        try {
+            table.insert(values);
+        } catch (Exception e) {
+            throw new SQLRecordException(e.getMessage());
+        }
     }
 
     private RecordManager() {

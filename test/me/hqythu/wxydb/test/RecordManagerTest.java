@@ -1,7 +1,6 @@
 package me.hqythu.wxydb.test;
 
-import me.hqythu.wxydb.exception.SQLRecordException;
-import me.hqythu.wxydb.exception.SQLTableException;
+import me.hqythu.wxydb.exception.level1.SQLRecordException;
 import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
@@ -12,12 +11,8 @@ import me.hqythu.wxydb.pagefile.*;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by apple on 15/12/24.
@@ -88,7 +83,7 @@ public class RecordManagerTest {
         record.add(18);
         RecordManager.getInstance().insert(TEST_TABLE1,record);
         record.set(1,19);
-        RecordManager.getInstance().insert(TEST_TABLE1,fields,record);
+        RecordManager.getInstance().insert(TEST_TABLE1,record);
 
         // 检查记录个数
         table = SystemManager.getInstance().getTable(TEST_TABLE1);
@@ -131,7 +126,7 @@ public class RecordManagerTest {
         record.add("LiuXiaoHong");
         record.add(null);
 
-        thrown.expect(SQLTableException.class);
+        thrown.expect(SQLRecordException.class);
         thrown.expectMessage("not null try to null");
         RecordManager.getInstance().insert(TEST_TABLE1,record);
 //        thrown.expect(SQLTableException.class);

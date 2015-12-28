@@ -1,9 +1,9 @@
 package me.hqythu.wxydb.manager;
 
+import me.hqythu.wxydb.exception.level1.SQLSystemException;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.pagefile.*;
 import me.hqythu.wxydb.util.Global;
-import me.hqythu.wxydb.pagefile.*;
 import me.hqythu.wxydb.object.Column;
 
 import java.io.*;
@@ -35,7 +35,7 @@ public class SystemManager {
     /**
      * 创建DB
      */
-    public boolean createDatabase(String DBname) {
+    public boolean createDatabase(String DBname) throws SQLSystemException {
         if (connectDB != null && connectDB.equals(DBname)) { // 已经存在
             return false;
         }
@@ -52,8 +52,7 @@ public class SystemManager {
 
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new SQLSystemException(e.getMessage());
         }
     }
 
@@ -88,10 +87,14 @@ public class SystemManager {
     /**
      * 创建表
      */
-    public boolean createTable(String tableName, List<Column> columns) {
-        Column[] cols = new Column[columns.size()];
-        columns.toArray(cols);
-        return createTable(tableName, cols);
+    public boolean createTable(String tableName, List<Column> columns) throws SQLSystemException {
+        try {
+            Column[] cols = new Column[columns.size()];
+            columns.toArray(cols);
+            return createTable(tableName, cols);
+        } catch (Exception e) {
+            throw new SQLSystemException(e.getMessage());
+        }
     }
 
     /**
@@ -149,12 +152,12 @@ public class SystemManager {
         return builder.toString();
     }
 
-//    /**
-//     * 结束,写回
-//     */
-//    public void close() {
-//        closeDatabase();
-//    }
+    /**
+     * 结束,写回
+     */
+    public void close() {
+        closeDatabase();
+    }
 
     //--------------------为其他模块提供系统管理--------------------
     public Table getTable(String tableName) {
@@ -206,7 +209,7 @@ public class SystemManager {
         }
     }
 
-    protected boolean createTable(String tableName, Column[] columns) {
+    protected boolean createTable(String tableName, Column[] columns) throws SQLSystemException {
         if (connectDB == null) return false;
         if (tables.size() >= Global.TABLE_MAX_SIZE) return false; // 限制一个库的表数
         if (tableName.length() > Global.TABLE_NAME_LEN) { // 表名
@@ -232,8 +235,7 @@ public class SystemManager {
             tables.put(tableName, table);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            throw new SQLSystemException(e.getMessage());
         }
     }
 

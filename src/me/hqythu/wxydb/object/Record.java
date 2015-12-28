@@ -1,6 +1,6 @@
 package me.hqythu.wxydb.object;
 
-import me.hqythu.wxydb.exception.SQLRecordException;
+import me.hqythu.wxydb.exception.level1.SQLRecordException;
 import me.hqythu.wxydb.util.BitSetMask;
 import me.hqythu.wxydb.util.Global;
 

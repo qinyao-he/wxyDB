@@ -94,7 +94,7 @@ public class SystemManagerTest {
     }
 
     @Test
-    public void testShow() {
+    public void testShow() throws Exception {
         Assert.assertTrue(SystemManager.getInstance().useDatabase(TEST_DB));
         List<Column> columns = new ArrayList<>();
         String columnInfos;

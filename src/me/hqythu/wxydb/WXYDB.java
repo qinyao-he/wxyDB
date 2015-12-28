@@ -21,7 +21,7 @@ public class WXYDB {
         QueryEngine.getInstance(); // 加载类，完成初始化
     }
 
-    public void go() {
+    public void console() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
 
@@ -63,7 +63,6 @@ public class WXYDB {
             result = sql.execute();
         } catch (Exception e) {
             result = e.getMessage();
-            e.printStackTrace();
         }
         return result;
     }
@@ -88,7 +87,7 @@ public class WXYDB {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            results.add("error at here");
         }
         return results;
     }
@@ -99,6 +98,6 @@ public class WXYDB {
 
     public static void main(String[] args) {
         WXYDB db = new WXYDB();
-        db.go();
+        db.console();
     }
 }

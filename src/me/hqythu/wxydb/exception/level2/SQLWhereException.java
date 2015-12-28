@@ -1,4 +1,4 @@
-package me.hqythu.wxydb.exception;
+package me.hqythu.wxydb.exception.level2;
 
 /**
  * Created by apple on 15/12/26.
