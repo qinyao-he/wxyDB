@@ -461,7 +461,7 @@ public class SQLParser
                 {
                     sql = sql.substring(1);
                 }
-                else if (sql.trim().toUpperCase().startsWith("NULL"))
+                else if (sql.trim().toUpperCase().startsWith("NULL") && !reading)
                 {
                     sql = sql.trim();
                     sql = sql.substring(4);

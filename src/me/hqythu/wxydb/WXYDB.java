@@ -80,6 +80,7 @@ public class WXYDB {
         try {
             Scanner scanner = new Scanner(file);
             StringBuilder builder = new StringBuilder();
+            int i = 0;
             while (scanner.hasNext()) {
                 String temp;
                 try {
@@ -89,6 +90,7 @@ public class WXYDB {
                 }
                 builder.append(temp);
                 if (temp.indexOf(';') != -1) {
+                    System.out.println(i++);
                     String sql = builder.toString();
                     ParseResult parseResult = SQLParser.parse(sql);
                     String result = parseResult.execute();
