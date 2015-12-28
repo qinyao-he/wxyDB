@@ -1,4 +1,4 @@
-package me.hqythu.wxydb.test;
+package me.hqythu.wxydb.test.level1;
 
 import me.hqythu.wxydb.exception.level1.SQLRecordException;
 import me.hqythu.wxydb.manager.RecordManager;

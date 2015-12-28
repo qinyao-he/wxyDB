@@ -1,4 +1,4 @@
-package me.hqythu.wxydb.test;
+package me.hqythu.wxydb.test.level1;
 
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;

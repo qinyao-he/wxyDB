@@ -56,6 +56,9 @@ public class WXYDB {
         }
     }
 
+    /**
+     * 执行一条SQL
+     */
     public String excute(String sqlString) {
         String result;
         try {
@@ -67,6 +70,9 @@ public class WXYDB {
         return result;
     }
 
+    /**
+     * 执行一个SQL语句文件
+     */
     public List<String> excuteFile(String fileName) {
         List<String> results = new ArrayList<>();
         File file  = new File((fileName));
@@ -92,6 +98,10 @@ public class WXYDB {
         return results;
     }
 
+    /**
+     * 写回
+     * 由于Java的析构比较迷,目前设置为,在结束使用后,手动写回
+     */
     public void writeBack() {
         BufPageManager.getInstance().clear();
     }

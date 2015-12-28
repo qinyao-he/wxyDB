@@ -1,5 +1,6 @@
-package me.hqythu.wxydb;
+package me.hqythu.wxydb.test.level0;
 
+import me.hqythu.wxydb.WXYDB;
 import me.hqythu.wxydb.sql.ParseResult;
 import me.hqythu.wxydb.sql.SQLParser;
 import org.junit.After;
@@ -20,7 +21,9 @@ public class WXYDBTest {
     public static final String ORDERS_FILE = "sql/orders.sql";
     public static final String PUBLISHER_FILE = "sql/publisher.sql";
     public static final String CUSTOMER_FILE = "sql/customer.sql";
+
     WXYDB wxydb;
+
     @Before
     public void setUp() throws Exception {
         wxydb = new WXYDB();
