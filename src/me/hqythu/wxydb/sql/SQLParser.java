@@ -424,7 +424,7 @@ public class SQLParser
 //	}
     static ParseResult parseINSERT(String sql)
     {
-        System.out.println(sql);
+//        System.out.println(sql);
 //        return null;
         String sqlS[] =  sql.split(" ");
         ParseResult result = new ParseResult();
