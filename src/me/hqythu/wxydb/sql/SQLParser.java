@@ -461,6 +461,16 @@ public class SQLParser
                 {
                     sql = sql.substring(1);
                 }
+                else if (sql.toUpperCase().startsWith("NULL"))
+                {
+                    sql = sql.substring(4);
+                    sql = sql.trim();
+                    if (sql.startsWith(","))
+                    {
+                        sql = sql.substring(1);
+                    }
+                    result.data.add(null);
+                }
                 else if (sql.charAt(0) == '\'' || sql.charAt(0) == '‘' || sql.charAt(0) == '’')
                 {
                     reading = !reading;
