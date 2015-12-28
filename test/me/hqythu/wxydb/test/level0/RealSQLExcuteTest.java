@@ -44,12 +44,12 @@ public class RealSQLExcuteTest {
         result = parseResult.execute();
     }
 
+    // 重复primary key
     @Test
-    public void testInsertCheck() throws Exception {
+    public void testInsertDuplicatePrimary() throws Exception {
         ParseResult parseResult;
         List<String> results;
         String result;
-
         parseResult = SQLParser.parse("INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’);");
         result = parseResult.execute();
         Assert.assertEquals("insert success",result);
@@ -62,7 +62,14 @@ public class RealSQLExcuteTest {
         thrown.expectMessage("can not insert duplicate primary key");
         parseResult = SQLParser.parse("INSERT INTO customer VALUES(300001,'JO CANNADY','M');");
         result = parseResult.execute();
+    }
 
+    // 插入数据类型有误
+    @Test
+    public void testInsertErrorType() throws Exception {
+        ParseResult parseResult;
+        List<String> results;
+        String result;
         thrown.expect(SQLExecException.class);
         thrown.expectMessage("insert error type at 2 column");
         parseResult = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
