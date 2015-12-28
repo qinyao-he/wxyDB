@@ -57,29 +57,29 @@ public class Table {
     // 将参数转为byte[]
 
     // values个数不足,需要补null
-    public void insert(String[] fields, Object[] values) throws SQLTableException {
-
-        if (fields == null) throw new SQLTableException("insert none fields");
-
-        Object[] newValues = new Object[columns.length];
-        for (int i = 0; i < newValues.length; i++) {
-            newValues[i] = null;
-        }
-        for (int i = 0; i < fields.length; i++) {
-            int col = fieldToCol(fields[i]);
-            newValues[col] = values[i];
-        }
-        insert(newValues);
-    }
+//    public void insert(String[] fields, Object[] values) throws SQLTableException {
+//
+//        if (fields == null) throw new SQLTableException("insert none fields");
+//
+//        Object[] newValues = new Object[columns.length];
+//        for (int i = 0; i < newValues.length; i++) {
+//            newValues[i] = null;
+//        }
+//        for (int i = 0; i < fields.length; i++) {
+//            int col = fieldToCol(fields[i]);
+//            newValues[col] = values[i];
+//        }
+//        insert(newValues);
+//    }
 
     // values的个数
-    public void insert(Object[] values) throws SQLTableException {
+    public void insert(Object[] values, boolean fast) throws SQLTableException {
 //        System.out.println(Arrays.toString(values));
 //        System.out.println(Arrays.toString(columns));
         if (values.length != columns.length) throw new SQLTableException("insert columns size not enough");
         try {
             byte[] record = Record.valuesToBytes(this, values);
-            insert(record);
+            insert(record, fast);
         } catch (Exception e) {
             throw new SQLTableException(e.getMessage());
         }
@@ -90,7 +90,7 @@ public class Table {
     /**
      * 插入记录，处理数据页
      */
-    public void insert(byte[] record) throws SQLTableException {
+    public void insert(byte[] record, boolean fast) throws SQLTableException {
 
         Page dbPage = SystemManager.getInstance().getDbPage();
         int fileId = dbPage.getFileId();
@@ -100,10 +100,12 @@ public class Table {
 
         try {
             tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
-
-            if (!checkPrimaryOk(record)) {
-                throw new SQLTableException("can not insert duplicate primary key");
+            if (!fast) {
+                if (!checkPrimaryOk(record)) {
+                    throw new SQLTableException("can not insert duplicate primary key");
+                }
             }
+
 
             // 数据首页
             int dataPageId = TablePageUser.getFirstDataPage(tablePage);

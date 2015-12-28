@@ -124,4 +124,17 @@ public class Where {
         return forCalc.pop();
     }
 
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append('[');
+        for (int i = 0; i < boolExprsAndOps.size(); i++) {
+            builder.append(boolExprsAndOps.get(i));
+            if (i != boolExprsAndOps.size() - 1) {
+                builder.append(',');
+            }
+        }
+        builder.append(']');
+        return builder.toString();
+    }
+
 }

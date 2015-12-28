@@ -109,5 +109,25 @@ public class BoolExpr {
         return false;
     }
 
-
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if (tableNameL != null) {
+            builder.append(tableNameL);
+            builder.append('.');
+            builder.append(columnNameL);
+        } else {
+            builder.append(valueL);
+        }
+        builder.append(' ');
+        builder.append(compareOp.toString());
+        builder.append(' ');
+        if (tableNameR != null) {
+            builder.append(tableNameR);
+            builder.append('.');
+            builder.append(columnNameR);
+        } else {
+            builder.append(valueR);
+        }
+        return builder.toString();
+    }
 }

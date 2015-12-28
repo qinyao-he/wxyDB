@@ -6,6 +6,7 @@ import me.hqythu.wxydb.exception.level1.SQLSystemException;
 import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
+import me.hqythu.wxydb.object.Record;
 import me.hqythu.wxydb.util.Func;
 import me.hqythu.wxydb.util.SelectOption;
 import me.hqythu.wxydb.util.SetValue;
@@ -71,8 +72,12 @@ public class ParseResult
                     }
                     break;
                 case DELETE:
+                    RecordManager.getInstance().remove(tableNames.get(0),where);
+                    result = "delete success";
                     break;
                 case UPDATE:
+                    RecordManager.getInstance().update(tableNames.get(0),where,values);
+                    result = "update success";
                     break;
                 case SELECT:
                     break;
@@ -112,8 +117,15 @@ public class ParseResult
                     }
                     break;
                 case DROP_TABLE:
+                    ok = SystemManager.getInstance().dropTable(tableNames.get(0));
+                    if (ok) {
+                        result = "drop table " + tableNames.get(0) + " success";
+                    } else {
+                        result = "drop table " + tableNames.get(0) + " failed";
+                    }
                     break;
                 case DESC:
+                    result = SystemManager.getInstance().showTableColumns(tableNames.get(0));
                     break;
                 case ERROR:
                     result = "parse sql error:";

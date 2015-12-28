@@ -23,13 +23,17 @@ import java.util.List;
 public class RecordManager {
 
     private static RecordManager manager = null;
+    private static boolean fast;
 
     public static RecordManager getInstance() {
         if (manager == null) {
             manager = new RecordManager();
+            manager.clearFast();
         }
         return manager;
     }
+    public void setFast() {fast = true;}
+    public void clearFast() {fast = false;}
 
     /**
      * INSERT
@@ -73,8 +77,7 @@ public class RecordManager {
         Table table = SystemManager.getInstance().getTable(tableName);
         if (table == null) throw new SQLRecordException("not have table: " + tableName);
         try {
-//            System.out.println(Arrays.toString(values));
-            table.insert(values);
+            table.insert(values,fast);
         } catch (Exception e) {
             throw new SQLRecordException(e.getMessage());
         }
