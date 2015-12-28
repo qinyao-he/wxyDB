@@ -64,6 +64,7 @@ public class MainWindow extends JFrame {
                 } catch (Exception exception) {
                     label.setText("create database fail");
                 }
+                refreshDatabase();
             }
         });
         openDatabaseButton = new JButton("Open Database");
@@ -73,6 +74,7 @@ public class MainWindow extends JFrame {
                 String filePath = UiUtilities.chooseFile(mainwindow);
                 label.setText(filePath);
                 SystemManager.getInstance().useDatabase(filePath);
+                refreshDatabase();
             }
         });
 
@@ -93,7 +95,7 @@ public class MainWindow extends JFrame {
     }
 
     private void refreshDatabase() {
-
+        structureTab.refreshDatabase();
     }
 
 }
