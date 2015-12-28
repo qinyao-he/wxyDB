@@ -823,6 +823,7 @@ public class SQLParser
     }
     public static ParseResult parse(String sql)
     {
+        sql = sql.trim();
         String preSql = preParse(sql);
         String ss[] =  preSql.split(" ");
         ParseResult result = new ParseResult();
