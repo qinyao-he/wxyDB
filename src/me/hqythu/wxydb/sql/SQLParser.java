@@ -5,10 +5,7 @@ import me.hqythu.wxydb.object.DataType;
 import me.hqythu.wxydb.sql.ParseResult.OrderType;
 import me.hqythu.wxydb.util.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 //import query.Condition.Type;
 
@@ -18,7 +15,7 @@ public class SQLParser
     {
         Object resultObject;
         value = value.replaceAll("\\,", "");
-        value = value.replaceAll("\\)", "");
+//        value = value.replaceAll("\\)", "");
         value = value.replaceAll("\\;", "");
         if (value.startsWith("\'") || value.startsWith("‘") || value.startsWith("’"))
         {
@@ -425,29 +422,68 @@ public class SQLParser
 //		}
 //		return conditions;
 //	}
-    static ParseResult parseINSERT(String sqlString)
+    static ParseResult parseINSERT(String sql)
     {
-        sqlString = sqlString.replaceAll(" \\, ", ", ");
-        String sql[] =  sqlString.split(" ");
+        System.out.println(sql);
+//        return null;
+        String sqlS[] =  sql.split(" ");
         ParseResult result = new ParseResult();
-        String currentString = "";
-        for (int i = 4; i < sql.length; i++)
+        result.tableNames.add(sqlS[2]);
+        sql = "";
+        for (int i = 3; i < sqlS.length; i++)
         {
-            sql[i] = sql[i].replaceAll("\\(", "");
-            sql[i] = sql[i].replaceAll("\\)", "");
-            currentString += sql[i];
-            if (currentString.endsWith(",") || currentString.endsWith(";"))
+            sql += sqlS[i] + ' ';
+        }
+        sql = sql.substring(0, sql.length() - 1);
+        int status = -1;
+        String valueString = "";
+        Object value = null;
+        boolean reading = false;
+        while(sql.length() > 0)
+        {
+            if (status == -1)
             {
-                result.data.add(exchange(currentString));
-                currentString = "";
+                if (sql.charAt(0) == '(' || sql.charAt(0) == ' ')
+                {
+                    status = 0;
+                }
+                sql = sql.substring(1);
             }
-            else
+            else if (status == 0)
             {
-                currentString += ' ';
+                if (sql.charAt(0) == '(' && !reading)
+                {
+                    sql = sql.substring(1);
+                }
+                else if (sql.charAt(0) == '\'' || sql.charAt(0) == '‘' || sql.charAt(0) == '’')
+                {
+                    reading = !reading;
+                    valueString += sql.charAt(0);
+                    sql = sql.substring(1);
+                }
+                else if (sql.charAt(0) == ')' && !reading)
+                {
+                    value = exchange(valueString.trim());
+                    result.data.add(value);
+                    break;
+                }
+                else if (sql.charAt(0) == ',' || sql.charAt(0) == '，')
+                {
+                    value = exchange(valueString.trim());
+                    result.data.add(value);
+                    value = null;
+                    valueString = "";
+                    sql = sql.substring(1);
+                }
+                else
+                {
+                    valueString += sql.charAt(0);
+                    sql = sql.substring(1);
+                }
             }
         }
         result.type = OrderType.INSERT;
-        result.tableNames.add(sql[2]);
+        result.tableNames.add(sqlS[2]);
         return result;
     }
     static ParseResult parseDELETE(String sqlString)
@@ -739,7 +775,8 @@ public class SQLParser
     {
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
-        ParseResult result = parse("SELECT SUM(quantity) FROM orders;");
+//        System.out.println(calcStm("10000"));
+        ParseResult result = parse("INSERT INTO book VALUES (200001,'Marias Diary (Plus S.)','Mark P. O. Morford',100082,5991,2530);");
 //		System.out.print("123");
     }
     public static ParseResult parse(String sql)
