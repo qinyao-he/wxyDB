@@ -461,8 +461,9 @@ public class SQLParser
                 {
                     sql = sql.substring(1);
                 }
-                else if (sql.toUpperCase().startsWith("NULL"))
+                else if (sql.trim().toUpperCase().startsWith("NULL"))
                 {
+                    sql = sql.trim();
                     sql = sql.substring(4);
                     sql = sql.trim();
                     if (sql.startsWith(","))
@@ -497,6 +498,11 @@ public class SQLParser
                     sql = sql.substring(1);
                 }
             }
+        }
+        if (sql.length() == 0 && !valueString.isEmpty())
+        {
+            value = exchange(valueString.trim());
+            result.data.add(value);
         }
         result.type = OrderType.INSERT;
         result.tableNames.add(sqlS[2]);
@@ -796,7 +802,7 @@ public class SQLParser
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
 //        System.out.println(calcStm("10000"));
-        ParseResult result = parse("DELETE FROM publisher WHERE state=’CA’;");
+        ParseResult result = parse("INSERT INTO customer VALUES (300001, null, 123)");
 //		System.out.print("123");
     }
     static String preParse(String sql)
