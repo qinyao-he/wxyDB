@@ -163,7 +163,7 @@ public class SQLParserTest {
         Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).tableNameL);
         Assert.assertEquals("state", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).columnNameL);
         Assert.assertEquals(CompareOp.IS, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).compareOp);
-        Assert.assertEquals("NULL", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
+        Assert.assertEquals(null, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
 
         sql = SQLParser.parse("DELETE FROM publisher WHERE state=’(CA)’;");
         Assert.assertTrue(sql.type == ParseResult.OrderType.DELETE);

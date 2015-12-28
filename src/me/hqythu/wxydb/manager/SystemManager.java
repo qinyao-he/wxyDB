@@ -181,6 +181,10 @@ public class SystemManager {
         return fileId;
     }
 
+    public String getDbName() {
+        return connectDB;
+    }
+
     //--------------------内部辅助函数--------------------
     protected void closeDatabase() {
         if (connectDB != null) {
