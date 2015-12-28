@@ -20,11 +20,11 @@ public class ConditionParser
 		value = value.replaceAll("\\,", "");
 		value = value.replaceAll("\\)", "");
 		value = value.replaceAll("\\;", "");
-		if (value.startsWith("\'") || value.startsWith("��") || value.startsWith("��"))
+		if (value.startsWith("\'") || value.startsWith("‘") || value.startsWith("’"))
 		{
 			value = value.replaceAll("\\'", "");
-			value = value.replaceAll("\\��", "");
-			value = value.replaceAll("\\��", "");
+			value = value.replaceAll("‘", "");
+			value = value.replaceAll("’", "");
 			resultObject = value;
 		}
 		else if (value.contains(".") || value.toUpperCase().equals("NULL"))
@@ -235,56 +235,46 @@ public class ConditionParser
 				sql = ret.second;
 				opt.push(node);
 			}
-			else if (sql.charAt(i) == '(' || opr.lastElement().equals("("))
-			{
-				opr.push(currentString);
-			}
-			else if (currentString.equals(";") && opr.size() == 1 && opt.size() == 1)
-			{
-				break;
-			}
-			else if (!currentString.isEmpty() && rank.get(currentString) <= rank.get(opr.lastElement())) 
-			{
-				boolean end = false;
-				while(!opr.isEmpty() && rank.get(currentString) <= rank.get(opr.lastElement()))
-				{
-					String r = opr.pop();
-					Node b = opt.pop();
-					Node a = opt.pop();
-					if (sql.charAt(i) == ')')
-					{
-						opr.pop();
-					}
-					Node node = new Node();
-					node.type = Type.SEP;
-					node.sep = r;
-					node.leftChild = a;
-					node.rightChild = b;
-					opt.push(node);
-					if (sql.charAt(i) == ';')
-					{
-						end = true;
-						break;
-					}
-				}
-				if (sql.charAt(i) != ')')
-				{
-					opr.push(currentString);
-				}
-				if (end)
-				{
-					break;
-				}
-			}
-			else
-			{
-				opr.push(currentString);
-			}
-			if (currentString.length() == 1)
-			{
-				sql = sql.substring(1);
-			}
-			sql = sql.trim();
+            else if (rank.get(currentString) <= rank.get(opr.lastElement()))
+            {
+                while(!opr.isEmpty() && rank.get(currentString) <= rank.get(opr.lastElement()))
+                {
+                    if (opr.lastElement().equals(";") || opr.lastElement().equals("("))
+                    {
+                        if (currentString.toUpperCase().equals("AND") || currentString.toUpperCase().equals("OR") || currentString.equals("("))
+                        {
+                            opr.push(currentString);
+                        }
+                        else
+                        {
+                            opr.pop();
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        String r = opr.pop();
+                        Node b = opt.pop();
+                        Node a = opt.pop();
+                        Node node = new Node();
+                        node.type = Type.SEP;
+                        node.sep = r;
+                        node.leftChild = a;
+                        node.rightChild = b;
+                        opt.push(node);
+                    }
+                }
+            }
+            else
+            {
+                opr.push(currentString);
+            }
+
+            if (currentString.length() == 1)
+            {
+                sql = sql.substring(1);
+            }
+            sql = sql.trim();
 		}
 		post(opt.firstElement());
         for (Node node: resultList)

@@ -17,6 +17,7 @@ public class SQLParser
         value = value.replaceAll("\\,", "");
 //        value = value.replaceAll("\\)", "");
         value = value.replaceAll("\\;", "");
+//        System.out.println(value);
         if (value.startsWith("\'") || value.startsWith("‘") || value.startsWith("’"))
         {
             value = value.replaceAll("\\'", "");
@@ -746,7 +747,11 @@ public class SQLParser
             }
             else if (status == 1)
             {
-                if (!sql.toUpperCase().startsWith("PRIMARY KEY"))
+                if (sql.startsWith(";"))
+                {
+                    break;
+                }
+                else if (!sql.toUpperCase().startsWith("PRIMARY KEY"))
                 {
                     DoubleReturn<Column, String> r = readColumn(sql);
                     result.columns.add(r.first);
@@ -780,7 +785,7 @@ public class SQLParser
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
 //        System.out.println(calcStm("10000"));
-        ParseResult result = parse("INSERT INTO book VALUES (200001,'Marias Diary (Plus S.)','Mark P. O. Morford',100082,5991,2530);");
+        ParseResult result = parse("DELETE FROM publisher WHERE state=’CA’;");
 //		System.out.print("123");
     }
     public static ParseResult parse(String sql)
