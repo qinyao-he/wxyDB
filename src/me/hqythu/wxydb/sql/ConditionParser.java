@@ -18,7 +18,7 @@ public class ConditionParser
 	{
 		Object resultObject;
 		value = value.replaceAll("\\,", "");
-		value = value.replaceAll("\\)", "");
+//		value = value.replaceAll("\\)", "");
 		value = value.replaceAll("\\;", "");
 		if (value.startsWith("\'") || value.startsWith("‘") || value.startsWith("’"))
 		{
@@ -170,9 +170,14 @@ public class ConditionParser
 	{
 		sql = sql.trim();
 		String resultString = "";
+        boolean isReading = false;
 		for (int i = 0; i < sql.length(); i++)
 		{
-			if (isAND(sql, i) || isOR(sql, i) || sql.charAt(i) == ';' || sql.charAt(i) == ')')
+            if (sql.charAt(i) == '\'' || sql.charAt(i) == '‘' || sql.charAt(i) == '’')
+            {
+                isReading = !isReading;
+            }
+			if (!isReading && (isAND(sql, i) || isOR(sql, i) || sql.charAt(i) == ';' || sql.charAt(i) == ')'))
 			{
 				sql = sql.substring(i);
 				break;
@@ -222,7 +227,7 @@ public class ConditionParser
 				currentString = "OR";
 				sql = sql.substring(2);
 			}
-			else if (sql.charAt(i) == '(' || sql.charAt(i) == ')' || sql.charAt(i) == ';' )
+			else if (sql.charAt(i) == '(' || sql.charAt(i) == ')' || sql.charAt(i) == ';')
 			{
 				currentString += sql.charAt(i);
 			}
@@ -335,8 +340,15 @@ public class ConditionParser
                     {
                         if (right.startsWith("*"))
                         {
-                            expr.tableNameR = tableName;
-                            expr.columnNameR = right.substring(1);
+                            if (right.toUpperCase().startsWith("*NULL"))
+                            {
+                                expr.valueR = "NULL";
+                            }
+                            else
+                            {
+                                expr.tableNameR = tableName;
+                                expr.columnNameR = right.substring(1);
+                            }
                         }
                         else
                         {
