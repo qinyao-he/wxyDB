@@ -133,8 +133,8 @@ public class SQLParserTest {
         System.out.println(sql.data);
         Assert.assertEquals("publisher", sql.tableNames.get(0));
         Assert.assertEquals(3,sql.data.size());
-        Assert.assertEquals(100044, sql.data.get(0));
-        Assert.assertEquals("Brooks/Cole Pub. Co", sql.data.get(1));
+        Assert.assertEquals(100050, sql.data.get(0));
+        Assert.assertEquals("Carlton Books, Ltd.", sql.data.get(1));
         Assert.assertEquals("CA", sql.data.get(2));
 
     }

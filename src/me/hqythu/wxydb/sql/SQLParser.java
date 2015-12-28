@@ -14,9 +14,9 @@ public class SQLParser
     static Object exchange(String value)
     {
         Object resultObject;
-        value = value.replaceAll("\\,", "");
+//        value = value.replaceAll("\\,", "");
 //        value = value.replaceAll("\\)", "");
-        value = value.replaceAll("\\;", "");
+//        value = value.replaceAll("\\;", "");
 //        System.out.println(value);
         if (value.startsWith("\'") || value.startsWith("‘") || value.startsWith("’"))
         {
@@ -434,12 +434,13 @@ public class SQLParser
         String sqlS[] =  sql.split(" ");
         ParseResult result = new ParseResult();
         result.tableNames.add(sqlS[2]);
-        sql = "";
-        for (int i = 3; i < sqlS.length; i++)
-        {
-            sql += sqlS[i] + ' ';
-        }
+        sql = sql.substring(sql.toUpperCase().indexOf("VALUES"));
+//        for (int i = 3; i < sqlS.length; i++)
+//        {
+//            sql += sqlS[i] + ' ';
+//        }
         sql = sql.substring(0, sql.length() - 1);
+        System.out.println(sql);
         int status = -1;
         String valueString = "";
         Object value = null;
@@ -472,7 +473,7 @@ public class SQLParser
                     result.data.add(value);
                     break;
                 }
-                else if (sql.charAt(0) == ',' || sql.charAt(0) == '，')
+                else if ((sql.charAt(0) == ',' || sql.charAt(0) == '，') && !reading)
                 {
                     value = exchange(valueString.trim());
                     result.data.add(value);
@@ -788,7 +789,7 @@ public class SQLParser
         ParseResult result = parse("DELETE FROM publisher WHERE state=’CA’;");
 //		System.out.print("123");
     }
-    public static ParseResult parse(String sql)
+    static String preParse(String sql)
     {
         sql = sql.replaceAll("\\, ", ",");
         sql = sql.replaceAll(" \\,", ",");
@@ -802,7 +803,12 @@ public class SQLParser
         sql = sql.replaceAll("> ", ">");
         sql = sql.replaceAll(" >", ">");
         sql = sql.replaceAll(">", " > ");
-        String ss[] =  sql.split(" ");
+        return sql;
+    }
+    public static ParseResult parse(String sql)
+    {
+        String preSql = preParse(sql);
+        String ss[] =  preSql.split(" ");
         ParseResult result = new ParseResult();
 //		try
 //		{
@@ -812,43 +818,43 @@ public class SQLParser
         }
         else if (ss[0].toUpperCase().equals("DELETE"))
         {
-            result = parseDELETE(sql);
+            result = parseDELETE(preSql);
         }
         else if (ss[0].toUpperCase().equals("UPDATE"))
         {
-            result = parseUPDATE(sql);
+            result = parseUPDATE(preSql);
         }
         else if (ss[0].toUpperCase().equals("SELECT"))
         {
-            result = parseSELECT(sql);
+            result = parseSELECT(preSql);
         }
         else if (ss[0].toUpperCase().equals("CREATE") && ss[1].toUpperCase().equals("DATABASE"))
         {
-            result = parseCREATE_DATABASE(sql);
+            result = parseCREATE_DATABASE(preSql);
         }
         else if (ss[0].toUpperCase().equals("DROP") && ss[1].toUpperCase().equals("DATABASE"))
         {
-            result = parseDROP_DATABASE(sql);
+            result = parseDROP_DATABASE(preSql);
         }
         else if (ss[0].toUpperCase().equals("USE"))
         {
-            result = parseUSE(sql);
+            result = parseUSE(preSql);
         }
         else if (ss[0].toUpperCase().equals("SHOW") && ss[1].toUpperCase().equals("TABLES;"))
         {
-            result = parseSHOW_TABLES(sql);
+            result = parseSHOW_TABLES(preSql);
         }
         else if (ss[0].toUpperCase().equals("CREATE") && ss[1].toUpperCase().equals("TABLE"))
         {
-            result = parseCREATE_TABLE(sql);
+            result = parseCREATE_TABLE(preSql);
         }
         else if (ss[0].toUpperCase().equals("DROP") && ss[1].toUpperCase().equals("TABLE"))
         {
-            result = parseDROP_TABLE(sql);
+            result = parseDROP_TABLE(preSql);
         }
         else if (ss[0].toUpperCase().equals("DESC"))
         {
-            result = parseDESC(sql);
+            result = parseDESC(preSql);
         }
         else
         {
