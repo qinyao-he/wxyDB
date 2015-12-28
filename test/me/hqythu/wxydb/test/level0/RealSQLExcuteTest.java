@@ -45,7 +45,7 @@ public class RealSQLExcuteTest {
     }
 
     // 重复primary key
-    @Test
+//    @Test
     public void testInsertDuplicatePrimary() throws Exception {
         ParseResult parseResult;
         List<String> results;
@@ -65,7 +65,7 @@ public class RealSQLExcuteTest {
     }
 
     // 插入数据类型有误
-    @Test
+//    @Test
     public void testInsertErrorType() throws Exception {
         ParseResult parseResult;
         List<String> results;
@@ -84,18 +84,24 @@ public class RealSQLExcuteTest {
         Table table;
 
         // 初始化数据数据
-        results = wxydb.excuteFile(PUBLISHER_FILE);
+//        public static final String BOOK_FILE = "sql/book.sql";
+//        public static final String ORDERS_FILE = "sql/orders.sql";
+//        public static final String PUBLISHER_FILE = "sql/publisher.sql";
+//        public static final String CUSTOMER_FILE = "sql/customer.sql";
+        results = wxydb.excuteFile(BOOK_FILE);
         System.out.println(results.size());
-        for (String temp : results) {
-            Assert.assertEquals(temp,"insert success");
+        for (int i = 0; i < results.size(); i++) {
+            Assert.assertEquals("insert success",results.get(i));
         }
-        table = SystemManager.getInstance().getTable("publisher");
-        System.out.println(table.getRecordSize());
-
-        parseResult = SQLParser.parse("DELETE FROM publisher WHERE state=’CA’;");
-        parseResult.execute();
-        table = SystemManager.getInstance().getTable("publisher");
-        System.out.println(table.getRecordSize());
+//        for (String temp : results) {
+//        }
+//        table = SystemManager.getInstance().getTable("publisher");
+//        System.out.println(table.getRecordSize());
+//
+//        parseResult = SQLParser.parse("DELETE FROM publisher WHERE state=’CA’;");
+//        parseResult.execute();
+//        table = SystemManager.getInstance().getTable("publisher");
+//        System.out.println(table.getRecordSize());
     }
 
 //    @Test
@@ -109,7 +115,7 @@ public class RealSQLExcuteTest {
         // 初始化数据数据
         results = wxydb.excuteFile(BOOK_FILE);
         for (String temp : results) {
-            Assert.assertEquals(temp,"insert success");
+            Assert.assertEquals("insert success",temp);
         }
 
         parseResult = SQLParser.parse("UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;");
@@ -133,15 +139,15 @@ public class RealSQLExcuteTest {
         // 初始化数据数据
         results = wxydb.excuteFile(PUBLISHER_FILE);
         for (String temp : results) {
-            Assert.assertNotEquals(temp,"insert success");
+            Assert.assertEquals("insert success",temp);
         }
         results = wxydb.excuteFile(BOOK_FILE);
         for (String temp : results) {
-            Assert.assertNotEquals(temp,"insert success");
+            Assert.assertEquals("insert success",temp);
         }
         results = wxydb.excuteFile(ORDERS_FILE);
         for (String temp : results) {
-            Assert.assertNotEquals(temp,"insert success");
+            Assert.assertEquals("insert success",temp);
         }
 
         // 列出所有加州出版商的信息

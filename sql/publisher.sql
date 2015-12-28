@@ -1543,7 +1543,7 @@ INSERT INTO publisher VALUES(103115,'Erdman, Robert/see Login','CA');
 INSERT INTO publisher VALUES(103118,'Collins Liturgical Books','CA');
 INSERT INTO publisher VALUES(103119,'Langenscheidt Fachv., M.','CA');
 INSERT INTO publisher VALUES(103120,'Barnes &amp; Noble, Inc.','CA');
- (103123,'Padwolf Publishing, Inc.','CA');
+INSERT INTO publisher VALUES(103123,'Padwolf Publishing, Inc.','CA');
 INSERT INTO publisher VALUES(103125,'Plaza y Vald?s Editores','CA');
 INSERT INTO publisher VALUES(103127,'Grass Roots Publications','CA');
 INSERT INTO publisher VALUES(103129,'Mccormick Mathers Pub Co','CA');
