@@ -1,6 +1,8 @@
 package me.hqythu.wxydb.sql;
 
 import me.hqythu.wxydb.exception.level0.SQLExecException;
+import me.hqythu.wxydb.exception.level1.SQLRecordException;
+import me.hqythu.wxydb.exception.level1.SQLSystemException;
 import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
@@ -54,11 +56,11 @@ public class ParseResult
 		values = new ArrayList<SetValue>();
         columns = new ArrayList<>();
 	}
-    public String execute() throws SQLExecException {
+    public String execute() throws SQLExecException, SQLSystemException, SQLRecordException {
         String result = "error";
         Object[] objects;
         boolean ok;
-        try {
+//        try {
             switch (type) {
                 case INSERT:
                     ok = RecordManager.getInstance().insert(tableNames.get(0),data);
@@ -117,9 +119,9 @@ public class ParseResult
                     result = "parse sql error";
                     break;
             }
-        } catch (Exception e) {
-            throw new SQLExecException(e.getMessage());
-        }
+//        } catch (Exception e) {
+//            throw new SQLExecException(e.getMessage());
+//        }
 
         return result;
     }

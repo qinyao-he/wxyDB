@@ -49,31 +49,39 @@ public class SQLParserTest {
     // Create Table, Drop Table, Show Tables, DESC Column
     @Test
     public void testTable() {
-        ParseResult sql;
+        ParseResult parseResult;
 
-        sql = SQLParser.parse("DROP TABLE customer;");
-        Assert.assertEquals(ParseResult.OrderType.DROP_TABLE, sql.type);
-        Assert.assertEquals("customer", sql.tableNames.get(0));
+        parseResult = SQLParser.parse("DROP TABLE customer;");
+        Assert.assertEquals(ParseResult.OrderType.DROP_TABLE, parseResult.type);
+        Assert.assertEquals("customer", parseResult.tableNames.get(0));
 
-        sql = SQLParser.parse("SHOW TABLES;");
-        Assert.assertEquals(ParseResult.OrderType.SHOW_TABLES, sql.type);
+        parseResult = SQLParser.parse("SHOW TABLES;");
+        Assert.assertEquals(ParseResult.OrderType.SHOW_TABLES, parseResult.type);
 
-        sql = SQLParser.parse("DESC customer;");
-        Assert.assertEquals(ParseResult.OrderType.DESC, sql.type);
-        Assert.assertEquals("customer", sql.tableNames.get(0));
+        parseResult = SQLParser.parse("DESC customer;");
+        Assert.assertEquals(ParseResult.OrderType.DESC, parseResult.type);
+        Assert.assertEquals("customer", parseResult.tableNames.get(0));
 
-        sql = SQLParser.parse("CREATE TABLE customer ( id int (10) ) ");
-        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
+        parseResult = SQLParser.parse("CREATE TABLE customer ( id int (10) ) ");
+        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,parseResult.type);
 
-        sql = SQLParser.parse("CREATE TABLE customer ( id int(10) NOT NULL ," +
+        parseResult = SQLParser.parse("CREATE TABLE customer ( id int(10) NOT NULL ," +
                 "name varchar(25) NOT NULL , gender varchar(1) NOT NULL , PRIMARY KEY(id)" +
                 ");");
-        Assert.assertEquals("customer",sql.tableNames.get(0));
-        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
+        Assert.assertEquals("customer",parseResult.tableNames.get(0));
+        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,parseResult.type);
 
-        sql = SQLParser.parse("CREATE TABLE publisher (  id int(10) NOT NULL,  name varchar(100) NOT NULL,  state varchar(2),  PRIMARY KEY  (id));");
-        Assert.assertEquals("publisher",sql.tableNames.get(0));
-        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,sql.type);
+        parseResult = SQLParser.parse("CREATE TABLE publisher (  id int(10) NOT NULL,  name varchar(100) NOT NULL,  state varchar(2),  PRIMARY KEY  (id));");
+        Assert.assertEquals("publisher",parseResult.tableNames.get(0));
+        Assert.assertEquals(ParseResult.OrderType.CREATE_TABLE,parseResult.type);
+
+        parseResult = SQLParser.parse("CREATE TABLE orders (" +
+                "  customer_id int(10) NOT NULL," +
+                "  book_id int(10) NOT NULL," +
+                "  quantity int(10) NOT NULL" +
+                ");");
+        System.out.println(parseResult.columns);
+        Assert.assertEquals(3,parseResult.columns.size());
 
     }
 
