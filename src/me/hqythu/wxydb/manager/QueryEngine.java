@@ -104,6 +104,7 @@ public class QueryEngine {
         try {
             switch (func) {
                 case SUM:
+                    result = 0;
                     for (Object[] record : records) {
                         if (where.match(record,table) && record[col] != null) {
                             result += (Integer) record[col];
@@ -111,6 +112,7 @@ public class QueryEngine {
                     }
                     break;
                 case AVG:
+                    result = 0;
                     size = 0;
                     for (Object[] record : records) {
                         if (where.match(record,table) && record[col] != null) {
@@ -140,6 +142,14 @@ public class QueryEngine {
                         }
                     }
                     if (records.size() == 0) result = 0;
+                    break;
+                case COUNT:
+                    result = 0;
+                    for (Object[] record : records) {
+                        if (where.match(record,table) && record[col] != null) {
+                            result++;
+                        }
+                    }
                     break;
             }
         } catch (Exception e) {

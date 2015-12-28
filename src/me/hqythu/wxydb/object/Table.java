@@ -74,6 +74,8 @@ public class Table {
 
     // values的个数
     public void insert(Object[] values) throws SQLTableException {
+//        System.out.println(Arrays.toString(values));
+//        System.out.println(Arrays.toString(columns));
         if (values.length != columns.length) throw new SQLTableException("insert columns size not enough");
         try {
             byte[] record = Record.valuesToBytes(this, values);

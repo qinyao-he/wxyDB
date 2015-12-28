@@ -5,6 +5,7 @@ import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.util.SetValue;
 import me.hqythu.wxydb.util.Where;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -72,6 +73,7 @@ public class RecordManager {
         Table table = SystemManager.getInstance().getTable(tableName);
         if (table == null) throw new SQLRecordException("not have table: " + tableName);
         try {
+//            System.out.println(Arrays.toString(values));
             table.insert(values);
         } catch (Exception e) {
             throw new SQLRecordException(e.getMessage());

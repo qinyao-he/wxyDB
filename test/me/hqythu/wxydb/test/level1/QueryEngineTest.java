@@ -170,7 +170,7 @@ public class QueryEngineTest {
     @Test
     public void testFunc() throws Exception {
         double temp;
-        double avg, sum, min, max;
+        double avg, sum, min, max, size;
         Func func;
         SelectOption select;
 
@@ -211,6 +211,10 @@ public class QueryEngineTest {
         func = Func.MIN;
         temp = QueryEngine.getInstance().func(func, select, new Where(true));
         Assert.assertTrue(abs(min - temp) < 1e6);
+        size = 10;
+        func = Func.COUNT;
+        temp = QueryEngine.getInstance().func(func, select, new Where(true));
+        Assert.assertTrue(abs(size - temp) < 1e6);
     }
 
     /**

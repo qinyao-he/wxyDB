@@ -1,14 +1,14 @@
 package me.hqythu.wxydb.test.level0;
 
 import me.hqythu.wxydb.WXYDB;
+import me.hqythu.wxydb.exception.level0.SQLExecException;
+import me.hqythu.wxydb.exception.level1.SQLRecordException;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.sql.ParseResult;
 import me.hqythu.wxydb.sql.SQLParser;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import java.util.List;
 
@@ -23,6 +23,9 @@ public class RealSQLExcuteTest {
     public static final String ORDERS_FILE = "sql/orders.sql";
     public static final String PUBLISHER_FILE = "sql/publisher.sql";
     public static final String CUSTOMER_FILE = "sql/customer.sql";
+
+    @Rule
+    public ExpectedException thrown= ExpectedException.none();
 
     WXYDB wxydb;
 
@@ -55,14 +58,16 @@ public class RealSQLExcuteTest {
         result = parseResult.execute();
         Assert.assertEquals("insert success",result);
 
+        thrown.expect(SQLExecException.class);
+        thrown.expectMessage("can not insert duplicate primary key");
         parseResult = SQLParser.parse("INSERT INTO customer VALUES(300001,'JO CANNADY','M');");
-
         result = parseResult.execute();
 
 
-        parseResult = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
-        result = parseResult.execute();
-        System.out.println(result);
+//        parseResult = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
+//        System.out.println(parseResult.data);
+//        result = parseResult.execute();
+//        System.out.println(result);
     }
 
 //    @Test
