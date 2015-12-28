@@ -105,8 +105,6 @@ public class ParseResult
                 } else {
                     result = "create table " + tableNames.get(0) + " failed";
                 }
-//                System.out.println(SystemManager.getInstance().getTables().size());
-
                 break;
             case DROP_TABLE:
                 break;
