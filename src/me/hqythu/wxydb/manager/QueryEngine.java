@@ -1,6 +1,7 @@
 package me.hqythu.wxydb.manager;
 
 import me.hqythu.wxydb.exception.level1.SQLQueryException;
+import me.hqythu.wxydb.exception.level2.SQLWhereException;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.util.Func;
 import me.hqythu.wxydb.util.SelectOption;
@@ -266,7 +267,7 @@ public class QueryEngine {
     /**
      *
      */
-    public List<Object[]> queryById(SelectOption select, Where where) throws SQLQueryException {
+    public List<Object[]> queryById(SelectOption select, Where where) throws SQLQueryException, SQLWhereException {
         Map<String, Table> tables = SystemManager.getInstance().getTables();
 
         List<Map<Table, Integer>> tempIds = tableJoinRecordIds(select.fromTableNames);
@@ -293,7 +294,7 @@ public class QueryEngine {
         }
 
         List<Object[]> result = new ArrayList<>(tempIds.size());
-        try {
+//        try {
             for (Map<Table, Integer> tempId : tempIds) {
                 Map<Table, Object[]> temp = new HashMap<>();
                 for (Map.Entry<Table,Integer> id : tempId.entrySet() ) {
@@ -317,9 +318,9 @@ public class QueryEngine {
                     result.add(record);
                 }
             }
-        } catch (Exception e) {
-            throw new SQLQueryException("query error : " + e.getMessage());
-        }
+//        } catch (Exception e) {
+//            throw new SQLQueryException("query error : " + e.getMessage());
+//        }
 
         return result;
     }

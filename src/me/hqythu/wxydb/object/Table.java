@@ -313,7 +313,7 @@ public class Table {
             byte[] data = TablePageUser.getRecord(page,index);
             return Record.bytesToValues(this,data);
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             return null;
         }
     }

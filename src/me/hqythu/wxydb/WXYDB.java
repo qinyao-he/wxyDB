@@ -93,7 +93,7 @@ public class WXYDB {
                 }
             }
         } catch (Exception e) {
-            results.add("error at here");
+            results.add(e.getMessage());
         }
         return results;
     }
