@@ -27,10 +27,14 @@ public class ConditionParser
 			value = value.replaceAll("’", "");
 			resultObject = value;
 		}
-		else if (value.contains(".") || value.toUpperCase().equals("NULL"))
+		else if (value.contains("."))
 		{
 			resultObject = '*'+value;
 		}
+        else if (value.toUpperCase().equals("NULL"))
+        {
+            resultObject = null;
+        }
 		else
 		{
             try
