@@ -116,7 +116,7 @@ public class ParseResult
                 case DESC:
                     break;
                 case ERROR:
-                    result = "parse sql error";
+                    result = "parse sql error:";
                     break;
             }
         } catch (Exception e) {

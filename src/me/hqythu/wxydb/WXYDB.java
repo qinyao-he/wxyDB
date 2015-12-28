@@ -81,11 +81,15 @@ public class WXYDB {
             Scanner scanner = new Scanner(file);
             StringBuilder builder = new StringBuilder();
             while (scanner.hasNext()) {
-                String temp = scanner.nextLine();
+                String temp;
+                try {
+                    temp = scanner.nextLine();
+                } catch (Exception e) {
+                    break;
+                }
                 builder.append(temp);
                 if (temp.indexOf(';') != -1) {
                     String sql = builder.toString();
-//                    System.out.println(sql);
                     ParseResult parseResult = SQLParser.parse(sql);
                     String result = parseResult.execute();
                     results.add(result);

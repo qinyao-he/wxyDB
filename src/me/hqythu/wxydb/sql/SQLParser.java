@@ -440,7 +440,7 @@ public class SQLParser
 //            sql += sqlS[i] + ' ';
 //        }
         sql = sql.substring(0, sql.length() - 1);
-        System.out.println(sql);
+//        System.out.println(sql);
         int status = -1;
         String valueString = "";
         Object value = null;

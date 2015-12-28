@@ -1,5 +1,6 @@
 package me.hqythu.wxydb.test.level0;
 
+import me.hqythu.wxydb.exception.level0.SQLExecException;
 import me.hqythu.wxydb.sql.ParseResult;
 import me.hqythu.wxydb.sql.SQLParser;
 import me.hqythu.wxydb.util.BoolExpr;
@@ -130,12 +131,22 @@ public class SQLParserTest {
         Assert.assertEquals(2530, sql.data.get(5));
 
         sql = SQLParser.parse("INSERT INTO publisher VALUES(100050,'Carlton Books, Ltd.','CA');");
-        System.out.println(sql.data);
         Assert.assertEquals("publisher", sql.tableNames.get(0));
         Assert.assertEquals(3,sql.data.size());
         Assert.assertEquals(100050, sql.data.get(0));
         Assert.assertEquals("Carlton Books, Ltd.", sql.data.get(1));
         Assert.assertEquals("CA", sql.data.get(2));
+
+        sql = SQLParser.parse("INSERT INTO book VALUES(200100,'Anyone Can Have a Happy',null,103343,3358,2213);");
+        Assert.assertTrue(sql.type == ParseResult.OrderType.INSERT);
+        Assert.assertEquals("book", sql.tableNames.get(0));
+        Assert.assertEquals(6,sql.data.size());
+        Assert.assertEquals(200100, sql.data.get(0));
+        Assert.assertEquals("Anyone Can Have a Happy", sql.data.get(1));
+        Assert.assertEquals(null, sql.data.get(2));
+        Assert.assertEquals(103343, sql.data.get(3));
+        Assert.assertEquals(3358, sql.data.get(4));
+        Assert.assertEquals(2213, sql.data.get(5));
 
     }
 
@@ -152,7 +163,7 @@ public class SQLParserTest {
         Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).tableNameL);
         Assert.assertEquals("state", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).columnNameL);
         Assert.assertEquals(CompareOp.IS, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).compareOp);
-        Assert.assertEquals("NULL", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
+        Assert.assertEquals(null, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
 
         sql = SQLParser.parse("DELETE FROM publisher WHERE state=’(CA)’;");
         Assert.assertTrue(sql.type == ParseResult.OrderType.DELETE);
