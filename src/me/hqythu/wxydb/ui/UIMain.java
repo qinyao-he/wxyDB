@@ -1,5 +1,7 @@
 package me.hqythu.wxydb.ui;
 
+import me.hqythu.wxydb.manager.SystemManager;
+
 import javax.swing.*;
 import java.awt.*;
 

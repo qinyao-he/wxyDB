@@ -18,8 +18,8 @@ public class StructureTab extends JPanel {
 
     private JPanel buttonPanel;
     private JTree structureTreeView;
+    private JScrollPane treeScroll;
     private DefaultTreeModel structureTreeModel;
-    private JTextArea textArea;
     private DefaultMutableTreeNode root;
 
     public StructureTab() {
@@ -35,39 +35,38 @@ public class StructureTab extends JPanel {
         setLayout(new BorderLayout());
         buttonPanel = new JPanel();
         add(buttonPanel, BorderLayout.NORTH);
-        root = new DefaultMutableTreeNode();
+        root = new DefaultMutableTreeNode("Database");
         structureTreeModel = new DefaultTreeModel(root);
-        structureTreeView = new JTree();
-        textArea = new JTextArea();
-        add(textArea, BorderLayout.SOUTH);
-        add(structureTreeView, BorderLayout.CENTER);
+        structureTreeView = new JTree(structureTreeModel);
+        treeScroll = new JScrollPane(structureTreeView);
+        add(treeScroll, BorderLayout.CENTER);
 
         refreshDatabase();
     }
 
     void refreshDatabase() {
         String tables = SystemManager.getInstance().showTables();
-        tables = tables.substring(1, tables.length() - 1);
-        textArea.setText(tables);
+        if (tables.equals("")) {
+            return;
+        } else {
+            tables = tables.substring(1, tables.length() - 1);
+        }
 
         String[] tableNames = tables.split(", ");
         root = (DefaultMutableTreeNode) structureTreeModel.getRoot();
         root.removeAllChildren();
         for (String tableName : tableNames) {
-            System.out.println(tableName);
             DefaultMutableTreeNode tableNode = new DefaultMutableTreeNode(tableName);
             String columnsResult = SystemManager.getInstance().showTableColumns(tableName);
             String[] columns = columnsResult.substring(1, columnsResult.length() - 1).split(",");
             for (String column : columns) {
                 String columnName = column.split(" ")[0];
-                System.out.println(columnName);
                 tableNode.add(new DefaultMutableTreeNode(columnName));
             }
             root.add(tableNode);
         }
 
         structureTreeModel.reload(root);
-        repaint();
     }
 
 }
