@@ -120,9 +120,13 @@ public class SQLParser
         {
             func = Func.MAX;
         }
-        else
+        else if (sql.startsWith("MIN"))
         {
             func = Func.MIN;
+        }
+        else
+        {
+            func = Func.COUNT;
         }
         sql = sql.substring(4,sql.length()-1);
         return new DoubleReturn<Func, String>(func, sql);
@@ -351,7 +355,7 @@ public class SQLParser
     }
     static boolean isFunc(String str)
     {
-        return str.toUpperCase().startsWith("SUM") || str.toUpperCase().startsWith("AVG") || str.toUpperCase().startsWith("MAX") || str.toUpperCase().startsWith("MIN");
+        return str.toUpperCase().startsWith("SUM") || str.toUpperCase().startsWith("AVG") || str.toUpperCase().startsWith("MAX") || str.toUpperCase().startsWith("MIN") || str.toUpperCase().startsWith("COUNT");
     }
     static DoubleReturn<Integer, String> readNum(String str)
     {
