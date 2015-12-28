@@ -2,6 +2,7 @@ package me.hqythu.wxydb.test.level0;
 
 import me.hqythu.wxydb.sql.ParseResult;
 import me.hqythu.wxydb.sql.SQLParser;
+import me.hqythu.wxydb.util.BoolExpr;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -130,6 +131,12 @@ public class SQLParserTest {
         sql = SQLParser.parse("DELETE FROM publisher WHERE state=’CA’;");
         Assert.assertTrue(sql.type == ParseResult.OrderType.DELETE);
         Assert.assertEquals("publisher", sql.tableNames.get(0));
+        Assert.assertEquals(1, sql.where.boolExprsAndOps.size());
+        Assert.assertEquals(1, sql.where.isExprs.size());
+        Assert.assertEquals(true, sql.where.boolExprsAndOps.get(0) instanceof BoolExpr);
+        Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).tableNameL);
+        Assert.assertEquals("state", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).columnNameL);
+        Assert.assertEquals("CA", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
     }
 
     // UPDATE
