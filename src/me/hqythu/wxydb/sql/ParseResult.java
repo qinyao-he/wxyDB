@@ -1,20 +1,15 @@
 package me.hqythu.wxydb.sql;
 
 import me.hqythu.wxydb.exception.level0.SQLExecException;
-import me.hqythu.wxydb.exception.level1.SQLRecordException;
-import me.hqythu.wxydb.exception.level1.SQLSystemException;
 import me.hqythu.wxydb.manager.QueryEngine;
 import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
-import me.hqythu.wxydb.object.Record;
-import me.hqythu.wxydb.util.Func;
 import me.hqythu.wxydb.util.SelectOption;
 import me.hqythu.wxydb.util.SetValue;
 import me.hqythu.wxydb.util.Where;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ParseResult
@@ -41,7 +36,7 @@ public class ParseResult
 	public List<SetValue> values;       // update
 	public SelectOption selectOption;   // select
 	public Where where;
-    public Func func;
+//    public Func func;
 
     // 需要修改
 	public List<String> tableNames;            // String tableName
@@ -58,7 +53,7 @@ public class ParseResult
 		data = new ArrayList<Object>();
 		values = new ArrayList<SetValue>();
         columns = new ArrayList<>();
-        func = null;
+//        func = null;
 	}
     public String execute() throws SQLExecException {
         String result = "error";

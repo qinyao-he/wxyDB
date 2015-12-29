@@ -624,23 +624,23 @@ public class SQLParser
                     {
                         if (rowName.startsWith("SUM"))
                         {
-                            result.func = Func.SUM;
+                            result.selectOption.func = Func.SUM;
                         }
                         else if (rowName.startsWith("AVG"))
                         {
-                            result.func = Func.AVG;
+                            result.selectOption.func = Func.AVG;
                         }
                         else if (rowName.startsWith("COUNT"))
                         {
-                            result.func = Func.COUNT;
+                            result.selectOption.func = Func.COUNT;
                         }
                         else if (rowName.startsWith("MIN"))
                         {
-                            result.func = Func.MIN;
+                            result.selectOption.func = Func.MIN;
                         }
                         else
                         {
-                            result.func = Func.MAX;
+                            result.selectOption.func = Func.MAX;
                         }
                         rowName = rowName.substring(rowName.indexOf("(")+1, rowName.indexOf(")")).trim();
                     }
