@@ -712,7 +712,7 @@ public class SQLParser
         result.type = OrderType.SELECT;
         if (!sql.isEmpty())
         {
-            if (!result.selectOption.tableNames.isEmpty())
+        if (result.selectOption.tableNames != null)
             {
                 result.where = ConditionParser.parseCondition(sql, result.selectOption.tableNames.get(0));
             }
