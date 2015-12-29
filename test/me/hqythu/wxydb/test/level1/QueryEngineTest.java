@@ -169,7 +169,7 @@ public class QueryEngineTest {
      */
     @Test
     public void testFunc() throws Exception {
-        double temp;
+        List<Object[]> temp;
         double avg, sum, min, max, size;
         Func func;
         SelectOption select;
@@ -197,24 +197,24 @@ public class QueryEngineTest {
 
         select = new SelectOption();
         select.add(TEST_TABLE1, "age");
-        func = Func.AVG;
-        temp = QueryEngine.getInstance().func(func, select, new Where(true));
-        Assert.assertTrue(abs(avg - temp) < 1e6);
-        func = Func.SUM;
-        temp = QueryEngine.getInstance().func(func, select, new Where(true));
-        Assert.assertTrue(abs(sum - temp) < 1e6);
+        select.setFunc(Func.AVG);
+        temp = QueryEngine.getInstance().query(select, new Where(true));
+        Assert.assertTrue(abs(avg - (Double)temp.get(0)[0]) < 1e6);
+        select.setFunc(Func.SUM);
+        temp = QueryEngine.getInstance().query(select, new Where(true));
+        Assert.assertTrue(abs(sum - (Double)temp.get(0)[0]) < 1e6);
         max = 9;
-        func = Func.MAX;
-        temp = QueryEngine.getInstance().func(func, select, new Where(true));
-        Assert.assertTrue(abs(max - temp) < 1e6);
+        select.setFunc(Func.MAX);
+        temp = QueryEngine.getInstance().query(select, new Where(true));
+        Assert.assertTrue(abs(max - (Double)temp.get(0)[0]) < 1e6);
         min = 0;
-        func = Func.MIN;
-        temp = QueryEngine.getInstance().func(func, select, new Where(true));
-        Assert.assertTrue(abs(min - temp) < 1e6);
+        select.setFunc(Func.MIN);
+        temp = QueryEngine.getInstance().query(select, new Where(true));
+        Assert.assertTrue(abs(min - (Double)temp.get(0)[0]) < 1e6);
         size = 10;
-        func = Func.COUNT;
-        temp = QueryEngine.getInstance().func(func, select, new Where(true));
-        Assert.assertTrue(abs(size - temp) < 1e6);
+        select.setFunc(Func.COUNT);
+        temp = QueryEngine.getInstance().query(select, new Where(true));
+        Assert.assertTrue(abs(size - (Double)temp.get(0)[0]) < 1e6);
     }
 
     /**
@@ -243,12 +243,11 @@ public class QueryEngineTest {
         record.add("LiuXiaoHong");
         record.add("F");
         RecordManager.getInstance().insert(TEST_TABLE2, record);
-        select = new SelectOption();
+        select = new SelectOption(true);
         select.addFromTable(TEST_TABLE1);
         select.addFromTable(TEST_TABLE2);
         where = new Where();
-        where.boolExprsAndOps.add(new BoolExpr(TEST_TABLE1, "age", CompareOp.GEQ, 7, true));
-        where.isExprs.add(true);
+        where.addExpr(new BoolExpr(TEST_TABLE1, "age", CompareOp.GEQ, 7, true));
         queryset = QueryEngine.getInstance().query(select, where);
         Assert.assertEquals(3, queryset.size());
         Assert.assertEquals(5, queryset.get(0).length);

@@ -146,7 +146,7 @@ public class ParseResult
     public List<Object[]> query() throws SQLExecException {
         if (type != OrderType.SELECT) throw new SQLExecException("not select sql");
         try {
-            List<Object[]> results = QueryEngine.getInstance().query(selectOption,where);
+            List<Object[]> results = QueryEngine.getInstance().queryById(selectOption,where);
             return results;
         } catch (Exception e) {
             throw new SQLExecException(e.getMessage());

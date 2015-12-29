@@ -70,16 +70,21 @@ public class WXYDB {
         return result;
     }
 
+    public List<String> excuteFile(String fileName) {
+        return excuteFile(fileName, Integer.MAX_VALUE);
+    }
+
     /**
      * 执行一个SQL语句文件
      */
-    public List<String> excuteFile(String fileName) {
+    public List<String> excuteFile(String fileName, int max) {
         List<String> results = new ArrayList<>();
         File file  = new File((fileName));
         if (!file.exists()) return results;
         try {
             Scanner scanner = new Scanner(file);
             StringBuilder builder = new StringBuilder();
+            int count = 0;
             while (scanner.hasNext()) {
                 String temp;
                 try {
@@ -94,6 +99,8 @@ public class WXYDB {
                     String result = parseResult.execute();
                     results.add(result);
                     builder.setLength(0);
+                    count++;
+                    if (count >= max) break;
                 }
             }
         } catch (Exception e) {

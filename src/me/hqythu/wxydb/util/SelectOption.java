@@ -40,6 +40,9 @@ public class SelectOption {
         tableNames.add(tableName);
         columnNames.add(columnName);
     }
+    public void setFunc(Func func) {
+        this.func = func;
+    }
     public String toString() {
         if (isAll()) {
             return "*";

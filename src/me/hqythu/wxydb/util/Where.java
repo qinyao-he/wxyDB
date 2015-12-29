@@ -53,7 +53,6 @@ public class Where {
         Table table;
         Object[] record;
         int col;
-
 //        forCalc.clear();
         for (int i = 0; i < isExprs.size(); i++) {
             if (isExprs.get(i)) {
@@ -62,14 +61,17 @@ public class Where {
                     table = tables.get(boolExpr.tableNameL);
                     record = records.get(table);
                     col = table.getColumnCol(boolExpr.columnNameL);
+                    if (col == -1) throw new SQLWhereException("no has column:"+boolExpr.columnNameL);
                     boolExpr.setValueL(record[col]);
                 }
                 if (boolExpr.isNeedValueR()) {
                     table = tables.get(boolExpr.tableNameR);
                     record = records.get(table);
                     col = table.getColumnCol(boolExpr.columnNameR);
+                    if (col == -1) throw new SQLWhereException("no has column:"+boolExpr.columnNameL);
                     boolExpr.setValueR(record[col]);
                 }
+
                 forCalc.push(boolExpr.getResult());
             } else {
                 BoolOp boolOp = (BoolOp) boolExprsAndOps.get(i);

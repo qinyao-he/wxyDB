@@ -3,6 +3,7 @@ package me.hqythu.wxydb.test.level0;
 import me.hqythu.wxydb.WXYDB;
 import me.hqythu.wxydb.exception.level0.SQLExecException;
 import me.hqythu.wxydb.exception.level1.SQLRecordException;
+import me.hqythu.wxydb.manager.QueryEngine;
 import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Table;
@@ -129,9 +130,6 @@ public class RealSQLExcuteTest {
         Assert.assertEquals(result,"update success");
 
         parseResult = SQLParser.parse("select * from book where title='Nine Times Nine'; ");
-        result = parseResult.execute();
-        Assert.assertEquals("[250000, Nine Times Nine, Anthony Boucher, 100339, 7366, 2711]",result);
-
         records = parseResult.query();
         Assert.assertEquals(1,records.size());
     }
@@ -140,16 +138,12 @@ public class RealSQLExcuteTest {
     public void testSelect() throws Exception {
         ParseResult parseResult;
         List<String> results;
-        List<Object> records;
+        List<Object[]> records;
         String result;
         Table table;
 
         // 初始化数据数据
         RecordManager.getInstance().setFast();
-        results = wxydb.excuteFile(BOOK_FILE);
-        for (String temp : results) {
-            Assert.assertEquals("insert success", temp);
-        }
         results = wxydb.excuteFile(PUBLISHER_FILE);
         for (String temp : results) {
             Assert.assertEquals("insert success", temp);
@@ -158,33 +152,27 @@ public class RealSQLExcuteTest {
         for (String temp : results) {
             Assert.assertEquals("insert success", temp);
         }
-        results = wxydb.excuteFile(ORDERS_FILE);
-        for (String temp : results) {
-            Assert.assertEquals("insert success", temp);
-        }
         RecordManager.getInstance().clearFast();
 
         // 列出所有加州出版商的信息
-        parseResult = SQLParser.parse("SELECT * FROM publisher WHERE nation='CA';");
-        result = parseResult.execute();
-        System.out.println(result);
+        parseResult = SQLParser.parse("SELECT * FROM publisher WHERE state='CA' and name='Red Bird Publishing';");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.isAll());
+        records = parseResult.query();
+        Assert.assertEquals(1,records.size());
 
         // 列出 authors 字段为空的记录的书名
         parseResult = SQLParser.parse("SELECT title FROM book WHERE authors is null;");
-        result = parseResult.execute();
-        System.out.println(result);
+        records = parseResult.query();
+        Assert.assertEquals(1,records.size());
 
-
-//         列出 authors 字段为空的记录的书名
-        parseResult = SQLParser.parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;");
-        parseResult.execute();
     }
 
     @Test
-    public void testFunc() throws Exception {
+    public void testSelectNull() throws Exception {
         ParseResult parseResult;
         List<String> results;
-        List<Object> records;
+        List<Object[]> records;
         String result;
         Table table;
 
@@ -197,5 +185,32 @@ public class RealSQLExcuteTest {
         RecordManager.getInstance().clearFast();
 
         parseResult = SQLParser.parse("SELECT title FROM book WHERE authors is null;");
+        records = parseResult.query();
+        Assert.assertEquals("[Anyone Can Have a Happy]",Arrays.toString(records.get(0)));
+    }
+
+    @Test
+    public void testJoinBig() throws Exception {
+        ParseResult parseResult;
+        List<String> results;
+        List<Object[]> records;
+        String result;
+        Table table;
+
+        // 初始化数据数据
+        RecordManager.getInstance().setFast();
+        results = wxydb.excuteFile(BOOK_FILE,3000);
+        for (String temp : results) {
+            Assert.assertEquals("insert success", temp);
+        }
+        results = wxydb.excuteFile(ORDERS_FILE,10);
+        for (String temp : results) {
+            Assert.assertEquals("insert success", temp);
+        }
+        RecordManager.getInstance().clearFast();
+
+        parseResult = SQLParser.parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;");
+        records = parseResult.query();
+        Assert.assertEquals("[Survival for Busy Women, 9]",QueryEngine.resultsToString(records));
     }
 }

@@ -29,13 +29,23 @@ public class QueryEngine {
      * 查询
      */
     public List<Object[]> query(SelectOption select, Where where) throws SQLQueryException {
-        Map<String, Table> tables = SystemManager.getInstance().getTables();
-
-        List<Map<Table, Object[]>> temps = tableJoinRecords(select.fromTableNames);
-
+        List<Object[]> result;
         Table[] t; // select对应的表
         int[] c;   // select对应的列号
         int nCol;
+
+        // Func类型
+        if (select.isFunc()) {
+            result = new ArrayList<>();
+            Object[] ret = new Object[1];
+            ret[0] = func(select,where);
+            result.add(ret);
+            return result;
+        }
+
+        // 初始化查询结果相关信息
+        Map<String, Table> tables = SystemManager.getInstance().getTables();
+        List<Map<Table, Object[]>> temps = tableJoinRecords(select.fromTableNames);
         if (select.isAll()) {
             nCol = 0;
             for (String tableName : select.getFromTableNames()) {
@@ -54,20 +64,20 @@ public class QueryEngine {
             }
         }
 
-        List<Object[]> result = new ArrayList<>(temps.size());
-
+        // 执行查询
         try {
+            result = new ArrayList<>(temps.size());
             for (Map<Table, Object[]> temp : temps) {
                 if (where.match(temp, tables)) {
                     Object[] record = new Object[nCol];
-                    if (select.isAll()) {
+                    if (select.isAll()) { // select *
                         int ii = 0;
                         for (Object[] objects : temp.values()) {
-                            for (int i = 0; i < objects.length; i++,ii++) {
+                            for (int i = 0; i < objects.length; i++, ii++) {
                                 record[ii] = objects[i];
                             }
                         }
-                    } else {
+                    } else { // 相应的列
                         for (int i = 0; i < nCol; i++) {
                             record[i] = temp.get(t[i])[c[i]];
                         }
@@ -82,13 +92,14 @@ public class QueryEngine {
         return result;
     }
 
-    public double func(Func func, SelectOption option, Where where) throws SQLQueryException {
-
+    protected double func(SelectOption option, Where where) throws SQLQueryException {
         String tableName;
         String columnName;
         Table table;
         List<Object[]> records;
+        Func func;
 
+        func = option.func;
         try {
             tableName = option.tableNames.get(0);
             columnName = option.columnNames.get(0);
@@ -107,7 +118,7 @@ public class QueryEngine {
                 case SUM:
                     result = 0;
                     for (Object[] record : records) {
-                        if (where.match(record,table) && record[col] != null) {
+                        if (where.match(record, table) && record[col] != null) {
                             result += (Integer) record[col];
                         }
                     }
@@ -116,7 +127,7 @@ public class QueryEngine {
                     result = 0;
                     size = 0;
                     for (Object[] record : records) {
-                        if (where.match(record,table) && record[col] != null) {
+                        if (where.match(record, table) && record[col] != null) {
                             size++;
                             result += (Integer) record[col];
                         }
@@ -127,7 +138,7 @@ public class QueryEngine {
                 case MAX:
                     result = Double.MIN_VALUE;
                     for (Object[] record : records) {
-                        if (where.match(record,table) && record[col] != null) {
+                        if (where.match(record, table) && record[col] != null) {
                             temp = (Integer) record[col];
                             if (result < temp) result = temp;
                         }
@@ -137,7 +148,7 @@ public class QueryEngine {
                 case MIN:
                     result = Double.MAX_VALUE;
                     for (Object[] record : records) {
-                        if (where.match(record,table) && record[col] != null) {
+                        if (where.match(record, table) && record[col] != null) {
                             temp = (Integer) record[col];
                             if (result > temp) result = temp;
                         }
@@ -147,7 +158,7 @@ public class QueryEngine {
                 case COUNT:
                     result = 0;
                     for (Object[] record : records) {
-                        if (where.match(record,table) && record[col] != null) {
+                        if (where.match(record, table) && record[col] != null) {
                             result++;
                         }
                     }
@@ -306,29 +317,29 @@ public class QueryEngine {
 
         List<Object[]> result = new ArrayList<>(tempIds.size());
 //        try {
-            for (Map<Table, Integer> tempId : tempIds) {
-                Map<Table, Object[]> temp = new HashMap<>();
-                for (Map.Entry<Table,Integer> id : tempId.entrySet() ) {
-                    Object[] o = id.getKey().getRecord(id.getValue());
-                    temp.put(id.getKey(),o);
-                }
-                if (where.match(temp, tables)) {
-                    Object[] record = new Object[nCol];
-                    if (select.isAll()) {
-                        int ii = 0;
-                        for (Object[] objects : temp.values()) {
-                            for (int i = 0; i < objects.length; i++,ii++) {
-                                record[ii] = objects[i];
-                            }
-                        }
-                    } else {
-                        for (int i = 0; i < nCol; i++) {
-                            record[i] = temp.get(t[i])[c[i]];
+        for (Map<Table, Integer> tempId : tempIds) {
+            Map<Table, Object[]> temp = new HashMap<>();
+            for (Map.Entry<Table, Integer> id : tempId.entrySet()) {
+                Object[] o = id.getKey().getRecord(id.getValue());
+                temp.put(id.getKey(), o);
+            }
+            if (where.match(temp, tables)) {
+                Object[] record = new Object[nCol];
+                if (select.isAll()) {
+                    int ii = 0;
+                    for (Object[] objects : temp.values()) {
+                        for (int i = 0; i < objects.length; i++, ii++) {
+                            record[ii] = objects[i];
                         }
                     }
-                    result.add(record);
+                } else {
+                    for (int i = 0; i < nCol; i++) {
+                        record[i] = temp.get(t[i])[c[i]];
+                    }
                 }
+                result.add(record);
             }
+        }
 //        } catch (Exception e) {
 //            throw new SQLQueryException("query error : " + e.getMessage());
 //        }
@@ -345,6 +356,7 @@ public class QueryEngine {
         } else {
             for (Object[] result : results) {
                 builder.append(Arrays.toString(result));
+                builder.append('\n');
             }
         }
         return builder.toString();
