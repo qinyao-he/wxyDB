@@ -1,4 +1,4 @@
-package me.hqythu.wxydb.test.level0;
+package me.hqythu.wxydb.test.level1;
 
 import me.hqythu.wxydb.exception.level0.SQLExecException;
 import me.hqythu.wxydb.sql.ParseResult;
@@ -235,7 +235,10 @@ public class SQLParserTest {
     // UPDATE
     @Test
     public void testUpdate() {
-
+        ParseResult parseResult;
+        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’ ");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
     }
 
     // SELECT

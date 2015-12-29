@@ -243,7 +243,7 @@ public class QueryEngineTest {
         record.add("LiuXiaoHong");
         record.add("F");
         RecordManager.getInstance().insert(TEST_TABLE2, record);
-        select = new SelectOption(true);
+        select = new SelectOption();
         select.addFromTable(TEST_TABLE1);
         select.addFromTable(TEST_TABLE2);
         where = new Where();

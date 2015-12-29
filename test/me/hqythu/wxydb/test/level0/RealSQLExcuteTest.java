@@ -79,6 +79,7 @@ public class RealSQLExcuteTest {
         parseResult.execute();
     }
 
+    // 删除数据
     @Test
     public void testDelete() throws Exception {
         ParseResult parseResult;
@@ -102,7 +103,7 @@ public class RealSQLExcuteTest {
         Assert.assertEquals(2474,table.getRecordSize());
     }
 
-//    @Test
+    @Test
     public void testUpdate() throws Exception {
         ParseResult parseResult;
         List<String> results;
