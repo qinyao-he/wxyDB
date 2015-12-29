@@ -57,8 +57,14 @@ public class ExeSQLTab extends JPanel {
                         ParseResult parseResult = SQLParser.parse(sqlStr);
                         java.util.List<Object[]> resultList = new ArrayList<>();
                         try {
-                            resultList = QueryEngine.getInstance().query(
-                                    parseResult.selectOption, parseResult.where);
+                            if (parseResult.type == ParseResult.OrderType.SELECT) {
+                                resultList = QueryEngine.getInstance().query(
+                                        parseResult.selectOption, parseResult.where);
+                            } else {
+                                Object[] tmp = new Object[1];
+                                tmp[0] = parseResult.execute();
+                                resultList.add(tmp);
+                            }
                         } catch (Exception e) {
                         }
                         final java.util.List<Object[]> result = resultList;
@@ -70,7 +76,11 @@ public class ExeSQLTab extends JPanel {
 
                             @Override
                             public int getColumnCount() {
-                                return result.get(0).length;
+                                if (result.size() == 0) {
+                                    return 0;
+                                } else {
+                                    return result.get(0).length;
+                                }
                             }
 
                             @Override
