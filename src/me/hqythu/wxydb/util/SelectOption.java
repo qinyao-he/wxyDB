@@ -7,11 +7,13 @@ import java.util.Set;
 
 public class SelectOption {
     public SelectOption() {
+        func = null;
         tableNames = new ArrayList<>();
         columnNames = new ArrayList<>();
         fromTableNames = new HashSet<>();
     }
     public SelectOption(boolean all) {
+        func = null;
         fromTableNames = new HashSet<>();
         if (all) {
             tableNames = null;
@@ -21,10 +23,12 @@ public class SelectOption {
             columnNames = new ArrayList<>();
         }
     }
+    public Func func;
     public List<String> tableNames;
     public List<String> columnNames;
     public Set<String> fromTableNames;
 
+    public boolean isFunc() {return func != null;}
     public boolean isAll() {return tableNames == null;}
     public Set<String> getFromTableNames() {
         return fromTableNames;

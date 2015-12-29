@@ -8,6 +8,7 @@ import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Table;
 import me.hqythu.wxydb.sql.ParseResult;
 import me.hqythu.wxydb.sql.SQLParser;
+import me.hqythu.wxydb.util.SetValue;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
@@ -108,36 +109,34 @@ public class RealSQLExcuteTest {
     public void testUpdate() throws Exception {
         ParseResult parseResult;
         List<String> results;
-        List<Object> records;
+        List<Object[]> records;
         String result;
-        Table table;
 
         // 初始化数据数据
-//        RecordManager.getInstance().setFast();
-//        results = wxydb.excuteFile(BOOK_FILE);
-//        for (String temp : results) {
-//            Assert.assertEquals("insert success", temp);
-//        }
-//        RecordManager.getInstance().clearFast();
+        RecordManager.getInstance().setFast();
+        results = wxydb.excuteFile(BOOK_FILE);
+        for (String temp : results) {
+            Assert.assertEquals("insert success", temp);
+        }
+        RecordManager.getInstance().clearFast();
 
-//        parseResult = SQLParser.parse("UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;");
-//        System.out.println(parseResult.tableNames.get(0));
-//        System.out.println(parseResult.where);
-//        result = parseResult.execute();
-//        Assert.assertEquals(result,"update success");
-//        table = SystemManager.getInstance().getTable("book");
-//        System.out.println(table.getRecordSize());
+        parseResult = SQLParser.parse("select * from book where title='Nine Times Nine'; ");
+        result = parseResult.execute();
+        Assert.assertEquals("empty",result);
 
-//        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’; ");
-//        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
-//        System.out.println(parseResult.where);
-//        System.out.println(parseResult.selectOption.fromTableNames);
-////        Assert.assertEquals(1,parseResult.selectOption.fromTableNames.size());
-//        result = parseResult.execute();
-//        System.out.println(result);
+        parseResult = SQLParser.parse("UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher';");
+        result = parseResult.execute();
+        Assert.assertEquals(result,"update success");
+
+        parseResult = SQLParser.parse("select * from book where title='Nine Times Nine'; ");
+        result = parseResult.execute();
+        Assert.assertEquals("[250000, Nine Times Nine, Anthony Boucher, 100339, 7366, 2711]",result);
+
+        records = parseResult.query();
+        Assert.assertEquals(1,records.size());
     }
 
-    //    @Test
+    @Test
     public void testSelect() throws Exception {
         ParseResult parseResult;
         List<String> results;
@@ -146,6 +145,11 @@ public class RealSQLExcuteTest {
         Table table;
 
         // 初始化数据数据
+        RecordManager.getInstance().setFast();
+        results = wxydb.excuteFile(BOOK_FILE);
+        for (String temp : results) {
+            Assert.assertEquals("insert success", temp);
+        }
         results = wxydb.excuteFile(PUBLISHER_FILE);
         for (String temp : results) {
             Assert.assertEquals("insert success", temp);
@@ -158,17 +162,40 @@ public class RealSQLExcuteTest {
         for (String temp : results) {
             Assert.assertEquals("insert success", temp);
         }
+        RecordManager.getInstance().clearFast();
 
         // 列出所有加州出版商的信息
-        parseResult = SQLParser.parse("SELECT * FROM publisher WHERE nation=’CA’;");
-        parseResult.execute();
+        parseResult = SQLParser.parse("SELECT * FROM publisher WHERE nation='CA';");
+        result = parseResult.execute();
+        System.out.println(result);
 
         // 列出 authors 字段为空的记录的书名
         parseResult = SQLParser.parse("SELECT title FROM book WHERE authors is null;");
-        parseResult.execute();
+        result = parseResult.execute();
+        System.out.println(result);
 
-        // 列出 authors 字段为空的记录的书名
+
+//         列出 authors 字段为空的记录的书名
         parseResult = SQLParser.parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;");
         parseResult.execute();
+    }
+
+    @Test
+    public void testFunc() throws Exception {
+        ParseResult parseResult;
+        List<String> results;
+        List<Object> records;
+        String result;
+        Table table;
+
+        // 初始化数据数据
+        RecordManager.getInstance().setFast();
+        results = wxydb.excuteFile(BOOK_FILE);
+        for (String temp : results) {
+            Assert.assertEquals("insert success", temp);
+        }
+        RecordManager.getInstance().clearFast();
+
+        parseResult = SQLParser.parse("SELECT title FROM book WHERE authors is null;");
     }
 }

@@ -1,5 +1,7 @@
 package me.hqythu.wxydb.util;
 
+import java.util.List;
+
 public class SetValue {
 
     // 认为表达式右边如果有变量,只能为表达式左边这个值
@@ -72,5 +74,46 @@ public class SetValue {
         } else {
             return value1;
         }
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("set ");
+        builder.append(toExprString());
+        return builder.toString();
+    }
+
+    public static String toString(List<SetValue> setValues) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("set ");
+        for (int i = 0; i < setValues.size(); i++) {
+            builder.append(setValues.get(i).toExprString());
+            if (i != setValues.size() - 1) {
+                builder.append(',');
+            }
+        }
+        return builder.toString();
+    }
+
+    protected String toExprString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(columnName);
+        if (calcOp == null) {
+            builder.append(" = ");
+            builder.append(value1);
+        } else {
+            if (isVar1) {
+                builder.append(columnName);
+            } else {
+                builder.append(value1);
+            }
+            builder.append(calcOp);
+            if (isVar2) {
+                builder.append(columnName);
+            } else {
+                builder.append(value2);
+            }
+        }
+        return builder.toString();
     }
 }

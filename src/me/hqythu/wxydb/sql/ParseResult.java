@@ -3,6 +3,7 @@ package me.hqythu.wxydb.sql;
 import me.hqythu.wxydb.exception.level0.SQLExecException;
 import me.hqythu.wxydb.exception.level1.SQLRecordException;
 import me.hqythu.wxydb.exception.level1.SQLSystemException;
+import me.hqythu.wxydb.manager.QueryEngine;
 import me.hqythu.wxydb.manager.RecordManager;
 import me.hqythu.wxydb.manager.SystemManager;
 import me.hqythu.wxydb.object.Column;
@@ -13,6 +14,7 @@ import me.hqythu.wxydb.util.SetValue;
 import me.hqythu.wxydb.util.Where;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ParseResult
@@ -56,10 +58,11 @@ public class ParseResult
 		data = new ArrayList<Object>();
 		values = new ArrayList<SetValue>();
         columns = new ArrayList<>();
+        func = null;
 	}
     public String execute() throws SQLExecException {
         String result = "error";
-        Object[] objects;
+        List<Object[]> records;
         boolean ok;
         try {
             switch (type) {
@@ -80,6 +83,8 @@ public class ParseResult
                     result = "update success";
                     break;
                 case SELECT:
+                    records = QueryEngine.getInstance().query(selectOption,where);
+                    result = QueryEngine.resultsToString(records);
                     break;
                 case CREATE_DATABASE:
                     ok = SystemManager.getInstance().createDatabase(dataBaseName);
@@ -136,5 +141,15 @@ public class ParseResult
         }
 
         return result;
+    }
+
+    public List<Object[]> query() throws SQLExecException {
+        if (type != OrderType.SELECT) throw new SQLExecException("not select sql");
+        try {
+            List<Object[]> results = QueryEngine.getInstance().query(selectOption,where);
+            return results;
+        } catch (Exception e) {
+            throw new SQLExecException(e.getMessage());
+        }
     }
 }

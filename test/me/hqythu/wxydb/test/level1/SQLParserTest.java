@@ -5,6 +5,7 @@ import me.hqythu.wxydb.sql.SQLParser;
 import me.hqythu.wxydb.util.BoolExpr;
 import me.hqythu.wxydb.util.BoolOp;
 import me.hqythu.wxydb.util.CompareOp;
+import me.hqythu.wxydb.util.SetValue;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -240,11 +241,10 @@ public class SQLParserTest {
         Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
 
         parseResult = SQLParser.parse("UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher';");
-        System.out.println(parseResult.tableNames.get(0));
-        System.out.println(parseResult.where);
+        Assert.assertEquals("book",parseResult.tableNames.get(0).toString());
+        Assert.assertEquals("set title = Nine Times Nine",SetValue.toString(parseResult.values));
+        Assert.assertEquals("[book.authors == Anthony Boucher]",parseResult.where.toString());
 
-//        System.out.println(parseResult.selectOption);
-//        System.out.println(parseResult.where);
     }
 
     // SELECT

@@ -55,6 +55,7 @@ public class QueryEngine {
         }
 
         List<Object[]> result = new ArrayList<>(temps.size());
+
         try {
             for (Map<Table, Object[]> temp : temps) {
                 if (where.match(temp, tables)) {
@@ -333,5 +334,19 @@ public class QueryEngine {
 //        }
 
         return result;
+    }
+
+    public static String resultsToString(List<Object[]> results) {
+        StringBuilder builder = new StringBuilder();
+        if (results == null) {
+            builder.append("result is null");
+        } else if (results.isEmpty()) {
+            builder.append("empty");
+        } else {
+            for (Object[] result : results) {
+                builder.append(Arrays.toString(result));
+            }
+        }
+        return builder.toString();
     }
 }
