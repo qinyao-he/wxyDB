@@ -71,6 +71,7 @@
     Query模块及其测试
         query, function, TableJoin
     主键的支持的测试
+    主键在更新过程的检查
 
     命令
         CREATE DATABASE orderDB; 创建名为 orderDB 的数据库
@@ -89,20 +90,16 @@
             如果数据类型不符合，应报错
         DELETE FROM publisher WHERE state=’CA’;
             删除所有加州的出版商
+        UPDATE book SET title=’Nine Times Nine’ WHERE authors='Anthony Boucher';
+            把作者 Anthony Boucher 的书的书名改为 Nine Times Nine
+        SELECT * FROM publisher WHERE nation='CA'; 列出所有加州出版商的信息。
+        SELECT title FROM book WHERE authors is null; 列出 authors 字段为空的记录的书名。
+        SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;
 
 未完成
-    主键在更新过程的检查
-    SQL语句的执行
     SQL基本功能展示
         三个表的联合查询例程
     GUI界面
-
-    命令
-        UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;
-            把作者 Anthony Boucher 的书的书名改为 Nine Times Nine
-        SELECT * FROM publisher WHERE nation=’CA’; 列出所有加州出版商的信息。
-        SELECT title FROM book WHERE authors is null; 列出 authors 字段为空的记录的书名。
-        SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;
 
 ----------------------基本框架----------------------
 业务逻辑

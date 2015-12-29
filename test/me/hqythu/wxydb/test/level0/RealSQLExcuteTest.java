@@ -19,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import static java.lang.Math.abs;
+
 /**
  * Created by apple on 15/12/28.
  */
@@ -56,7 +58,6 @@ public class RealSQLExcuteTest {
     @Test
     public void testInsertDuplicatePrimary() throws Exception {
         ParseResult parseResult;
-        List<String> results;
         String result;
         parseResult = SQLParser.parse("INSERT INTO customer VALUES (300001, ‘CHAD CABELLO’, ‘F’);");
         result = parseResult.execute();
@@ -87,7 +88,6 @@ public class RealSQLExcuteTest {
     public void testDelete() throws Exception {
         ParseResult parseResult;
         List<String> results;
-        String result;
         Table table;
 
         RecordManager.getInstance().setFast();
@@ -139,8 +139,6 @@ public class RealSQLExcuteTest {
         ParseResult parseResult;
         List<String> results;
         List<Object[]> records;
-        String result;
-        Table table;
 
         // 初始化数据数据
         RecordManager.getInstance().setFast();
@@ -195,7 +193,6 @@ public class RealSQLExcuteTest {
         List<String> results;
         List<Object[]> records;
         String result;
-        Table table;
 
         // 初始化数据数据
         RecordManager.getInstance().setFast();
@@ -211,6 +208,40 @@ public class RealSQLExcuteTest {
 
         parseResult = SQLParser.parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;");
         records = parseResult.query();
-        Assert.assertEquals("[Survival for Busy Women, 9]",QueryEngine.resultsToString(records));
+        Assert.assertEquals(1,records.size());
+    }
+
+    @Test
+    public void testFunc() throws Exception {
+        ParseResult parseResult;
+        List<String> results;
+        List<Object[]> records;
+        String result;
+
+        results = wxydb.excuteFile(ORDERS_FILE);
+        for (String temp : results) {
+            Assert.assertEquals("insert success", temp);
+        }
+        RecordManager.getInstance().clearFast();
+
+        parseResult = SQLParser.parse("SELECT SUM(quantity) from orders;");
+        records = parseResult.query();
+        Assert.assertTrue(abs(117368 - (Double)records.get(0)[0]) < 1e6);
+
+        parseResult = SQLParser.parse("SELECT COUNT(quantity) from orders;");
+        records = parseResult.query();
+        Assert.assertTrue(abs(23530 - (Double)records.get(0)[0]) < 1e6);
+
+        parseResult = SQLParser.parse("SELECT MIN(customer_id) from orders;");
+        records = parseResult.query();
+        Assert.assertTrue(abs(300001 - (Double)records.get(0)[0]) < 1e6);
+
+        parseResult = SQLParser.parse("SELECT MAX(book_id) from orders;");
+        records = parseResult.query();
+        Assert.assertTrue(abs(225000 - (Double)records.get(0)[0]) < 1e6);
+
+        parseResult = SQLParser.parse("SELECT AVG(quantity) from orders;");
+        records = parseResult.query();
+        Assert.assertTrue(abs(4.988015299617509 - (Double)records.get(0)[0]) < 1e6);
     }
 }

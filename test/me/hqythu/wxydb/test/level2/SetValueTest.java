@@ -71,9 +71,7 @@ public class SetValueTest {
 
         // Where 初始化
         Where where = new Where();
-        where.boolExprsAndOps.add(new BoolExpr(true));
-        where.isExprs.add(true);
-//        where.boolExprs.add(new BoolExpr());
+        where.addExpr(new BoolExpr(true));
         List<SetValue> setValues = new ArrayList<>();
 
         // 更新,set age = age+1

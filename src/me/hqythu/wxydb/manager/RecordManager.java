@@ -66,7 +66,7 @@ public class RecordManager {
         Table table = SystemManager.getInstance().getTable(tableName);
         if (table == null) throw new SQLRecordException("not have table: " + tableName);
         try {
-            table.update(where, setValues);
+            table.update(where, setValues, fast);
         } catch (Exception e) {
             throw new SQLRecordException(e.getMessage());
         }

@@ -55,27 +55,7 @@ public class Table {
     //------------------------预处理------------------------
     // 插入预处理
     // 将参数转为byte[]
-
-    // values个数不足,需要补null
-//    public void insert(String[] fields, Object[] values) throws SQLTableException {
-//
-//        if (fields == null) throw new SQLTableException("insert none fields");
-//
-//        Object[] newValues = new Object[columns.length];
-//        for (int i = 0; i < newValues.length; i++) {
-//            newValues[i] = null;
-//        }
-//        for (int i = 0; i < fields.length; i++) {
-//            int col = fieldToCol(fields[i]);
-//            newValues[col] = values[i];
-//        }
-//        insert(newValues);
-//    }
-
-    // values的个数
     public void insert(Object[] values, boolean fast) throws SQLTableException {
-//        System.out.println(Arrays.toString(values));
-//        System.out.println(Arrays.toString(columns));
         if (values.length != columns.length) throw new SQLTableException("insert columns size not enough");
         try {
             byte[] record = Record.valuesToBytes(this, values);
@@ -101,11 +81,10 @@ public class Table {
         try {
             tablePage = BufPageManager.getInstance().getPage(fileId, pageId);
             if (!fast) {
-                if (!checkPrimaryOk(record)) {
+                if (!checkDataPrimaryOk(record)) {
                     throw new SQLTableException("can not insert duplicate primary key");
                 }
             }
-
 
             // 数据首页
             int dataPageId = TablePageUser.getFirstDataPage(tablePage);
@@ -199,7 +178,7 @@ public class Table {
      * 未完成
      * 未考虑primary key
      */
-    public void update(Where where, List<SetValue> setValues) throws SQLTableException {
+    public void update(Where where, List<SetValue> setValues, boolean fast) throws SQLTableException {
         int fileId = SystemManager.getInstance().getFileId();
         if (fileId == -1) throw new SQLTableException("have not open database");
 
@@ -223,6 +202,11 @@ public class Table {
                         for (SetValue setValue : setValues) {
                             int col = getColumnCol(setValue.columnName);
                             values[col] = setValue.calcValue(values[col]);
+                        }
+                        if (!fast) {
+                            if (!checkSetValuePrimaryOk(values,setValues)) {
+                                throw new SQLTableException("can not insert duplicate primary key");
+                            }
                         }
                         data = Record.valuesToBytes(this, values);
                         DataPageUser.writeRecord(page, index, data);
@@ -324,7 +308,7 @@ public class Table {
 
     //-------------------辅助函数-------------------
     //检查是否与primary key冲突
-    protected boolean checkPrimaryOk(byte[] data) throws SQLTableException {
+    protected boolean checkDataPrimaryOk(byte[] data) throws SQLTableException {
         int fileId = SystemManager.getInstance().getFileId();
         if (fileId == -1) throw new SQLTableException("can not get DB fileId");
         try {
@@ -339,6 +323,41 @@ public class Table {
                     }
                 }
             }
+            return true;
+        } catch (Exception e) {
+            throw new SQLTableException("check failed: " + e.getMessage());
+        }
+    }
+
+    protected boolean checkSetValuePrimaryOk(Object[] toCheck, List<SetValue> setValues) throws SQLTableException {
+        int fileId = SystemManager.getInstance().getFileId();
+        if (fileId == -1) throw new SQLTableException("can not get DB fileId");
+        try {
+            Page page = BufPageManager.getInstance().getPage(fileId, pageId);
+
+            // 是否存在primary key
+            int keyPos = TablePageUser.getPrimaryCol(page);
+            if (keyPos == -1) return true;
+
+            // 是否修改primary key
+            boolean isPrimary = false;
+            for (SetValue setValue : setValues) {
+                int col = getColumnCol(setValue.columnName);
+                if (col == keyPos) {
+                    isPrimary = true;
+                    break;
+                }
+            }
+            if (!isPrimary) return true;
+
+            // 遍历检查
+            List<Object[]> records = getAllRecords();
+            for (Object[] record : records) {
+                if (record[keyPos].equals(toCheck[keyPos])) {
+                    return false;
+                }
+            }
+
             return true;
         } catch (Exception e) {
             throw new SQLTableException("check failed: " + e.getMessage());
