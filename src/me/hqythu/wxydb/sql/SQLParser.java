@@ -619,6 +619,30 @@ public class SQLParser
                 if (sql.charAt(0) == ',' || sql.toUpperCase().startsWith("FROM"))
                 {
                     rowName = rowName.trim();
+                    if (rowName.contains("("))
+                    {
+                        if (rowName.startsWith("SUM"))
+                        {
+                            result.func = Func.SUM;
+                        }
+                        else if (rowName.startsWith("AVG"))
+                        {
+                            result.func = Func.AVG;
+                        }
+                        else if (rowName.startsWith("COUNT"))
+                        {
+                            result.func = Func.COUNT;
+                        }
+                        else if (rowName.startsWith("MIN"))
+                        {
+                            result.func = Func.MIN;
+                        }
+                        else
+                        {
+                            result.func = Func.MAX;
+                        }
+                        rowName = rowName.substring(rowName.indexOf("(")+1, rowName.indexOf(")")).trim();
+                    }
                     if (rowName.contains("."))
                     {
                         result.selectOption.add(rowName.substring(0, rowName.indexOf(".")), rowName.substring(rowName.indexOf(".")+1));
@@ -632,6 +656,7 @@ public class SQLParser
                         }
                         else
                         {
+                            result.selectOption.columnNames.add(rowName);
                             needToUpdate = true;
                         }
                     }
@@ -659,7 +684,7 @@ public class SQLParser
                     result.selectOption.addFromTable(tableName.trim());
                     lastTableName = tableName.trim();
                     tableName = "";
-                    if (sql.charAt(0) == ',')
+                    if (sql.charAt(0) == ',' || sql.charAt(0) == ';')
                     {
                         sql = sql.substring(1);
                     }
@@ -825,7 +850,7 @@ public class SQLParser
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
 //        System.out.println(calcStm("10000"));
-        ParseResult result = parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;");
+        ParseResult result = parse("SELECT MAX(title) FROM table;");
 //		System.out.print("123");
     }
     static String preParse(String sql)
