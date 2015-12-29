@@ -583,6 +583,7 @@ public class SQLParser
                     value = new SetValue();
                     if (sql.toUpperCase().startsWith("WHERE"))
                     {
+                        sql = sql.substring(5);
                         break;
                     }
                     else
@@ -850,7 +851,7 @@ public class SQLParser
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
 //        System.out.println(calcStm("10000"));
-        ParseResult result = parse("SELECT MAX(title) FROM table;");
+        ParseResult result = parse("UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;");
 //		System.out.print("123");
     }
     static String preParse(String sql)
