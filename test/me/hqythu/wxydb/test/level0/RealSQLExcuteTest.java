@@ -13,6 +13,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -120,18 +121,20 @@ public class RealSQLExcuteTest {
 //        RecordManager.getInstance().clearFast();
 
 //        parseResult = SQLParser.parse("UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;");
+//        System.out.println(parseResult.tableNames.get(0));
+//        System.out.println(parseResult.where);
 //        result = parseResult.execute();
 //        Assert.assertEquals(result,"update success");
 //        table = SystemManager.getInstance().getTable("book");
 //        System.out.println(table.getRecordSize());
 
-        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’ ");
-        System.out.println("hehe");
-        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
-        Assert.assertEquals(1,parseResult.where.boolExprsAndOps.size());
-        Assert.assertEquals(1,parseResult.selectOption.fromTableNames.size());
-        result = parseResult.execute();
-
+//        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’; ");
+//        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+//        System.out.println(parseResult.where);
+//        System.out.println(parseResult.selectOption.fromTableNames);
+////        Assert.assertEquals(1,parseResult.selectOption.fromTableNames.size());
+//        result = parseResult.execute();
+//        System.out.println(result);
     }
 
     //    @Test

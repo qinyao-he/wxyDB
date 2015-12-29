@@ -238,6 +238,13 @@ public class SQLParserTest {
         parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’;");
         Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
         Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+
+        parseResult = SQLParser.parse("UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher';");
+        System.out.println(parseResult.tableNames.get(0));
+        System.out.println(parseResult.where);
+
+//        System.out.println(parseResult.selectOption);
+//        System.out.println(parseResult.where);
     }
 
     // SELECT

@@ -36,4 +36,21 @@ public class SelectOption {
         tableNames.add(tableName);
         columnNames.add(columnName);
     }
+    public String toString() {
+        if (isAll()) {
+            return "*";
+        } else {
+            StringBuilder builder = new StringBuilder();
+            builder.append("SET ");
+            for (int i = 0; i < tableNames.size(); i++) {
+                builder.append(tableNames.get(i));
+                builder.append('.');
+                builder.append(columnNames.get(i));
+                if (i != tableNames.size() - 1) {
+                    builder.append(',');
+                }
+            }
+            return builder.toString();
+        }
+    }
 }
