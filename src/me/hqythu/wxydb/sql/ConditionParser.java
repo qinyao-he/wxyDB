@@ -29,7 +29,7 @@ public class ConditionParser
 		}
 		else if (value.contains("."))
 		{
-			resultObject = '*'+value;
+			resultObject = value;
 		}
         else if (value.toUpperCase().equals("NULL"))
         {
@@ -361,8 +361,8 @@ public class ConditionParser
                     }
                     else
                     {
-                        expr.tableNameR = right.substring(0, node.condition.left.indexOf('.')-1);
-                        expr.columnNameR = right.substring(node.condition.left.indexOf('.'));
+                        expr.tableNameR = right.substring(0, ((String)node.condition.right).indexOf('.'));
+                        expr.columnNameR = right.substring(((String)node.condition.right).indexOf('.')+1);
                     }
                 }
                 else

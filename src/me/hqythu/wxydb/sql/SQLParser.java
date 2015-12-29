@@ -527,156 +527,179 @@ public class SQLParser
         result.where = ConditionParser.parseCondition(conds, result.tableNames.get(0));
         return result;
     }
-    static ParseResult parseUPDATE(String sqlString)
+    static ParseResult parseUPDATE(String sql)
     {
-        sqlString = sqlString.replaceAll(";", " ;");
-        String sql[] =  sqlString.split(" ");
+//        sqlString = sqlString.replaceAll(";", " ;");
+        String sqlS[] =  sql.split(" ");
         ParseResult result = new ParseResult();
-        result.tableNames.add(sql[1]);
-        int num = 0;
-        Value value = new Value();
+        result.tableNames.add(sqlS[1]);
+        int status = 0;
+//        Value value = new Value();
+        SetValue value = new SetValue();
         String right = "";
+        String left = "";
         boolean startCopy = false;
         String conds = "";
-        for(int i = 3; i < sql.length; i++)
+        boolean isReading = false;
+        sql = sql.substring(sql.toUpperCase().indexOf("SET")+3);
+        while(sql.length() > 0)
         {
-            if (sql[i].toUpperCase().equals("WHERE"))
+            if (status == 0)
             {
-                startCopy = true;
-                continue;
-            }
-            if (startCopy)
-            {
-                conds += sql[i]+' ';
-            }
-            else
-            {
-                if (num == 0)
+                if (sql.charAt(0) == '=')
                 {
-                    value.left = sql[i];
-                    i++;
-                    num = 1;
-                    continue;
+                    left = left.trim();
+                    status = 1;
+                    sql = sql.substring(1);
                 }
-                else if (num == 1)
+                else
                 {
-                    if (sql[i+1].equals(",") || sql[i+1].toUpperCase().equals("WHERE"))
+                    left += sql.charAt(0);
+                    sql = sql.substring(1);
+                }
+            }
+            else if (status == 1)
+            {
+                if (sql.charAt(0) == '\'')
+                {
+                    isReading = !isReading;
+                }
+                if (!isReading && (sql.charAt(0) == ',' || sql.toUpperCase().startsWith("WHERE")))
+                {
+                    Object r = exchange(right.trim());
+                    right = "";
+                    if (r instanceof SetValue)
                     {
-                        right += sql[i];
-                        value.right = exchange(right);
-                        SetValue v = new SetValue();
-                        if (!(value.right instanceof SetValue))
-                        {
-                            v.isVar1 = false;
-                            v.value1 = value.right;
-                        }
-                        else
-                        {
-                            v = (SetValue)value.right;
-                        }
-                        v.columnName = value.left;
-                        result.values.add(v);
-                        value = new Value();
-                        num = 0;
-                        if (sql[i+1].equals(","))
-                        {
-                            i++;
-                        }
-                        right = "";
+                        value = (SetValue)r;
                     }
                     else
                     {
-                        right += sql[i];
-                        right += ' ';
+                        value.isVar1 = false;
+                        value.value1 = r;
                     }
+                    value.columnName = left;
+                    left = "";
+                    result.values.add(value);
+                    value = new SetValue();
+                    if (sql.toUpperCase().startsWith("WHERE"))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        sql = sql.substring(1);
+                        status = 0;
+                    }
+                }
+                else
+                {
+                    right += sql.charAt(0);
+                    sql = sql.substring(1);
                 }
             }
         }
         result.type = OrderType.UPDATE;
-        result.where = ConditionParser.parseCondition(conds, result.tableNames.get(0));
+        result.where = ConditionParser.parseCondition(sql, result.tableNames.get(0));
         return result;
     }
-    static ParseResult parseSELECT(String sqlString)
+    static ParseResult parseSELECT(String sql)
     {
-        sqlString = sqlString.replaceAll(";", " ;");
-        String sql[] =  sqlString.split(" ");
+        sql = sql.trim();
+        sql = sql.substring(6);
+        int status = 0;
         ParseResult result = new ParseResult();
-        int num = 0;
-        String conds = "";
-        for (int i = 1; i < sql.length; i++)
+        String rowName = "";
+        String tableName = "";
+        String lastTableName = "";
+        boolean needToUpdate = false;
+        while (sql.length() > 0)
         {
-            if (num == 0)
+            if (status == 0)
             {
-                if (sql[i].toUpperCase().equals("FROM"))
+                if (sql.charAt(0) == ',' || sql.toUpperCase().startsWith("FROM"))
                 {
-                    num = 1;
-                    continue;
-                }
-                else if (!sql[i].equals(","))
-                {
-                    result.rowNames.add(sql[i]);
-                }
-            }
-            else if (num == 1)
-            {
-                if (sql[i].toUpperCase().equals("WHERE"))
-                {
-                    num = 2;
-                    continue;
-                }
-                else if (!sql[i].equals(",") && !sql[i].equals(";"))
-                {
-                    result.tableNames.add(sql[i]);
-                }
-
-            }
-            else
-            {
-                conds += sql[i]+' ';
-            }
-        }
-        if (result.rowNames.size() == 1)
-        {
-            if (result.rowNames.get(0).equals("*"))
-            {
-                result.selectOption = new SelectOption(true);
-            }
-            else if (isFunc(result.rowNames.get(0)))
-            {
-                DoubleReturn<Func, String> r = readFunc(result.rowNames.get(0));
-                result.selectOption.add(result.tableNames.get(0), r.second);
-                result.func = r.first;
-            }
-        }
-        else
-        {
-            for (String row : result.rowNames)
-            {
-                if (row.contains("."))
-                {
-                    result.selectOption.add(row.substring(0, row.indexOf(".")), row.substring(row.indexOf(".")+1));
+                    rowName = rowName.trim();
+                    if (rowName.contains("."))
+                    {
+                        result.selectOption.add(rowName.substring(0, rowName.indexOf(".")), rowName.substring(rowName.indexOf(".")+1));
+                    }
+                    else
+                    {
+                        if (rowName.equals("*"))
+                        {
+                            result.selectOption.tableNames = null;
+                            result.selectOption.columnNames = null;
+                        }
+                        else
+                        {
+                            needToUpdate = true;
+                        }
+                    }
+                    rowName = "";
+                    if (sql.toUpperCase().startsWith("FROM"))
+                    {
+                        sql = sql.substring(4);
+                        status = 1;
+                    }
+                    else
+                    {
+                        sql = sql.substring(1);
+                    }
                 }
                 else
                 {
-                    result.selectOption.add(result.tableNames.get(0), row);
+                    rowName += sql.charAt(0);
+                    sql = sql.substring(1);
                 }
             }
+            else
+            {
+                if (sql.charAt(0) == ',' || sql.charAt(0) == ';' || sql.toUpperCase().startsWith("WHERE"))
+                {
+                    result.selectOption.addFromTable(tableName.trim());
+                    lastTableName = tableName.trim();
+                    tableName = "";
+                    if (sql.charAt(0) == ',')
+                    {
+                        sql = sql.substring(1);
+                    }
+                    else
+                    {
+                        sql = sql.substring(5);
+                        break;
+                    }
+                }
+                else
+                {
+                    tableName += sql.charAt(0);
+                    sql = sql.substring(1);
+                }
+            }
+
         }
-        for (String table : result.tableNames)
+        if (needToUpdate)
         {
-            result.selectOption.addFromTable(table);
+            for (int i = 0; i < result.selectOption.columnNames.size(); i++)
+            {
+                result.selectOption.tableNames.add(lastTableName);
+            }
         }
         result.type = OrderType.SELECT;
-        if (!conds.isEmpty())
+        if (!sql.isEmpty())
         {
-            result.where = ConditionParser.parseCondition(conds, result.tableNames.get(0));
+            if (!result.selectOption.tableNames.isEmpty())
+            {
+                result.where = ConditionParser.parseCondition(sql, result.selectOption.tableNames.get(0));
+            }
+            else
+            {
+                result.where = ConditionParser.parseCondition(sql, lastTableName);
+            }
         }
         else
         {
             result.where = new Where(true);
         }
-        result.tableNames = new ArrayList<String>();
-        result.rowNames = new ArrayList<String>();
         return result;
     }
     static ParseResult parseCREATE_DATABASE(String sqlString)
@@ -802,7 +825,7 @@ public class SQLParser
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
 //        System.out.println(calcStm("10000"));
-        ParseResult result = parse("INSERT INTO customer VALUES (300001, null, 123)");
+        ParseResult result = parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;");
 //		System.out.print("123");
     }
     static String preParse(String sql)
