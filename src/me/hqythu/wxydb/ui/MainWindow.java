@@ -4,8 +4,7 @@ import me.hqythu.wxydb.manager.SystemManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 
 /**
  * Created by hqythu on 12/29/2015.
@@ -48,6 +47,14 @@ public class MainWindow extends JFrame {
 
         createTabView();
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosed(e);
+                SystemManager.getInstance().writeBack();
+            }
+        });
     }
 
     private void createToolbar() {
