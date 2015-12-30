@@ -321,5 +321,7 @@ public class SQLParserTest {
         Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
         Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("sum"));
 
+        parseResult = SQLParser.parse("select * from orders where (customer_id > 305000 and book_id > 210000) or quantity >= 10;");
+        System.out.println(parseResult.where);
     }
 }

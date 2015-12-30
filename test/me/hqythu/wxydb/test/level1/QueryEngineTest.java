@@ -59,6 +59,7 @@ public class QueryEngineTest {
     @Test
     public void testJoinTwoSmall() throws Exception {
         List<Map<Table, Object[]>> results;
+        List<Map<Table, Integer>> ids;
         Set<String> tableNames;
 
         // 初始化插入数据
@@ -83,12 +84,12 @@ public class QueryEngineTest {
         tableNames = new HashSet<>();
 
         tableNames.add(TEST_TABLE1);
-        results = QueryEngine.getInstance().tableJoinRecords(tableNames);
-        Assert.assertEquals(NUM1, results.size());
+        ids = QueryEngine.getInstance().tableJoinRecordIds(tableNames);
+        Assert.assertEquals(NUM1, ids.size());
 
         tableNames.add(TEST_TABLE2);
-        results = QueryEngine.getInstance().tableJoinRecords(tableNames);
-        Assert.assertEquals(NUM1 * NUM2, results.size());
+        ids = QueryEngine.getInstance().tableJoinRecordIds(tableNames);
+        Assert.assertEquals(NUM1 * NUM2, ids.size());
 
     }
 
@@ -98,6 +99,7 @@ public class QueryEngineTest {
 //    @Test
     public void testJoinHasOneEmpty() throws Exception {
         List<Map<Table, Object[]>> results;
+        List<Map<Table, Integer>> ids;
         Set<String> tableNames;
 
         // 初始化插入数据
@@ -113,12 +115,12 @@ public class QueryEngineTest {
         tableNames = new HashSet<>();
 
         tableNames.add(TEST_TABLE1);
-        results = QueryEngine.getInstance().tableJoinRecords(tableNames);
-        Assert.assertEquals(BIG_NUM, results.size());
+        ids = QueryEngine.getInstance().tableJoinRecordIds(tableNames);
+        Assert.assertEquals(BIG_NUM, ids.size());
 
         tableNames.add(TEST_TABLE2);
-        results = QueryEngine.getInstance().tableJoinRecords(tableNames);
-        Assert.assertEquals(0, results.size());
+        ids = QueryEngine.getInstance().tableJoinRecordIds(tableNames);
+        Assert.assertEquals(0, ids.size());
     }
 
     /**
@@ -158,7 +160,7 @@ public class QueryEngineTest {
         select.addFromTable(TEST_TABLE2);
         where = new Where();
         where.addExpr(new BoolExpr(TEST_TABLE1, "age", CompareOp.GEQ, 7, true));
-        queryset = QueryEngine.getInstance().query(select, where);
+        queryset = QueryEngine.getInstance().queryById(select, where);
         Assert.assertEquals(6, queryset.size());
         queryset = QueryEngine.getInstance().queryById(select, where);
         Assert.assertEquals(6, queryset.size());
@@ -198,22 +200,22 @@ public class QueryEngineTest {
         select = new SelectOption();
         select.add(TEST_TABLE1, "age");
         select.setFunc(Func.AVG);
-        temp = QueryEngine.getInstance().query(select, new Where(true));
+        temp = QueryEngine.getInstance().queryById(select, new Where(true));
         Assert.assertTrue(abs(avg - (Double)temp.get(0)[0]) < 1e6);
         select.setFunc(Func.SUM);
-        temp = QueryEngine.getInstance().query(select, new Where(true));
+        temp = QueryEngine.getInstance().queryById(select, new Where(true));
         Assert.assertTrue(abs(sum - (Double)temp.get(0)[0]) < 1e6);
         max = 9;
         select.setFunc(Func.MAX);
-        temp = QueryEngine.getInstance().query(select, new Where(true));
+        temp = QueryEngine.getInstance().queryById(select, new Where(true));
         Assert.assertTrue(abs(max - (Double)temp.get(0)[0]) < 1e6);
         min = 0;
         select.setFunc(Func.MIN);
-        temp = QueryEngine.getInstance().query(select, new Where(true));
+        temp = QueryEngine.getInstance().queryById(select, new Where(true));
         Assert.assertTrue(abs(min - (Double)temp.get(0)[0]) < 1e6);
         size = 10;
         select.setFunc(Func.COUNT);
-        temp = QueryEngine.getInstance().query(select, new Where(true));
+        temp = QueryEngine.getInstance().queryById(select, new Where(true));
         Assert.assertTrue(abs(size - (Double)temp.get(0)[0]) < 1e6);
     }
 
@@ -248,7 +250,7 @@ public class QueryEngineTest {
         select.addFromTable(TEST_TABLE2);
         where = new Where();
         where.addExpr(new BoolExpr(TEST_TABLE1, "age", CompareOp.GEQ, 7, true));
-        queryset = QueryEngine.getInstance().query(select, where);
+        queryset = QueryEngine.getInstance().queryById(select, where);
         Assert.assertEquals(3, queryset.size());
         Assert.assertEquals(5, queryset.get(0).length);
         queryset = QueryEngine.getInstance().queryById(select, where);

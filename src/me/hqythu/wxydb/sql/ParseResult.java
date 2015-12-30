@@ -78,8 +78,13 @@ public class ParseResult
                     result = "update success";
                     break;
                 case SELECT:
-                    records = QueryEngine.getInstance().query(selectOption,where);
-                    result = QueryEngine.resultsToString(records);
+                    try {
+                        records = QueryEngine.getInstance().queryById(selectOption,where);
+                        result = QueryEngine.resultsToString(records);
+                    } catch (Exception e) {
+//                        e.printStackTrace();
+                        result = e.getMessage();
+                    }
                     break;
                 case CREATE_DATABASE:
                     ok = SystemManager.getInstance().createDatabase(dataBaseName);
@@ -144,6 +149,7 @@ public class ParseResult
             List<Object[]> results = QueryEngine.getInstance().queryById(selectOption,where);
             return results;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new SQLExecException(e.getMessage());
         }
     }

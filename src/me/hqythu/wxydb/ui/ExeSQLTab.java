@@ -57,7 +57,7 @@ public class ExeSQLTab extends JPanel {
                         ParseResult parseResult = SQLParser.parse(sqlStr);
                         java.util.List<Object[]> resultList = new ArrayList<>();
                         try {
-                            resultList = QueryEngine.getInstance().query(
+                            resultList = QueryEngine.getInstance().queryById(
                                     parseResult.selectOption, parseResult.where);
                         } catch (Exception e) {
                         }

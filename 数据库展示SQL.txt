@@ -1,0 +1,38 @@
+use orderDB;
+
+主键检查
+INSERT INTO customer VALUES (300001, 'CHAD CABELLO', 'F');
+
+数据列类型检查
+INSERT INTO orders VALUES (315000,200001,'eight');
+
+数据长度检查
+INSERT INTO customer VALUES (500001, 'CHAD CABELLO', 'Fdd');
+
+null的处理
+SELECT title FROM book WHERE authors is null;
+
+where的栈式处理
+select * from orders where customer_id > 306000 and (book_id > 220000 or quantity >= 10);
+
+where不存在的列
+SELECT * FROM publisher WHERE nation'CA';
+
+聚集查询
+select SUM(quantity) from orders where book_id > 220000;
+select AVG(quantity) from orders where book_id > 220000;
+select COUNT(id) from book where id > 220000;
+select MIN(copies) from book;
+select MAX(copies) from book;
+
+
+多表连接（容易爆栈）
+use orderDBsmall;
+SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;
+SELECT customer.name,book.title,orders.quantity FROM customer,book,orders WHERE orders.customer_id=customer.id AND orders.book_id=book.id AND orders.quantity > 9;
+
+
+基本功能
+SHOW TABLES;
+DESC customer;
+SELECT * FROM publisher WHERE state='CA';
