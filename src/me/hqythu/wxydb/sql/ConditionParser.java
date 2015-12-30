@@ -17,9 +17,9 @@ public class ConditionParser
 	static Object exchange(String value)
 	{
 		Object resultObject;
-		value = value.replaceAll("\\,", "");
+//		value = value.replaceAll("\\,", "");
 //		value = value.replaceAll("\\)", "");
-		value = value.replaceAll("\\;", "");
+//		value = value.replaceAll("\\;", "");
 		if (value.startsWith("\'") || value.startsWith("‘") || value.startsWith("’"))
 		{
 			value = value.replaceAll("\\'", "");
@@ -50,16 +50,16 @@ public class ConditionParser
 	}
 	public static void main(String[] args)
 	{
-		String string = "authors=��Anthony Boucher��;";
+		String string = "a = 1 and (b <> '123' or c < 234 and d is null);";
         Where result = parseCondition(string, "myTable");
-        for (Object obj : result.boolExprsAndOps)
-		{
-			System.out.println(obj);
-		}
-        for (Boolean bool : result.isExprs)
-		{
-			System.out.println(bool);
-		}
+//        for (Object obj : result.boolExprsAndOps)
+//		{
+//			System.out.println(obj);
+//		}
+//        for (Boolean bool : result.isExprs)
+//		{
+//			System.out.println(bool);
+//		}
 	}
 	static DoubleReturn<Condition, String> String2Condition(String sql)
 	{
@@ -148,7 +148,7 @@ public class ConditionParser
 	}
 	static boolean isAND(String sql, int i)
 	{
-		if (sql.substring(i).toUpperCase().startsWith("AND") && sql.substring(i).charAt(3) == ' ')
+		if (sql.substring(i).toUpperCase().startsWith("AND") && (sql.substring(i).charAt(3) == ' ' || sql.substring(i).charAt(3) == '('))
 		{
 			return true;
 		}
@@ -156,7 +156,7 @@ public class ConditionParser
 	}
 	static boolean isOR(String sql, int i)
 	{
-		if (sql.substring(i).toUpperCase().startsWith("OR") && sql.substring(i).charAt(2) == ' ')
+		if (sql.substring(i).toUpperCase().startsWith("OR") && (sql.substring(i).charAt(2) == ' ' || sql.substring(i).charAt(2) == '('))
 		{
 			return true;
 		}
@@ -164,7 +164,7 @@ public class ConditionParser
 	}
 	static boolean isIS (String sql, int i)
 	{
-		if (sql.substring(i).toUpperCase().startsWith("IS") && sql.substring(i).charAt(2) == ' ')
+		if (sql.substring(i).toUpperCase().startsWith("IS") && (sql.substring(i).charAt(2) == ' ' || sql.substring(i).charAt(2) == '('))
 		{
 			return true;
 		}
@@ -251,11 +251,7 @@ public class ConditionParser
                 {
                     if (opr.lastElement().equals(";") || opr.lastElement().equals("("))
                     {
-                        if (currentString.toUpperCase().equals("AND") || currentString.toUpperCase().equals("OR") || currentString.equals("("))
-                        {
-                            opr.push(currentString);
-                        }
-                        else
+                        if (currentString.equals(")") || currentString.toUpperCase().equals(";"))
                         {
                             opr.pop();
                         }
@@ -273,6 +269,10 @@ public class ConditionParser
                         node.rightChild = b;
                         opt.push(node);
                     }
+                }
+                if (!(currentString.equals(";") || currentString.equals(")")))
+                {
+                    opr.push(currentString);
                 }
             }
             else

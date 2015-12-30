@@ -2,10 +2,7 @@ package me.hqythu.wxydb.test.level1;
 
 import me.hqythu.wxydb.sql.ParseResult;
 import me.hqythu.wxydb.sql.SQLParser;
-import me.hqythu.wxydb.util.BoolExpr;
-import me.hqythu.wxydb.util.BoolOp;
-import me.hqythu.wxydb.util.CompareOp;
-import me.hqythu.wxydb.util.SetValue;
+import me.hqythu.wxydb.util.*;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -89,7 +86,7 @@ public class SQLParserTest {
     }
 
     // INSERT
-//    @Test
+    @Test
     public void testInsert() {
         ParseResult sql;
 
@@ -151,7 +148,7 @@ public class SQLParserTest {
     }
 
     // DELETE
-//    @Test
+    @Test
     public void testDelete() {
         ParseResult sql;
         sql = SQLParser.parse("DELETE FROM publisher WHERE state is null;");
@@ -165,7 +162,7 @@ public class SQLParserTest {
         Assert.assertEquals(CompareOp.IS, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).compareOp);
         Assert.assertEquals(null, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
 
-        sql = SQLParser.parse("DELETE FROM publisher WHERE state=’(CA)’;");
+        sql = SQLParser.parse("DELETE FROM publisher WHERE state=’(CA,)’;");
         Assert.assertTrue(sql.type == ParseResult.OrderType.DELETE);
         Assert.assertEquals("publisher", sql.tableNames.get(0));
         Assert.assertEquals(1, sql.where.boolExprsAndOps.size());
@@ -173,9 +170,9 @@ public class SQLParserTest {
         Assert.assertEquals(true, sql.where.boolExprsAndOps.get(0) instanceof BoolExpr);
         Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).tableNameL);
         Assert.assertEquals("state", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).columnNameL);
-        Assert.assertEquals("(CA)", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
+        Assert.assertEquals("(CA,)", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
 
-        sql = SQLParser.parse("DELETE FROM publisher WHERE a = 1 and (b <> '123' or c < 234 or d = 3);");
+        sql = SQLParser.parse("DELETE FROM publisher WHERE a = 1 and (b <> '123' or c < 234 or d is null);");
         Assert.assertTrue(sql.type == ParseResult.OrderType.DELETE);
         Assert.assertEquals("publisher", sql.tableNames.get(0));
         Assert.assertEquals(7, sql.where.boolExprsAndOps.size());
@@ -201,9 +198,11 @@ public class SQLParserTest {
         Assert.assertEquals(1, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
         Assert.assertEquals("123", ((BoolExpr)sql.where.boolExprsAndOps.get(1)).valueR);
         Assert.assertEquals(234, ((BoolExpr)sql.where.boolExprsAndOps.get(2)).valueR);
-        Assert.assertEquals(3, ((BoolExpr)sql.where.boolExprsAndOps.get(4)).valueR);
+        Assert.assertEquals(null, ((BoolExpr)sql.where.boolExprsAndOps.get(4)).valueR);
+        Assert.assertEquals(CompareOp.IS, ((BoolExpr)sql.where.boolExprsAndOps.get(4)).compareOp);
 
-        sql = SQLParser.parse("DELETE FROM publisher WHERE a = 1 and (b <> '123' or (c < 234 or d = 3));");
+
+        sql = SQLParser.parse("DELETE FROM publisher WHERE a=1 or(b<>'123' or(c<234 or d=3));");
         Assert.assertTrue(sql.type == ParseResult.OrderType.DELETE);
         Assert.assertEquals("publisher", sql.tableNames.get(0));
         Assert.assertEquals(7, sql.where.boolExprsAndOps.size());
@@ -225,7 +224,7 @@ public class SQLParserTest {
         Assert.assertEquals("d", ((BoolExpr)sql.where.boolExprsAndOps.get(3)).columnNameL);
         Assert.assertEquals(BoolOp.OR, sql.where.boolExprsAndOps.get(4));
         Assert.assertEquals(BoolOp.OR, sql.where.boolExprsAndOps.get(5));
-        Assert.assertEquals(BoolOp.AND, sql.where.boolExprsAndOps.get(6));
+        Assert.assertEquals(BoolOp.OR, sql.where.boolExprsAndOps.get(6));
         Assert.assertEquals(1, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
         Assert.assertEquals("123", ((BoolExpr)sql.where.boolExprsAndOps.get(1)).valueR);
         Assert.assertEquals(234, ((BoolExpr)sql.where.boolExprsAndOps.get(2)).valueR);
@@ -236,19 +235,91 @@ public class SQLParserTest {
     @Test
     public void testUpdate() {
         ParseResult parseResult;
-        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’;");
-        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
-        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
-
         parseResult = SQLParser.parse("UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher';");
         Assert.assertEquals("book",parseResult.tableNames.get(0).toString());
         Assert.assertEquals("set title = Nine Times Nine",SetValue.toString(parseResult.values));
         Assert.assertEquals("[book.authors == Anthony Boucher]",parseResult.where.toString());
 
+        parseResult = SQLParser.parse("UPDATE book SET title='(Nine Times, N213ine)' WHERE authors='Anthony Boucher';");
+        Assert.assertTrue(parseResult.tableNames.get(0).equals("book"));
+        Assert.assertEquals("set title = (Nine Times, N213ine)",SetValue.toString(parseResult.values));
+        Assert.assertEquals("[book.authors == Anthony Boucher]",parseResult.where.toString());
+
+        parseResult = SQLParser.parse("UPDATE book SET title=title+1,b=2*b, c=8-(1+2+3)*4/6+5-7 WHERE authors='Anthony Boucher';");
+        Assert.assertTrue(parseResult.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.values.get(0).isVar1);
+        Assert.assertTrue(!parseResult.values.get(0).isVar2);
+        Assert.assertTrue(parseResult.values.get(0).calcOp.equals(CalcOp.ADD));
+        Assert.assertTrue(parseResult.values.get(0).value2.equals(1));
+        Assert.assertTrue(!parseResult.values.get(1).isVar1);
+        Assert.assertTrue(parseResult.values.get(1).isVar2);
+        Assert.assertTrue(parseResult.values.get(1).calcOp.equals(CalcOp.MUL));
+        Assert.assertTrue(parseResult.values.get(1).value1.equals(2));
+        Assert.assertTrue(!parseResult.values.get(2).isVar1);
+        Assert.assertTrue(parseResult.values.get(2).value1.equals(2));
+
+
+        Assert.assertEquals("[book.authors == Anthony Boucher]",parseResult.where.toString());
     }
 
     // SELECT
+    @Test
     public void testSelect() {
+        ParseResult parseResult;
+        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+
+        parseResult = SQLParser.parse("select a from book where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("a"));
+
+        parseResult = SQLParser.parse("select book.a,title.b from book,title,BBB where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("title"));
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("BBB"));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(1).equals("title"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("a"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(1).equals("b"));
+
+        parseResult = SQLParser.parse("select SUM(sum) from book where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+        Assert.assertTrue(parseResult.selectOption.func.equals(Func.SUM));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("sum"));
+
+        parseResult = SQLParser.parse("select MAX(sum) from book where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+        Assert.assertTrue(parseResult.selectOption.func.equals(Func.MAX));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("sum"));
+
+        parseResult = SQLParser.parse("select COUNT(sum) from book where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+        Assert.assertTrue(parseResult.selectOption.func.equals(Func.COUNT));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("sum"));
+
+        parseResult = SQLParser.parse("select AVG(sum) from book where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+        Assert.assertTrue(parseResult.selectOption.func.equals(Func.AVG));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("sum"));
+
+        parseResult = SQLParser.parse("select MIN ( sum ) from book where title='Nine Times Nine min';");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+        Assert.assertTrue(parseResult.selectOption.func.equals(Func.MIN));
+        Assert.assertTrue(parseResult.selectOption.tableNames.get(0).equals("book"));
+        Assert.assertTrue(parseResult.selectOption.columnNames.get(0).equals("sum"));
 
     }
 }
