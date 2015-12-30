@@ -16,7 +16,7 @@ where的栈式处理
 select * from orders where customer_id > 306000 and (book_id > 220000 or quantity >= 10);
 
 where不存在的列
-SELECT * FROM publisher WHERE nation'CA';
+SELECT * FROM publisher WHERE nation='CA';
 
 聚集查询
 select SUM(quantity) from orders where book_id > 220000;

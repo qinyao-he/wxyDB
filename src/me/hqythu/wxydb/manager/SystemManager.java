@@ -159,6 +159,13 @@ public class SystemManager {
         closeDatabase();
     }
 
+    /**
+     * 写回
+     * 清空缓存页
+     */
+    public void writeBack() {
+        BufPageManager.getInstance().clear();
+    }
     //--------------------为其他模块提供系统管理--------------------
     public Table getTable(String tableName) {
         if (connectDB == null) return null;
@@ -184,7 +191,6 @@ public class SystemManager {
     public String getDbName() {
         return connectDB;
     }
-
     //--------------------内部辅助函数--------------------
     protected void closeDatabase() {
         if (connectDB != null) {

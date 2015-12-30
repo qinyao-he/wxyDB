@@ -149,6 +149,7 @@ public class QueryEngine {
                 table = tableChoose.get(i);
 
                 tempIds = table.getAllRecordIds();
+                System.out.println(results.size() * tempIds.size());
                 tempResults = new ArrayList<>(results.size() * tempIds.size());
 
                 // 每条记录
