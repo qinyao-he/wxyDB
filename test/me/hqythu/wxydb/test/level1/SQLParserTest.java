@@ -236,9 +236,7 @@ public class SQLParserTest {
     @Test
     public void testUpdate() {
         ParseResult parseResult;
-        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’;");
-        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
-        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+
 
         parseResult = SQLParser.parse("UPDATE book SET title='Nine Times Nine' WHERE authors='Anthony Boucher';");
         Assert.assertEquals("book",parseResult.tableNames.get(0).toString());
@@ -248,7 +246,15 @@ public class SQLParserTest {
     }
 
     // SELECT
+    @Test
     public void testSelect() {
+        ParseResult parseResult;
 
+        parseResult = SQLParser.parse("select * from book where title=’Nine Times Nine’;");
+        Assert.assertEquals(ParseResult.OrderType.SELECT,parseResult.type);
+        Assert.assertTrue(parseResult.selectOption.fromTableNames.contains("book"));
+
+        parseResult = SQLParser.parse("select * from orders where (customer_id > 305000 and book_id > 210000) or quantity >= 10;");
+        System.out.println(parseResult.where);
     }
 }

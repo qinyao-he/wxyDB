@@ -48,7 +48,7 @@ public class Record {
                             Integer ii = (Integer) values[i];
                             buffer.putInt(offsets[i] + Global.RECORD_STATIC_DATA_POS, ii);
                         } catch (Exception e) {
-                            throw new SQLRecordException("insert error type at "+ i + " column");
+                            throw new SQLRecordException("insert error type at column " + (i+1));
                         }
                         break;
                     case VARCHAR:
@@ -56,10 +56,10 @@ public class Record {
                         try {
                             ss = (String) values[i];
                         } catch (Exception e) {
-                            throw new SQLRecordException("insert error type at "+ i + " column");
+                            throw new SQLRecordException("insert error type at column " + (i+1));
                         }
                         if (ss.length() > column.len) {
-                            throw new SQLRecordException("column data too long");
+                            throw new SQLRecordException("column data too long at column " + (i+1));
                         }
                         buffer.position(offsets[i] + Global.RECORD_STATIC_DATA_POS);
                         buffer.put(ss.getBytes());

@@ -329,7 +329,15 @@ public class Table {
         }
     }
 
-    protected boolean checkSetValuePrimaryOk(Object[] toCheck, List<SetValue> setValues) throws SQLTableException {
+    public boolean checkSetValuePrimaryOk(Object[] toCheck, List<SetValue> setValues) throws SQLTableException {
+        int[] cols = new int[setValues.size()];
+        for (int i = 0; i < setValues.size(); i++) {
+            cols[i] = getColumnCol(setValues.get(i).columnName);
+        }
+        return checkSetValuePrimaryOk(toCheck,cols);
+    }
+
+    protected boolean checkSetValuePrimaryOk(Object[] toCheck, int[] cols) throws SQLTableException {
         int fileId = SystemManager.getInstance().getFileId();
         if (fileId == -1) throw new SQLTableException("can not get DB fileId");
         try {
@@ -341,8 +349,7 @@ public class Table {
 
             // 是否修改primary key
             boolean isPrimary = false;
-            for (SetValue setValue : setValues) {
-                int col = getColumnCol(setValue.columnName);
+            for (int col : cols) {
                 if (col == keyPos) {
                     isPrimary = true;
                     break;

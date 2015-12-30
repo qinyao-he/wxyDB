@@ -78,7 +78,7 @@ public class RealSQLExcuteTest {
     public void testInsertErrorType() throws Exception {
         ParseResult parseResult;
         thrown.expect(SQLExecException.class);
-        thrown.expectMessage("insert error type at 2 column");
+        thrown.expectMessage("insert error type at column 3");
         parseResult = SQLParser.parse("INSERT INTO orders VALUES (315000,200001,’eight’);");
         parseResult.execute();
     }
@@ -200,13 +200,13 @@ public class RealSQLExcuteTest {
         for (String temp : results) {
             Assert.assertEquals("insert success", temp);
         }
-        results = wxydb.excuteFile(ORDERS_FILE,10);
+        results = wxydb.excuteFile(ORDERS_FILE,6);
         for (String temp : results) {
             Assert.assertEquals("insert success", temp);
         }
         RecordManager.getInstance().clearFast();
 
-        parseResult = SQLParser.parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;");
+        parseResult = SQLParser.parse("SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id;");
         records = parseResult.query();
         Assert.assertEquals(1,records.size());
     }
