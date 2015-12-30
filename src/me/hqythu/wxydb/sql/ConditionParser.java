@@ -220,6 +220,7 @@ public class ConditionParser
 		while(sql.length() > 0)
 		{
 			int i = 0;
+            sql = sql.trim();
 			String currentString = new String();
 			if (isAND(sql, i))
 			{
