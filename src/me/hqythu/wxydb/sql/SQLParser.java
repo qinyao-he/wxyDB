@@ -265,7 +265,7 @@ public class SQLParser
         Map<String, Integer> rank = new HashMap<String, Integer>();
         str += '#';
         rank.put("#", -2);
-        rank.put("(", -1);
+        rank.put("(", 2);
         rank.put("+", 0);
         rank.put("-", 0);
         rank.put("*", 1);
@@ -286,47 +286,53 @@ public class SQLParser
             {
                 if (rank.get(String.valueOf(str.charAt(0))) <= rank.get(ins.lastElement()))
                 {
-                    if (ins.lastElement().equals("#") && str.charAt(0) == '#')
+                    while(!ins.isEmpty() && rank.get(String.valueOf(str.charAt(0))) <= rank.get(ins.lastElement()))
                     {
-                        break;
+                        if (ins.lastElement().equals("#") || ins.lastElement().equals("("))
+                        {
+                            if (str.charAt(0)==')')
+                            {
+                                ins.pop();
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            Integer b = opr.pop();
+                            Integer a = opr.pop();
+                            Integer r = 0;
+                            String i = ins.pop();
+                            switch (i)
+                            {
+                                case "+":
+                                    r = a + b;
+                                    break;
+                                case "-":
+                                    r = a - b;
+                                    break;
+                                case "*":
+                                    r = a * b;
+                                    break;
+                                case "/":
+                                    r = a / b;
+                                    break;
+                                default:
+                                    break;
+                            }
+                            opr.push(r);
+                        }
                     }
-                    Integer a = opr.pop();
-                    Integer b = opr.pop();
-                    Integer r = 0;
-                    String i = ins.pop();
-                    switch (i)
-                    {
-                        case "+":
-                            r = a + b;
-                            break;
-                        case "-":
-                            r = a - b;
-                            break;
-                        case "*":
-                            r = a * b;
-                            break;
-                        case "/":
-                            r = a / b;
-                            break;
-                        default:
-                            break;
-                    }
-                    opr.push(r);
-                    if (str.charAt(0) == ')')
-                    {
-                        ins.pop();
-                    }
-                    else
+                    if (!(str.charAt(0) == ')' || str.charAt(0) == '#'))
                     {
                         ins.push(String.valueOf(str.charAt(0)));
                     }
-                    str = str.substring(1);
                 }
                 else
                 {
                     ins.push(String.valueOf(str.charAt(0)));
-                    str = str.substring(1);
                 }
+                str = str.substring(1);
+                str = str.trim();
             }
         }
         return opr.firstElement();
@@ -851,8 +857,9 @@ public class SQLParser
 //		Scanner s = new Scanner(System.in);
 //		String sql = s.nextLine();
 //        System.out.println(calcStm("10000"));
-        ParseResult result = parse("UPDATE book SET title=’Nine Times Nine’ WHERE authors=’Anthony Boucher’;");
+//        ParseResult result = parse("DELETE FROM publisher WHERE state=’(CA,)’;");
 //		System.out.print("123");
+        System.out.println(calcStm("8-(1+2+3)*4/6+5-7"));
     }
     static String preParse(String sql)
     {
@@ -884,43 +891,43 @@ public class SQLParser
         }
         else if (ss[0].toUpperCase().equals("DELETE"))
         {
-            result = parseDELETE(preSql);
+            result = parseDELETE(sql);
         }
         else if (ss[0].toUpperCase().equals("UPDATE"))
         {
-            result = parseUPDATE(preSql);
+            result = parseUPDATE(sql);
         }
         else if (ss[0].toUpperCase().equals("SELECT"))
         {
-            result = parseSELECT(preSql);
+            result = parseSELECT(sql);
         }
         else if (ss[0].toUpperCase().equals("CREATE") && ss[1].toUpperCase().equals("DATABASE"))
         {
-            result = parseCREATE_DATABASE(preSql);
+            result = parseCREATE_DATABASE(sql);
         }
         else if (ss[0].toUpperCase().equals("DROP") && ss[1].toUpperCase().equals("DATABASE"))
         {
-            result = parseDROP_DATABASE(preSql);
+            result = parseDROP_DATABASE(sql);
         }
         else if (ss[0].toUpperCase().equals("USE"))
         {
-            result = parseUSE(preSql);
+            result = parseUSE(sql);
         }
         else if (ss[0].toUpperCase().equals("SHOW") && ss[1].toUpperCase().equals("TABLES;"))
         {
-            result = parseSHOW_TABLES(preSql);
+            result = parseSHOW_TABLES(sql);
         }
         else if (ss[0].toUpperCase().equals("CREATE") && ss[1].toUpperCase().equals("TABLE"))
         {
-            result = parseCREATE_TABLE(preSql);
+            result = parseCREATE_TABLE(sql);
         }
         else if (ss[0].toUpperCase().equals("DROP") && ss[1].toUpperCase().equals("TABLE"))
         {
-            result = parseDROP_TABLE(preSql);
+            result = parseDROP_TABLE(sql);
         }
         else if (ss[0].toUpperCase().equals("DESC"))
         {
-            result = parseDESC(preSql);
+            result = parseDESC(sql);
         }
         else
         {

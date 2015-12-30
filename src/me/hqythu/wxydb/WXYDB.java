@@ -29,19 +29,20 @@ public class WXYDB {
             String sqlString = scanner.nextLine();
             String result;
 
+            // 执行命令的反馈
+            if (sqlString.equals("quit")) {
+                break;
+            }
+
             // 解析执行命令
             try {
                 ParseResult sql = SQLParser.parse(sqlString);
                 result = sql.execute();
             } catch (Exception e) {
                 result = e.getMessage();
-                e.printStackTrace();
+//                e.printStackTrace();
             }
 
-            // 执行命令的反馈
-            if (result.equals("quit")) {
-                break;
-            }
             switch (result) {
                 case "option1":
                     System.out.println("1");
@@ -54,6 +55,8 @@ public class WXYDB {
                     break;
             }
         }
+        System.out.println("have fun! :)");
+        SystemManager.getInstance().close();
     }
 
     /**
