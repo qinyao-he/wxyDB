@@ -48,7 +48,12 @@ public class DataTab extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JComboBox<String> comboBox = (JComboBox)e.getSource();
-                String tableName = comboBox.getSelectedItem().toString();
+                String tableName;
+                if (comboBox.getSelectedItem() != null) {
+                    tableName = comboBox.getSelectedItem().toString();
+                } else {
+                    return;
+                }
 
                 String sqlStr = "select * from " + tableName + ";";
                 new Thread(new Runnable() {
