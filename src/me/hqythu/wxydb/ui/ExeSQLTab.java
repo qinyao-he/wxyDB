@@ -66,6 +66,9 @@ public class ExeSQLTab extends JPanel {
                                 resultList.add(tmp);
                             }
                         } catch (Exception e) {
+                            Object[] tmp = new Object[1];
+                            tmp[0] = e.getMessage();
+                            resultList.add(tmp);
                         }
                         final java.util.List<Object[]> result = resultList;
                         TableModel model = new AbstractTableModel() {
