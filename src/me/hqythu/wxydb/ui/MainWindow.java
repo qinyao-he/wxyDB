@@ -96,6 +96,7 @@ public class MainWindow extends JFrame {
 
     private void refreshDatabase() {
         structureTab.refreshDatabase();
+        dataTab.refreshDatabase();
     }
 
 }
