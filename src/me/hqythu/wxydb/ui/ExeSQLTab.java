@@ -58,7 +58,7 @@ public class ExeSQLTab extends JPanel {
                         java.util.List<Object[]> resultList = new ArrayList<>();
                         try {
                             if (parseResult.type == ParseResult.OrderType.SELECT) {
-                                resultList = QueryEngine.getInstance().query(
+                                resultList = QueryEngine.getInstance().queryById(
                                         parseResult.selectOption, parseResult.where);
                             } else {
                                 Object[] tmp = new Object[1];
