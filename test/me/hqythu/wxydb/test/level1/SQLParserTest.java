@@ -172,7 +172,7 @@ public class SQLParserTest {
         Assert.assertEquals("state", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).columnNameL);
         Assert.assertEquals("(CA,)", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
 
-        sql = SQLParser.parse("DELETE FROM publisher WHERE a = 1 and (b <> '123' or c < 234 or d is null);");
+        sql = SQLParser.parse("DELETE FROM publisher WHERE a = 1 and (b <> '123' or c < 234 and d is null);");
         Assert.assertTrue(sql.type == ParseResult.OrderType.DELETE);
         Assert.assertEquals("publisher", sql.tableNames.get(0));
         Assert.assertEquals(7, sql.where.boolExprsAndOps.size());
@@ -180,26 +180,26 @@ public class SQLParserTest {
         Assert.assertEquals(true, sql.where.boolExprsAndOps.get(0) instanceof BoolExpr);
         Assert.assertEquals(true, sql.where.boolExprsAndOps.get(1) instanceof BoolExpr);
         Assert.assertEquals(true, sql.where.boolExprsAndOps.get(2) instanceof BoolExpr);
-        Assert.assertEquals(true, sql.where.boolExprsAndOps.get(3) instanceof BoolOp);
-        Assert.assertEquals(true, sql.where.boolExprsAndOps.get(4) instanceof BoolExpr);
+        Assert.assertEquals(true, sql.where.boolExprsAndOps.get(3) instanceof BoolExpr);
+        Assert.assertEquals(true, sql.where.boolExprsAndOps.get(4) instanceof BoolOp);
         Assert.assertEquals(true, sql.where.boolExprsAndOps.get(5) instanceof BoolOp);
         Assert.assertEquals(true, sql.where.boolExprsAndOps.get(6) instanceof BoolOp);
         Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).tableNameL);
         Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(1)).tableNameL);
         Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(2)).tableNameL);
-        Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(4)).tableNameL);
+        Assert.assertEquals("publisher", ((BoolExpr)sql.where.boolExprsAndOps.get(3)).tableNameL);
         Assert.assertEquals("a", ((BoolExpr)sql.where.boolExprsAndOps.get(0)).columnNameL);
         Assert.assertEquals("b", ((BoolExpr)sql.where.boolExprsAndOps.get(1)).columnNameL);
         Assert.assertEquals("c", ((BoolExpr)sql.where.boolExprsAndOps.get(2)).columnNameL);
-        Assert.assertEquals("d", ((BoolExpr)sql.where.boolExprsAndOps.get(4)).columnNameL);
-        Assert.assertEquals(BoolOp.OR, sql.where.boolExprsAndOps.get(3));
+        Assert.assertEquals("d", ((BoolExpr)sql.where.boolExprsAndOps.get(3)).columnNameL);
+        Assert.assertEquals(BoolOp.AND, sql.where.boolExprsAndOps.get(4));
         Assert.assertEquals(BoolOp.OR, sql.where.boolExprsAndOps.get(5));
         Assert.assertEquals(BoolOp.AND, sql.where.boolExprsAndOps.get(6));
         Assert.assertEquals(1, ((BoolExpr)sql.where.boolExprsAndOps.get(0)).valueR);
         Assert.assertEquals("123", ((BoolExpr)sql.where.boolExprsAndOps.get(1)).valueR);
         Assert.assertEquals(234, ((BoolExpr)sql.where.boolExprsAndOps.get(2)).valueR);
-        Assert.assertEquals(null, ((BoolExpr)sql.where.boolExprsAndOps.get(4)).valueR);
-        Assert.assertEquals(CompareOp.IS, ((BoolExpr)sql.where.boolExprsAndOps.get(4)).compareOp);
+        Assert.assertEquals(null, ((BoolExpr)sql.where.boolExprsAndOps.get(3)).valueR);
+        Assert.assertEquals(CompareOp.IS, ((BoolExpr)sql.where.boolExprsAndOps.get(3)).compareOp);
 
 
         sql = SQLParser.parse("DELETE FROM publisher WHERE a=1 or(b<>'123' or(c<234 or d=3));");
