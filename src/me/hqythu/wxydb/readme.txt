@@ -2,7 +2,7 @@
 2015年10月25日
     数据库系统框架雏形
         四大模块、exception、utils
-    完成页式文件系统、页式文件系统缓存操作（未严格测试）
+    完成页式文件系统、页式文件系统缓存操作
 
 2015年10月26日
     补充框架
@@ -96,9 +96,7 @@
         SELECT title FROM book WHERE authors is null; 列出 authors 字段为空的记录的书名。
         SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;
 
-未完成
     SQL基本功能展示
-        三个表的联合查询例程
     GUI界面
 
 ----------------------基本框架----------------------

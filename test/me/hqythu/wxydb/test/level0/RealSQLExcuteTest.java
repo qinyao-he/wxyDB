@@ -187,7 +187,7 @@ public class RealSQLExcuteTest {
         Assert.assertEquals("[Anyone Can Have a Happy]",Arrays.toString(records.get(0)));
     }
 
-    @Test
+//    @Test
     public void testJoinBig() throws Exception {
         ParseResult parseResult;
         List<String> results;

@@ -32,13 +32,13 @@ public class Global {
      * 表页信息
      */
     public static final int TBPAGE_NAME_POS = 0;
-    public static final int TBPAGE_PRIMARY_POS = 100;
-    public static final int TBPAGE_PROP_POS = 104;
-    public static final int TBPAGE_PAGEIDX_POS = 108;
-    public static final int TBPAGE_DATAIDX_POS = 112;
-    public static final int TBPAGE_RECORD_SIZE_POS = 116;
-    public static final int TBPAGE_RECORD_LEN_POS = 120;
-    public static final int TBPAGE_COLUMN_POS = 124; // 2
+    public static final int TBPAGE_PRIMARY_POS = 124;
+    public static final int TBPAGE_PROP_POS = 128;
+    public static final int TBPAGE_PAGEIDX_POS = 132;
+    public static final int TBPAGE_DATAIDX_POS = 136;
+    public static final int TBPAGE_RECORD_SIZE_POS = 140;
+    public static final int TBPAGE_RECORD_LEN_POS = 144;
+    public static final int TBPAGE_COLUMN_POS = 148; // 2
     public static final int COL_NAME_POS = 0;
     public static final int COL_PROP_POS = 120;
     public static final int COL_TYPE_POS = 124;
@@ -46,7 +46,7 @@ public class Global {
 
     public static final int TABLE_NAME_LEN = TBPAGE_PRIMARY_POS - TBPAGE_NAME_POS; // 100
     public static final int COL_NAME_LEN = COL_PROP_POS - COL_NAME_POS; // 120
-    public static final int COL_INFO_POS = 128;
+    public static final int COL_INFO_POS = 256;
     public static final int PER_COL_INFO_LEN = 128;
 
     /**

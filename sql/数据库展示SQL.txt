@@ -25,14 +25,22 @@ select COUNT(id) from book where id > 220000;
 select MIN(copies) from book;
 select MAX(copies) from book;
 
+基本功能
+SHOW TABLES;
+DESC customer;
+SELECT * FROM publisher WHERE state='CA';
 
-多表连接（容易爆栈）
+多表连接（容易爆堆）
 use orderDBsmall;
 SELECT book.title,orders.quantity FROM book,orders WHERE book.id=orders.book_id AND orders.quantity>8;
 SELECT customer.name,book.title,orders.quantity FROM customer,book,orders WHERE orders.customer_id=customer.id AND orders.book_id=book.id AND orders.quantity > 9;
 
 
-基本功能
-SHOW TABLES;
-DESC customer;
-SELECT * FROM publisher WHERE state='CA';
+
+不足之处
+    没有索引,primary key的检查为线性
+    模块划分,导致多表连接的查询计划一次给出,爆堆
+    sql语句解析不够完备,鲁棒性有待增强
+    gui还有很多提升空间
+
+

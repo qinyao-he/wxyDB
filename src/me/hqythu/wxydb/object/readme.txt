@@ -1,10 +1,8 @@
 数据库对象模块
 
-Colume 列
+Column 列
 
 DateType 数据类型
-
-QuerySet 查询结果
 
 Record 记录
     记录在项目中主要以byte[]形式存在
