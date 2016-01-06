@@ -27,11 +27,11 @@ import static java.lang.Math.abs;
 public class RealSQLExcuteTest {
 
     public static final String TEST_DB = "orderDB";
-    public static final String CREATE_FILE = "sql/create.sql";
-    public static final String BOOK_FILE = "sql/book.sql";
-    public static final String ORDERS_FILE = "sql/orders.sql";
-    public static final String PUBLISHER_FILE = "sql/publisher.sql";
-    public static final String CUSTOMER_FILE = "sql/customer.sql";
+    public static final String CREATE_FILE = "res/sql/create.sql";
+    public static final String BOOK_FILE = "res/sql/book.sql";
+    public static final String ORDERS_FILE = "res/sql/orders.sql";
+    public static final String PUBLISHER_FILE = "res/sql/publisher.sql";
+    public static final String CUSTOMER_FILE = "res/sql/customer.sql";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

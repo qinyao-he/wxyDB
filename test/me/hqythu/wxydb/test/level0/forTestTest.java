@@ -20,12 +20,12 @@ import java.util.List;
  * Created by apple on 15/12/30.
  */
 public class forTestTest {
-    public static final String CREATE_FILE = "sql/create.sql";
-    public static final String CREATE_S_FILE = "sql/testJoin.sql";
-    public static final String BOOK_FILE = "sql/book.sql";
-    public static final String ORDERS_FILE = "sql/orders.sql";
-    public static final String PUBLISHER_FILE = "sql/publisher.sql";
-    public static final String CUSTOMER_FILE = "sql/customer.sql";
+    public static final String CREATE_FILE = "res/sql/create.sql";
+    public static final String CREATE_S_FILE = "res/sql/testJoin.sql";
+    public static final String BOOK_FILE = "res/sql/book.sql";
+    public static final String ORDERS_FILE = "res/sql/orders.sql";
+    public static final String PUBLISHER_FILE = "res/sql/publisher.sql";
+    public static final String CUSTOMER_FILE = "res/sql/customer.sql";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
