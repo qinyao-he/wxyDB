@@ -1,0 +1,1026 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: SQLParser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.sql</a> ]
+</div>
+
+<h1>Coverage Summary for Class: SQLParser (me.hqythu.wxydb.sql)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SQLParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.2%
+  </span>
+  <span class="absValue">
+    (23/ 27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95%
+  </span>
+  <span class="absValue">
+    (455/ 479)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.sql;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import me.hqythu.wxydb.object.Column;
+<i>4</i>&nbsp;import me.hqythu.wxydb.object.DataType;
+<i>5</i>&nbsp;import me.hqythu.wxydb.sql.ParseResult.OrderType;
+<i>6</i>&nbsp;import me.hqythu.wxydb.util.*;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.util.*;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;//import query.Condition.Type;
+<i>11</i>&nbsp;
+<b class="nc"><i>12</i>&nbsp;public class SQLParser</b>
+<i>13</i>&nbsp;{
+<i>14</i>&nbsp;    static Object exchange(String value)
+<i>15</i>&nbsp;    {
+<i>16</i>&nbsp;        Object resultObject;
+<i>17</i>&nbsp;//        value = value.replaceAll(&quot;\\,&quot;, &quot;&quot;);
+<i>18</i>&nbsp;//        value = value.replaceAll(&quot;\\)&quot;, &quot;&quot;);
+<i>19</i>&nbsp;//        value = value.replaceAll(&quot;\\;&quot;, &quot;&quot;);
+<i>20</i>&nbsp;//        System.out.println(value);
+<b class="fc"><i>21</i>&nbsp;        if (value.startsWith(&quot;\&#39;&quot;) || value.startsWith(&quot;¡®&quot;) || value.startsWith(&quot;¡¯&quot;))</b>
+<i>22</i>&nbsp;        {
+<b class="fc"><i>23</i>&nbsp;            value = value.replaceAll(&quot;\\&#39;&quot;, &quot;&quot;);</b>
+<b class="fc"><i>24</i>&nbsp;            value = value.replaceAll(&quot;\\¡®&quot;, &quot;&quot;);</b>
+<b class="fc"><i>25</i>&nbsp;            value = value.replaceAll(&quot;\\¡¯&quot;, &quot;&quot;);</b>
+<b class="fc"><i>26</i>&nbsp;            resultObject = value;</b>
+<i>27</i>&nbsp;        }
+<b class="fc"><i>28</i>&nbsp;        else if (value.contains(&quot;.&quot;))</b>
+<i>29</i>&nbsp;        {
+<b class="nc"><i>30</i>&nbsp;            resultObject = value;</b>
+<i>31</i>&nbsp;        }
+<i>32</i>&nbsp;        else
+<i>33</i>&nbsp;        {
+<b class="fc"><i>34</i>&nbsp;            if (isNumStm(value))</b>
+<i>35</i>&nbsp;            {
+<b class="fc"><i>36</i>&nbsp;                resultObject = calcStm(value);</b>
+<i>37</i>&nbsp;            }
+<i>38</i>&nbsp;            else
+<i>39</i>&nbsp;            {
+<b class="fc"><i>40</i>&nbsp;                SetValue v = new SetValue();</b>
+<b class="fc"><i>41</i>&nbsp;                value = value.trim();</b>
+<b class="fc"><i>42</i>&nbsp;                int statue = 0;</b>
+<b class="fc"><i>43</i>&nbsp;                while(value.length() &gt; 0)</b>
+<i>44</i>&nbsp;                {
+<b class="fc"><i>45</i>&nbsp;                    if (statue == 0)</b>
+<i>46</i>&nbsp;                    {
+<b class="fc"><i>47</i>&nbsp;                        if (isNum(value.charAt(0)))</b>
+<i>48</i>&nbsp;                        {
+<b class="fc"><i>49</i>&nbsp;                            DoubleReturn&lt;Integer, String&gt; result = readNum(value);</b>
+<b class="fc"><i>50</i>&nbsp;                            value = result.second;</b>
+<b class="fc"><i>51</i>&nbsp;                            v.isVar1 = false;</b>
+<b class="fc"><i>52</i>&nbsp;                            v.value1 = result.first;</b>
+<b class="fc"><i>53</i>&nbsp;                            statue = 1;</b>
+<b class="fc"><i>54</i>&nbsp;                        }</b>
+<i>55</i>&nbsp;                        else
+<i>56</i>&nbsp;                        {
+<b class="fc"><i>57</i>&nbsp;                            v.isVar1 = true;</b>
+<b class="fc"><i>58</i>&nbsp;                            value = readVar(value);</b>
+<b class="fc"><i>59</i>&nbsp;                            statue = 1;</b>
+<i>60</i>&nbsp;                        }
+<i>61</i>&nbsp;                    }
+<b class="fc"><i>62</i>&nbsp;                    else if (statue == 1)</b>
+<i>63</i>&nbsp;                    {
+<b class="fc"><i>64</i>&nbsp;                        value = value.trim();</b>
+<b class="fc"><i>65</i>&nbsp;                        switch (value.charAt(0))</b>
+<i>66</i>&nbsp;                        {
+<i>67</i>&nbsp;                            case &#39;+&#39;:
+<b class="fc"><i>68</i>&nbsp;                                v.calcOp = CalcOp.ADD;</b>
+<b class="fc"><i>69</i>&nbsp;                                break;</b>
+<i>70</i>&nbsp;                            case &#39;-&#39;:
+<b class="nc"><i>71</i>&nbsp;                                v.calcOp = CalcOp.SUB;</b>
+<b class="nc"><i>72</i>&nbsp;                                break;</b>
+<i>73</i>&nbsp;                            case &#39;*&#39;:
+<b class="fc"><i>74</i>&nbsp;                                v.calcOp = CalcOp.MUL;</b>
+<b class="fc"><i>75</i>&nbsp;                                break;</b>
+<i>76</i>&nbsp;                            case &#39;/&#39;:
+<b class="nc"><i>77</i>&nbsp;                                v.calcOp = CalcOp.DIV;</b>
+<b class="nc"><i>78</i>&nbsp;                                break;</b>
+<i>79</i>&nbsp;                            default:
+<i>80</i>&nbsp;                                break;
+<i>81</i>&nbsp;                        }
+<b class="fc"><i>82</i>&nbsp;                        value = value.substring(1);</b>
+<b class="fc"><i>83</i>&nbsp;                        value = value.trim();</b>
+<b class="fc"><i>84</i>&nbsp;                        statue = 2;</b>
+<i>85</i>&nbsp;                    }
+<b class="fc"><i>86</i>&nbsp;                    else if (statue == 2)</b>
+<i>87</i>&nbsp;                    {
+<b class="fc"><i>88</i>&nbsp;                        if (isNum(value.charAt(0)))</b>
+<i>89</i>&nbsp;                        {
+<b class="fc"><i>90</i>&nbsp;                            DoubleReturn&lt;Integer, String&gt; result = readNum(value);</b>
+<b class="fc"><i>91</i>&nbsp;                            value = result.second;</b>
+<b class="fc"><i>92</i>&nbsp;                            v.isVar2 = false;</b>
+<b class="fc"><i>93</i>&nbsp;                            v.value2 = result.first;</b>
+<b class="fc"><i>94</i>&nbsp;                            break;</b>
+<i>95</i>&nbsp;                        }
+<i>96</i>&nbsp;                        else
+<i>97</i>&nbsp;                        {
+<b class="fc"><i>98</i>&nbsp;                            v.isVar2 = true;</b>
+<b class="fc"><i>99</i>&nbsp;                            value = readVar(value);</b>
+<b class="fc"><i>100</i>&nbsp;                            break;</b>
+<i>101</i>&nbsp;                        }
+<i>102</i>&nbsp;                    }
+<i>103</i>&nbsp;                }
+<b class="fc"><i>104</i>&nbsp;                resultObject = v;</b>
+<i>105</i>&nbsp;            }
+<i>106</i>&nbsp;        }
+<b class="fc"><i>107</i>&nbsp;        return resultObject;</b>
+<i>108</i>&nbsp;    }
+<i>109</i>&nbsp;    static DoubleReturn&lt;Func, String&gt; readFunc(String sql)
+<i>110</i>&nbsp;    {
+<i>111</i>&nbsp;        Func func;
+<b class="nc"><i>112</i>&nbsp;        if (sql.startsWith(&quot;SUM&quot;))</b>
+<i>113</i>&nbsp;        {
+<b class="nc"><i>114</i>&nbsp;            func = Func.SUM;</b>
+<i>115</i>&nbsp;        }
+<b class="nc"><i>116</i>&nbsp;        else if (sql.startsWith(&quot;AVG&quot;))</b>
+<i>117</i>&nbsp;        {
+<b class="nc"><i>118</i>&nbsp;            func = Func.AVG;</b>
+<i>119</i>&nbsp;        }
+<b class="nc"><i>120</i>&nbsp;        else if (sql.startsWith(&quot;MAX&quot;))</b>
+<i>121</i>&nbsp;        {
+<b class="nc"><i>122</i>&nbsp;            func = Func.MAX;</b>
+<i>123</i>&nbsp;        }
+<b class="nc"><i>124</i>&nbsp;        else if (sql.startsWith(&quot;MIN&quot;))</b>
+<i>125</i>&nbsp;        {
+<b class="nc"><i>126</i>&nbsp;            func = Func.MIN;</b>
+<i>127</i>&nbsp;        }
+<i>128</i>&nbsp;        else
+<i>129</i>&nbsp;        {
+<b class="nc"><i>130</i>&nbsp;            func = Func.COUNT;</b>
+<i>131</i>&nbsp;        }
+<b class="nc"><i>132</i>&nbsp;        sql = sql.substring(4,sql.length()-1);</b>
+<b class="nc"><i>133</i>&nbsp;        return new DoubleReturn&lt;Func, String&gt;(func, sql);</b>
+<i>134</i>&nbsp;    }
+<i>135</i>&nbsp;    static DoubleReturn&lt;DataType, String&gt; readType(String sql)
+<i>136</i>&nbsp;    {
+<b class="fc"><i>137</i>&nbsp;        DoubleReturn&lt;DataType, String&gt; result = new DoubleReturn&lt;DataType, String&gt;();</b>
+<b class="fc"><i>138</i>&nbsp;        if (sql.toUpperCase().startsWith(&quot;INT&quot;) &amp;&amp; sql.charAt(3) == &#39; &#39;)</b>
+<i>139</i>&nbsp;        {
+<b class="fc"><i>140</i>&nbsp;            result.first = DataType.INT;</b>
+<b class="fc"><i>141</i>&nbsp;            result.second = sql.substring(3);</b>
+<i>142</i>&nbsp;        }
+<b class="fc"><i>143</i>&nbsp;        else if (sql.toUpperCase().startsWith(&quot;VARCHAR&quot;) &amp;&amp; sql.charAt(7) == &#39; &#39;)</b>
+<i>144</i>&nbsp;        {
+<b class="fc"><i>145</i>&nbsp;            result.first = DataType.VARCHAR;</b>
+<b class="fc"><i>146</i>&nbsp;            result.second = sql.substring(7);</b>
+<i>147</i>&nbsp;        }
+<b class="fc"><i>148</i>&nbsp;        return result;</b>
+<i>149</i>&nbsp;    }
+<i>150</i>&nbsp;    static DoubleReturn&lt;Column, String&gt; readColumn(String sql)
+<i>151</i>&nbsp;    {
+<b class="fc"><i>152</i>&nbsp;        String id = &quot;&quot;;</b>
+<b class="fc"><i>153</i>&nbsp;        DataType type = DataType.UNKNOWN;</b>
+<b class="fc"><i>154</i>&nbsp;        Integer length = 0;</b>
+<b class="fc"><i>155</i>&nbsp;        boolean notNull = false;</b>
+<b class="fc"><i>156</i>&nbsp;        int status = 0;</b>
+<b class="fc"><i>157</i>&nbsp;        sql = sql.trim();</b>
+<b class="fc"><i>158</i>&nbsp;        while(sql.length() &gt; 0)</b>
+<i>159</i>&nbsp;        {
+<b class="fc"><i>160</i>&nbsp;            if (status == 0)</b>
+<i>161</i>&nbsp;            {
+<b class="fc"><i>162</i>&nbsp;                if (sql.charAt(0) == &#39; &#39;)</b>
+<i>163</i>&nbsp;                {
+<b class="fc"><i>164</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>165</i>&nbsp;                    status = 1;</b>
+<i>166</i>&nbsp;                }
+<i>167</i>&nbsp;                else
+<i>168</i>&nbsp;                {
+<b class="fc"><i>169</i>&nbsp;                    id += sql.charAt(0);</b>
+<b class="fc"><i>170</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>171</i>&nbsp;                }
+<i>172</i>&nbsp;            }
+<b class="fc"><i>173</i>&nbsp;            else if (status == 1)</b>
+<i>174</i>&nbsp;            {
+<b class="fc"><i>175</i>&nbsp;                sql = sql.trim();</b>
+<b class="fc"><i>176</i>&nbsp;                DoubleReturn&lt;DataType, String&gt; r = readType(sql);</b>
+<b class="fc"><i>177</i>&nbsp;                type = r.first;</b>
+<b class="fc"><i>178</i>&nbsp;                sql = r.second;</b>
+<b class="fc"><i>179</i>&nbsp;                status = 2;</b>
+<b class="fc"><i>180</i>&nbsp;            }</b>
+<b class="fc"><i>181</i>&nbsp;            else if (status == 2)</b>
+<i>182</i>&nbsp;            {
+<b class="fc"><i>183</i>&nbsp;                sql = sql.trim();</b>
+<b class="fc"><i>184</i>&nbsp;                sql = sql.substring(1);</b>
+<b class="fc"><i>185</i>&nbsp;                status = 3;</b>
+<i>186</i>&nbsp;            }
+<b class="fc"><i>187</i>&nbsp;            else if (status == 3)</b>
+<i>188</i>&nbsp;            {
+<b class="fc"><i>189</i>&nbsp;                sql = sql.trim();</b>
+<b class="fc"><i>190</i>&nbsp;                DoubleReturn&lt;Integer, String&gt; r = readNum(sql);</b>
+<b class="fc"><i>191</i>&nbsp;                length = r.first;</b>
+<b class="fc"><i>192</i>&nbsp;                sql = r.second;</b>
+<b class="fc"><i>193</i>&nbsp;                status = 4;</b>
+<b class="fc"><i>194</i>&nbsp;            }</b>
+<b class="fc"><i>195</i>&nbsp;            else if (status == 4)</b>
+<i>196</i>&nbsp;            {
+<b class="fc"><i>197</i>&nbsp;                sql = sql.trim();</b>
+<b class="fc"><i>198</i>&nbsp;                sql = sql.substring(1);</b>
+<b class="fc"><i>199</i>&nbsp;                status = 5;</b>
+<i>200</i>&nbsp;            }
+<b class="fc"><i>201</i>&nbsp;            else if (status == 5)</b>
+<i>202</i>&nbsp;            {
+<b class="fc"><i>203</i>&nbsp;                sql = sql.trim();</b>
+<b class="fc"><i>204</i>&nbsp;                if (sql.toUpperCase().startsWith(&quot;NOT NULL&quot;))</b>
+<i>205</i>&nbsp;                {
+<b class="fc"><i>206</i>&nbsp;                    notNull = true;</b>
+<b class="fc"><i>207</i>&nbsp;                    sql = sql.substring(8);</b>
+<b class="fc"><i>208</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>209</i>&nbsp;                    sql = sql.substring(1);</b>
+<b class="fc"><i>210</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>211</i>&nbsp;                    break;</b>
+<i>212</i>&nbsp;                }
+<i>213</i>&nbsp;                else
+<i>214</i>&nbsp;                {
+<b class="fc"><i>215</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>216</i>&nbsp;                    sql = sql.substring(1);</b>
+<b class="fc"><i>217</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>218</i>&nbsp;                    notNull = false;</b>
+<b class="fc"><i>219</i>&nbsp;                    break;</b>
+<i>220</i>&nbsp;                }
+<i>221</i>&nbsp;            }
+<i>222</i>&nbsp;        }
+<b class="fc"><i>223</i>&nbsp;        Column column = new Column(id, type, length.shortValue());</b>
+<b class="fc"><i>224</i>&nbsp;        if (notNull)</b>
+<i>225</i>&nbsp;        {
+<b class="fc"><i>226</i>&nbsp;            column.setNotNull();</b>
+<i>227</i>&nbsp;        }
+<b class="fc"><i>228</i>&nbsp;        return new DoubleReturn&lt;Column, String&gt;(column, sql);</b>
+<i>229</i>&nbsp;    }
+<i>230</i>&nbsp;    static DoubleReturn&lt;String, String&gt; readString(String sql)
+<i>231</i>&nbsp;    {
+<b class="fc"><i>232</i>&nbsp;        String var = &quot;&quot;;</b>
+<b class="fc"><i>233</i>&nbsp;        for (int i = 0; i &lt; sql.length(); i++)</b>
+<i>234</i>&nbsp;        {
+<b class="fc"><i>235</i>&nbsp;            if (sql.charAt(i) == &#39; &#39;)</b>
+<i>236</i>&nbsp;            {
+<b class="fc"><i>237</i>&nbsp;                sql = sql.substring(i);</b>
+<b class="fc"><i>238</i>&nbsp;                break;</b>
+<i>239</i>&nbsp;            }
+<i>240</i>&nbsp;            else
+<i>241</i>&nbsp;            {
+<b class="fc"><i>242</i>&nbsp;                var += sql.charAt(i);</b>
+<i>243</i>&nbsp;            }
+<i>244</i>&nbsp;        }
+<b class="fc"><i>245</i>&nbsp;        return new DoubleReturn&lt;String, String&gt;(var, sql);</b>
+<i>246</i>&nbsp;    }
+<i>247</i>&nbsp;    static String readVar(String sql)
+<i>248</i>&nbsp;    {
+<b class="fc"><i>249</i>&nbsp;        for (int i = 0; i &lt; sql.length(); i++)</b>
+<i>250</i>&nbsp;        {
+<b class="fc"><i>251</i>&nbsp;            if (isSym(sql.charAt(i)))</b>
+<i>252</i>&nbsp;            {
+<b class="fc"><i>253</i>&nbsp;                sql = sql.substring(i);</b>
+<b class="fc"><i>254</i>&nbsp;                break;</b>
+<i>255</i>&nbsp;            }
+<i>256</i>&nbsp;        }
+<b class="fc"><i>257</i>&nbsp;        return sql;</b>
+<i>258</i>&nbsp;    }
+<i>259</i>&nbsp;    static Integer calcStm(String str)
+<i>260</i>&nbsp;    {
+<i>261</i>&nbsp;//		System.out.println(str);
+<b class="fc"><i>262</i>&nbsp;        Stack&lt;Integer&gt; opr = new Stack&lt;Integer&gt;();</b>
+<b class="fc"><i>263</i>&nbsp;        Stack&lt;String&gt; ins = new Stack&lt;String&gt;();</b>
+<b class="fc"><i>264</i>&nbsp;        ins.push(&quot;#&quot;);</b>
+<b class="fc"><i>265</i>&nbsp;        Map&lt;String, Integer&gt; rank = new HashMap&lt;String, Integer&gt;();</b>
+<b class="fc"><i>266</i>&nbsp;        str += &#39;#&#39;;</b>
+<b class="fc"><i>267</i>&nbsp;        rank.put(&quot;#&quot;, -2);</b>
+<b class="fc"><i>268</i>&nbsp;        rank.put(&quot;(&quot;, 2);</b>
+<b class="fc"><i>269</i>&nbsp;        rank.put(&quot;+&quot;, 0);</b>
+<b class="fc"><i>270</i>&nbsp;        rank.put(&quot;-&quot;, 0);</b>
+<b class="fc"><i>271</i>&nbsp;        rank.put(&quot;*&quot;, 1);</b>
+<b class="fc"><i>272</i>&nbsp;        rank.put(&quot;/&quot;, 1);</b>
+<b class="fc"><i>273</i>&nbsp;        rank.put(&quot;)&quot;, -1);</b>
+<b class="fc"><i>274</i>&nbsp;        while(str.length() &gt; 0)</b>
+<i>275</i>&nbsp;        {
+<b class="fc"><i>276</i>&nbsp;            Integer num = 0;</b>
+<b class="fc"><i>277</i>&nbsp;            if (isNum(str.charAt(0)))</b>
+<i>278</i>&nbsp;            {
+<b class="fc"><i>279</i>&nbsp;                DoubleReturn&lt;Integer, String&gt; result = new DoubleReturn&lt;Integer, String&gt;();</b>
+<b class="fc"><i>280</i>&nbsp;                result = readNum(str);</b>
+<b class="fc"><i>281</i>&nbsp;                num = result.first;</b>
+<b class="fc"><i>282</i>&nbsp;                str = result.second;</b>
+<b class="fc"><i>283</i>&nbsp;                opr.push(num);</b>
+<b class="fc"><i>284</i>&nbsp;            }</b>
+<i>285</i>&nbsp;            else
+<i>286</i>&nbsp;            {
+<b class="fc"><i>287</i>&nbsp;                if (rank.get(String.valueOf(str.charAt(0))) &lt;= rank.get(ins.lastElement()))</b>
+<i>288</i>&nbsp;                {
+<b class="fc"><i>289</i>&nbsp;                    while(!ins.isEmpty() &amp;&amp; rank.get(String.valueOf(str.charAt(0))) &lt;= rank.get(ins.lastElement()))</b>
+<i>290</i>&nbsp;                    {
+<b class="fc"><i>291</i>&nbsp;                        if (ins.lastElement().equals(&quot;#&quot;) || ins.lastElement().equals(&quot;(&quot;))</b>
+<i>292</i>&nbsp;                        {
+<b class="fc"><i>293</i>&nbsp;                            if (str.charAt(0)==&#39;)&#39;)</b>
+<i>294</i>&nbsp;                            {
+<b class="fc"><i>295</i>&nbsp;                                ins.pop();</b>
+<i>296</i>&nbsp;                            }
+<i>297</i>&nbsp;                            break;
+<i>298</i>&nbsp;                        }
+<i>299</i>&nbsp;                        else
+<i>300</i>&nbsp;                        {
+<b class="fc"><i>301</i>&nbsp;                            Integer b = opr.pop();</b>
+<b class="fc"><i>302</i>&nbsp;                            Integer a = opr.pop();</b>
+<b class="fc"><i>303</i>&nbsp;                            Integer r = 0;</b>
+<b class="fc"><i>304</i>&nbsp;                            String i = ins.pop();</b>
+<b class="fc"><i>305</i>&nbsp;                            switch (i)</b>
+<i>306</i>&nbsp;                            {
+<i>307</i>&nbsp;                                case &quot;+&quot;:
+<b class="fc"><i>308</i>&nbsp;                                    r = a + b;</b>
+<b class="fc"><i>309</i>&nbsp;                                    break;</b>
+<i>310</i>&nbsp;                                case &quot;-&quot;:
+<b class="fc"><i>311</i>&nbsp;                                    r = a - b;</b>
+<b class="fc"><i>312</i>&nbsp;                                    break;</b>
+<i>313</i>&nbsp;                                case &quot;*&quot;:
+<b class="fc"><i>314</i>&nbsp;                                    r = a * b;</b>
+<b class="fc"><i>315</i>&nbsp;                                    break;</b>
+<i>316</i>&nbsp;                                case &quot;/&quot;:
+<b class="fc"><i>317</i>&nbsp;                                    r = a / b;</b>
+<b class="fc"><i>318</i>&nbsp;                                    break;</b>
+<i>319</i>&nbsp;                                default:
+<i>320</i>&nbsp;                                    break;
+<i>321</i>&nbsp;                            }
+<b class="fc"><i>322</i>&nbsp;                            opr.push(r);</b>
+<b class="fc"><i>323</i>&nbsp;                        }</b>
+<i>324</i>&nbsp;                    }
+<b class="fc"><i>325</i>&nbsp;                    if (!(str.charAt(0) == &#39;)&#39; || str.charAt(0) == &#39;#&#39;))</b>
+<i>326</i>&nbsp;                    {
+<b class="fc"><i>327</i>&nbsp;                        ins.push(String.valueOf(str.charAt(0)));</b>
+<i>328</i>&nbsp;                    }
+<i>329</i>&nbsp;                }
+<i>330</i>&nbsp;                else
+<i>331</i>&nbsp;                {
+<b class="fc"><i>332</i>&nbsp;                    ins.push(String.valueOf(str.charAt(0)));</b>
+<i>333</i>&nbsp;                }
+<b class="fc"><i>334</i>&nbsp;                str = str.substring(1);</b>
+<b class="fc"><i>335</i>&nbsp;                str = str.trim();</b>
+<i>336</i>&nbsp;            }
+<b class="fc"><i>337</i>&nbsp;        }</b>
+<b class="fc"><i>338</i>&nbsp;        return opr.firstElement();</b>
+<i>339</i>&nbsp;    }
+<i>340</i>&nbsp;    static boolean isNumStm(String sql)
+<i>341</i>&nbsp;    {
+<b class="fc"><i>342</i>&nbsp;        for (int i = 0; i &lt; sql.length(); i++)</b>
+<i>343</i>&nbsp;        {
+<b class="fc"><i>344</i>&nbsp;            if (!(isNum(sql.charAt(i)) || isSym(sql.charAt(i))))</b>
+<i>345</i>&nbsp;            {
+<b class="fc"><i>346</i>&nbsp;                return false;</b>
+<i>347</i>&nbsp;            }
+<i>348</i>&nbsp;        }
+<b class="fc"><i>349</i>&nbsp;        return true;</b>
+<i>350</i>&nbsp;    }
+<i>351</i>&nbsp;    static boolean isNum(char c)
+<i>352</i>&nbsp;    {
+<b class="fc"><i>353</i>&nbsp;        if (c &gt;= &#39;0&#39; &amp;&amp; c &lt;= &#39;9&#39;)</b>
+<i>354</i>&nbsp;        {
+<b class="fc"><i>355</i>&nbsp;            return true;</b>
+<i>356</i>&nbsp;        }
+<b class="fc"><i>357</i>&nbsp;        return false;</b>
+<i>358</i>&nbsp;    }
+<i>359</i>&nbsp;    static boolean isSym(char c)
+<i>360</i>&nbsp;    {
+<b class="fc"><i>361</i>&nbsp;        return (c == &#39;+&#39; || c == &#39;-&#39; || c == &#39;*&#39; || c == &#39;/&#39; || c == &#39;(&#39; || c == &#39;)&#39;);</b>
+<i>362</i>&nbsp;    }
+<i>363</i>&nbsp;    static boolean isFunc(String str)
+<i>364</i>&nbsp;    {
+<b class="nc"><i>365</i>&nbsp;        return str.toUpperCase().startsWith(&quot;SUM&quot;) || str.toUpperCase().startsWith(&quot;AVG&quot;) || str.toUpperCase().startsWith(&quot;MAX&quot;) || str.toUpperCase().startsWith(&quot;MIN&quot;) || str.toUpperCase().startsWith(&quot;COUNT&quot;);</b>
+<i>366</i>&nbsp;    }
+<i>367</i>&nbsp;    static DoubleReturn&lt;Integer, String&gt; readNum(String str)
+<i>368</i>&nbsp;    {
+<b class="fc"><i>369</i>&nbsp;        String num = &quot;&quot;;</b>
+<b class="fc"><i>370</i>&nbsp;        while(str.length() &gt; 0 &amp;&amp; isNum(str.charAt(0)))</b>
+<i>371</i>&nbsp;        {
+<b class="fc"><i>372</i>&nbsp;            num += str.charAt(0);</b>
+<b class="fc"><i>373</i>&nbsp;            str = str.substring(1);</b>
+<i>374</i>&nbsp;        }
+<b class="fc"><i>375</i>&nbsp;        DoubleReturn&lt;Integer, String&gt; result = new DoubleReturn&lt;Integer, String&gt;();</b>
+<b class="fc"><i>376</i>&nbsp;        result.first = Integer.valueOf(num);</b>
+<b class="fc"><i>377</i>&nbsp;        result.second = str;</b>
+<b class="fc"><i>378</i>&nbsp;        return result;</b>
+<i>379</i>&nbsp;    }
+<i>380</i>&nbsp;    //	static List&lt;Condition&gt; parseConditions(List&lt;String&gt; conds)
+<i>381</i>&nbsp;//	{
+<i>382</i>&nbsp;//		List&lt;Condition&gt; conditions = new ArrayList&lt;Condition&gt;();
+<i>383</i>&nbsp;//		int num = 0;
+<i>384</i>&nbsp;//		Condition condition = new Condition();
+<i>385</i>&nbsp;//		String value = &quot;&quot;;
+<i>386</i>&nbsp;//		for(int i = 0; i &lt; conds.size()-1; i++)
+<i>387</i>&nbsp;//		{
+<i>388</i>&nbsp;//			if (num == 0)
+<i>389</i>&nbsp;//			{
+<i>390</i>&nbsp;//				condition.left = conds.get(i);
+<i>391</i>&nbsp;//				num = 1;
+<i>392</i>&nbsp;//				continue;
+<i>393</i>&nbsp;//			}
+<i>394</i>&nbsp;//			else if (num == 1)
+<i>395</i>&nbsp;//			{
+<i>396</i>&nbsp;//				String middle = conds.get(i);
+<i>397</i>&nbsp;//				if (conds.get(i+1).equals(&quot;&gt;&quot;) || conds.get(i+1).equals(&quot;=&quot;))
+<i>398</i>&nbsp;//				{
+<i>399</i>&nbsp;//					middle += conds.get(i+1);
+<i>400</i>&nbsp;//					i++;
+<i>401</i>&nbsp;//				}
+<i>402</i>&nbsp;//				condition.middle = middle;
+<i>403</i>&nbsp;//				num = 2;
+<i>404</i>&nbsp;//				continue;
+<i>405</i>&nbsp;//			}
+<i>406</i>&nbsp;//			else
+<i>407</i>&nbsp;//			{
+<i>408</i>&nbsp;//				if (conds.get(i).endsWith(&quot;\&#39;&quot;) || conds.get(i).endsWith(&quot;¡®&quot;) || conds.get(i).endsWith(&quot;¡¯&quot;) || conds.get(i+1).equals(&quot;;&quot;) || conds.get(i+1).toUpperCase().equals(&quot;AND&quot;) ||conds.get(i+1).toUpperCase().equals(&quot;OR&quot;) )
+<i>409</i>&nbsp;//				{
+<i>410</i>&nbsp;//					String v = conds.get(i);
+<i>411</i>&nbsp;//					value += v;
+<i>412</i>&nbsp;//					condition.right = exchange(value);
+<i>413</i>&nbsp;//					value = &quot;&quot;;
+<i>414</i>&nbsp;//					condition.type = Type.COND;
+<i>415</i>&nbsp;//					conditions.add(condition);
+<i>416</i>&nbsp;//					condition = new Condition();
+<i>417</i>&nbsp;//					if (conds.get(i+1).toUpperCase().equals(&quot;AND&quot;) || conds.get(i+1).toUpperCase().equals(&quot;OR&quot;))
+<i>418</i>&nbsp;//					{
+<i>419</i>&nbsp;//						condition.type = Type.SEP;
+<i>420</i>&nbsp;//						condition.sep = conds.get(i+1).toUpperCase();
+<i>421</i>&nbsp;//						conditions.add(condition);
+<i>422</i>&nbsp;//						condition = new Condition();
+<i>423</i>&nbsp;//						i++;
+<i>424</i>&nbsp;//					}
+<i>425</i>&nbsp;//					num = 0;
+<i>426</i>&nbsp;//				}
+<i>427</i>&nbsp;//				else
+<i>428</i>&nbsp;//				{
+<i>429</i>&nbsp;//					value = conds.get(i);
+<i>430</i>&nbsp;//					value += &#39; &#39;;
+<i>431</i>&nbsp;//				}
+<i>432</i>&nbsp;//			}
+<i>433</i>&nbsp;//		}
+<i>434</i>&nbsp;//		return conditions;
+<i>435</i>&nbsp;//	}
+<i>436</i>&nbsp;    static ParseResult parseINSERT(String sql)
+<i>437</i>&nbsp;    {
+<i>438</i>&nbsp;//        System.out.println(sql);
+<i>439</i>&nbsp;//        return null;
+<b class="fc"><i>440</i>&nbsp;        String sqlS[] =  sql.split(&quot; &quot;);</b>
+<b class="fc"><i>441</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>442</i>&nbsp;        result.tableNames.add(sqlS[2]);</b>
+<b class="fc"><i>443</i>&nbsp;        sql = sql.substring(sql.toUpperCase().indexOf(&quot;VALUES&quot;));</b>
+<i>444</i>&nbsp;//        for (int i = 3; i &lt; sqlS.length; i++)
+<i>445</i>&nbsp;//        {
+<i>446</i>&nbsp;//            sql += sqlS[i] + &#39; &#39;;
+<i>447</i>&nbsp;//        }
+<b class="fc"><i>448</i>&nbsp;        sql = sql.substring(0, sql.length() - 1);</b>
+<i>449</i>&nbsp;//        System.out.println(sql);
+<b class="fc"><i>450</i>&nbsp;        int status = -1;</b>
+<b class="fc"><i>451</i>&nbsp;        String valueString = &quot;&quot;;</b>
+<b class="fc"><i>452</i>&nbsp;        Object value = null;</b>
+<b class="fc"><i>453</i>&nbsp;        boolean reading = false;</b>
+<b class="fc"><i>454</i>&nbsp;        while(sql.length() &gt; 0)</b>
+<i>455</i>&nbsp;        {
+<b class="fc"><i>456</i>&nbsp;            if (status == -1)</b>
+<i>457</i>&nbsp;            {
+<b class="fc"><i>458</i>&nbsp;                if (sql.charAt(0) == &#39;(&#39; || sql.charAt(0) == &#39; &#39;)</b>
+<i>459</i>&nbsp;                {
+<b class="fc"><i>460</i>&nbsp;                    status = 0;</b>
+<i>461</i>&nbsp;                }
+<b class="fc"><i>462</i>&nbsp;                sql = sql.substring(1);</b>
+<i>463</i>&nbsp;            }
+<b class="fc"><i>464</i>&nbsp;            else if (status == 0)</b>
+<i>465</i>&nbsp;            {
+<b class="fc"><i>466</i>&nbsp;                if (sql.charAt(0) == &#39;(&#39; &amp;&amp; !reading)</b>
+<i>467</i>&nbsp;                {
+<b class="fc"><i>468</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>469</i>&nbsp;                }
+<b class="fc"><i>470</i>&nbsp;                else if (sql.trim().toUpperCase().startsWith(&quot;NULL&quot;) &amp;&amp; !reading)</b>
+<i>471</i>&nbsp;                {
+<b class="fc"><i>472</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>473</i>&nbsp;                    sql = sql.substring(4);</b>
+<b class="fc"><i>474</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>475</i>&nbsp;                    if (sql.startsWith(&quot;,&quot;))</b>
+<i>476</i>&nbsp;                    {
+<b class="fc"><i>477</i>&nbsp;                        sql = sql.substring(1);</b>
+<i>478</i>&nbsp;                    }
+<b class="fc"><i>479</i>&nbsp;                    result.data.add(null);</b>
+<i>480</i>&nbsp;                }
+<b class="fc"><i>481</i>&nbsp;                else if (sql.charAt(0) == &#39;\&#39;&#39; || sql.charAt(0) == &#39;¡®&#39; || sql.charAt(0) == &#39;¡¯&#39;)</b>
+<i>482</i>&nbsp;                {
+<b class="fc"><i>483</i>&nbsp;                    reading = !reading;</b>
+<b class="fc"><i>484</i>&nbsp;                    valueString += sql.charAt(0);</b>
+<b class="fc"><i>485</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>486</i>&nbsp;                }
+<b class="fc"><i>487</i>&nbsp;                else if (sql.charAt(0) == &#39;)&#39; &amp;&amp; !reading)</b>
+<i>488</i>&nbsp;                {
+<b class="fc"><i>489</i>&nbsp;                    value = exchange(valueString.trim());</b>
+<b class="fc"><i>490</i>&nbsp;                    result.data.add(value);</b>
+<b class="fc"><i>491</i>&nbsp;                    break;</b>
+<i>492</i>&nbsp;                }
+<b class="fc"><i>493</i>&nbsp;                else if ((sql.charAt(0) == &#39;,&#39; || sql.charAt(0) == &#39;£¬&#39;) &amp;&amp; !reading)</b>
+<i>494</i>&nbsp;                {
+<b class="fc"><i>495</i>&nbsp;                    value = exchange(valueString.trim());</b>
+<b class="fc"><i>496</i>&nbsp;                    result.data.add(value);</b>
+<b class="fc"><i>497</i>&nbsp;                    value = null;</b>
+<b class="fc"><i>498</i>&nbsp;                    valueString = &quot;&quot;;</b>
+<b class="fc"><i>499</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>500</i>&nbsp;                }
+<i>501</i>&nbsp;                else
+<i>502</i>&nbsp;                {
+<b class="fc"><i>503</i>&nbsp;                    valueString += sql.charAt(0);</b>
+<b class="fc"><i>504</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>505</i>&nbsp;                }
+<i>506</i>&nbsp;            }
+<i>507</i>&nbsp;        }
+<b class="fc"><i>508</i>&nbsp;        if (sql.length() == 0 &amp;&amp; !valueString.isEmpty())</b>
+<i>509</i>&nbsp;        {
+<b class="nc"><i>510</i>&nbsp;            value = exchange(valueString.trim());</b>
+<b class="nc"><i>511</i>&nbsp;            result.data.add(value);</b>
+<i>512</i>&nbsp;        }
+<b class="fc"><i>513</i>&nbsp;        result.type = OrderType.INSERT;</b>
+<b class="fc"><i>514</i>&nbsp;        result.tableNames.add(sqlS[2]);</b>
+<b class="fc"><i>515</i>&nbsp;        return result;</b>
+<i>516</i>&nbsp;    }
+<i>517</i>&nbsp;    static ParseResult parseDELETE(String sqlString)
+<i>518</i>&nbsp;    {
+<b class="fc"><i>519</i>&nbsp;        sqlString = sqlString.replaceAll(&quot;;&quot;, &quot; ;&quot;);</b>
+<b class="fc"><i>520</i>&nbsp;        String sql[] =  sqlString.split(&quot; &quot;);</b>
+<b class="fc"><i>521</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>522</i>&nbsp;        result.tableNames.add(sql[2]);</b>
+<b class="fc"><i>523</i>&nbsp;        String conds = &quot;&quot;;</b>
+<b class="fc"><i>524</i>&nbsp;        for (int i = 4; i &lt; sql.length; i++)</b>
+<i>525</i>&nbsp;        {
+<b class="fc"><i>526</i>&nbsp;            if (sql[i].isEmpty())</b>
+<i>527</i>&nbsp;            {
+<b class="nc"><i>528</i>&nbsp;                continue;</b>
+<i>529</i>&nbsp;            }
+<b class="fc"><i>530</i>&nbsp;            conds += sql[i]+&#39; &#39;;</b>
+<i>531</i>&nbsp;        }
+<b class="fc"><i>532</i>&nbsp;        result.type = OrderType.DELETE;</b>
+<b class="fc"><i>533</i>&nbsp;        result.where = ConditionParser.parseCondition(conds, result.tableNames.get(0));</b>
+<b class="fc"><i>534</i>&nbsp;        return result;</b>
+<i>535</i>&nbsp;    }
+<i>536</i>&nbsp;    static ParseResult parseUPDATE(String sql)
+<i>537</i>&nbsp;    {
+<i>538</i>&nbsp;//        sqlString = sqlString.replaceAll(&quot;;&quot;, &quot; ;&quot;);
+<b class="fc"><i>539</i>&nbsp;        String sqlS[] =  sql.split(&quot; &quot;);</b>
+<b class="fc"><i>540</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>541</i>&nbsp;        result.tableNames.add(sqlS[1]);</b>
+<b class="fc"><i>542</i>&nbsp;        int status = 0;</b>
+<i>543</i>&nbsp;//        Value value = new Value();
+<b class="fc"><i>544</i>&nbsp;        SetValue value = new SetValue();</b>
+<b class="fc"><i>545</i>&nbsp;        String right = &quot;&quot;;</b>
+<b class="fc"><i>546</i>&nbsp;        String left = &quot;&quot;;</b>
+<b class="fc"><i>547</i>&nbsp;        boolean startCopy = false;</b>
+<b class="fc"><i>548</i>&nbsp;        String conds = &quot;&quot;;</b>
+<b class="fc"><i>549</i>&nbsp;        boolean isReading = false;</b>
+<b class="fc"><i>550</i>&nbsp;        sql = sql.substring(sql.toUpperCase().indexOf(&quot;SET&quot;)+3);</b>
+<b class="fc"><i>551</i>&nbsp;        while(sql.length() &gt; 0)</b>
+<i>552</i>&nbsp;        {
+<b class="fc"><i>553</i>&nbsp;            if (status == 0)</b>
+<i>554</i>&nbsp;            {
+<b class="fc"><i>555</i>&nbsp;                if (sql.charAt(0) == &#39;=&#39;)</b>
+<i>556</i>&nbsp;                {
+<b class="fc"><i>557</i>&nbsp;                    left = left.trim();</b>
+<b class="fc"><i>558</i>&nbsp;                    status = 1;</b>
+<b class="fc"><i>559</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>560</i>&nbsp;                }
+<i>561</i>&nbsp;                else
+<i>562</i>&nbsp;                {
+<b class="fc"><i>563</i>&nbsp;                    left += sql.charAt(0);</b>
+<b class="fc"><i>564</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>565</i>&nbsp;                }
+<i>566</i>&nbsp;            }
+<b class="fc"><i>567</i>&nbsp;            else if (status == 1)</b>
+<i>568</i>&nbsp;            {
+<b class="fc"><i>569</i>&nbsp;                if (sql.charAt(0) == &#39;\&#39;&#39;)</b>
+<i>570</i>&nbsp;                {
+<b class="fc"><i>571</i>&nbsp;                    isReading = !isReading;</b>
+<i>572</i>&nbsp;                }
+<b class="fc"><i>573</i>&nbsp;                if (!isReading &amp;&amp; (sql.charAt(0) == &#39;,&#39; || sql.toUpperCase().startsWith(&quot;WHERE&quot;)))</b>
+<i>574</i>&nbsp;                {
+<b class="fc"><i>575</i>&nbsp;                    Object r = exchange(right.trim());</b>
+<b class="fc"><i>576</i>&nbsp;                    right = &quot;&quot;;</b>
+<b class="fc"><i>577</i>&nbsp;                    if (r instanceof SetValue)</b>
+<i>578</i>&nbsp;                    {
+<b class="fc"><i>579</i>&nbsp;                        value = (SetValue)r;</b>
+<i>580</i>&nbsp;                    }
+<i>581</i>&nbsp;                    else
+<i>582</i>&nbsp;                    {
+<b class="fc"><i>583</i>&nbsp;                        value.isVar1 = false;</b>
+<b class="fc"><i>584</i>&nbsp;                        value.value1 = r;</b>
+<i>585</i>&nbsp;                    }
+<b class="fc"><i>586</i>&nbsp;                    value.columnName = left;</b>
+<b class="fc"><i>587</i>&nbsp;                    left = &quot;&quot;;</b>
+<b class="fc"><i>588</i>&nbsp;                    result.values.add(value);</b>
+<b class="fc"><i>589</i>&nbsp;                    value = new SetValue();</b>
+<b class="fc"><i>590</i>&nbsp;                    if (sql.toUpperCase().startsWith(&quot;WHERE&quot;))</b>
+<i>591</i>&nbsp;                    {
+<b class="fc"><i>592</i>&nbsp;                        sql = sql.substring(5);</b>
+<b class="fc"><i>593</i>&nbsp;                        break;</b>
+<i>594</i>&nbsp;                    }
+<i>595</i>&nbsp;                    else
+<i>596</i>&nbsp;                    {
+<b class="fc"><i>597</i>&nbsp;                        sql = sql.substring(1);</b>
+<b class="fc"><i>598</i>&nbsp;                        status = 0;</b>
+<i>599</i>&nbsp;                    }
+<b class="fc"><i>600</i>&nbsp;                }</b>
+<i>601</i>&nbsp;                else
+<i>602</i>&nbsp;                {
+<b class="fc"><i>603</i>&nbsp;                    right += sql.charAt(0);</b>
+<b class="fc"><i>604</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>605</i>&nbsp;                }
+<i>606</i>&nbsp;            }
+<i>607</i>&nbsp;        }
+<b class="fc"><i>608</i>&nbsp;        result.type = OrderType.UPDATE;</b>
+<b class="fc"><i>609</i>&nbsp;        result.where = ConditionParser.parseCondition(sql, result.tableNames.get(0));</b>
+<b class="fc"><i>610</i>&nbsp;        return result;</b>
+<i>611</i>&nbsp;    }
+<i>612</i>&nbsp;    static ParseResult parseSELECT(String sql)
+<i>613</i>&nbsp;    {
+<b class="fc"><i>614</i>&nbsp;        sql = sql.trim();</b>
+<b class="fc"><i>615</i>&nbsp;        sql = sql.substring(6);</b>
+<b class="fc"><i>616</i>&nbsp;        int status = 0;</b>
+<b class="fc"><i>617</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>618</i>&nbsp;        String rowName = &quot;&quot;;</b>
+<b class="fc"><i>619</i>&nbsp;        String tableName = &quot;&quot;;</b>
+<b class="fc"><i>620</i>&nbsp;        String lastTableName = &quot;&quot;;</b>
+<b class="fc"><i>621</i>&nbsp;        boolean needToUpdate = false;</b>
+<b class="fc"><i>622</i>&nbsp;        while (sql.length() &gt; 0)</b>
+<i>623</i>&nbsp;        {
+<b class="fc"><i>624</i>&nbsp;            if (status == 0)</b>
+<i>625</i>&nbsp;            {
+<b class="fc"><i>626</i>&nbsp;                if (sql.charAt(0) == &#39;,&#39; || sql.toUpperCase().startsWith(&quot;FROM&quot;))</b>
+<i>627</i>&nbsp;                {
+<b class="fc"><i>628</i>&nbsp;                    rowName = rowName.trim();</b>
+<b class="fc"><i>629</i>&nbsp;                    if (rowName.contains(&quot;(&quot;))</b>
+<i>630</i>&nbsp;                    {
+<b class="fc"><i>631</i>&nbsp;                        if (rowName.startsWith(&quot;SUM&quot;))</b>
+<i>632</i>&nbsp;                        {
+<b class="fc"><i>633</i>&nbsp;                            result.selectOption.func = Func.SUM;</b>
+<i>634</i>&nbsp;                        }
+<b class="fc"><i>635</i>&nbsp;                        else if (rowName.startsWith(&quot;AVG&quot;))</b>
+<i>636</i>&nbsp;                        {
+<b class="fc"><i>637</i>&nbsp;                            result.selectOption.func = Func.AVG;</b>
+<i>638</i>&nbsp;                        }
+<b class="fc"><i>639</i>&nbsp;                        else if (rowName.startsWith(&quot;COUNT&quot;))</b>
+<i>640</i>&nbsp;                        {
+<b class="fc"><i>641</i>&nbsp;                            result.selectOption.func = Func.COUNT;</b>
+<i>642</i>&nbsp;                        }
+<b class="fc"><i>643</i>&nbsp;                        else if (rowName.startsWith(&quot;MIN&quot;))</b>
+<i>644</i>&nbsp;                        {
+<b class="fc"><i>645</i>&nbsp;                            result.selectOption.func = Func.MIN;</b>
+<i>646</i>&nbsp;                        }
+<i>647</i>&nbsp;                        else
+<i>648</i>&nbsp;                        {
+<b class="fc"><i>649</i>&nbsp;                            result.selectOption.func = Func.MAX;</b>
+<i>650</i>&nbsp;                        }
+<b class="fc"><i>651</i>&nbsp;                        rowName = rowName.substring(rowName.indexOf(&quot;(&quot;)+1, rowName.indexOf(&quot;)&quot;)).trim();</b>
+<i>652</i>&nbsp;                    }
+<b class="fc"><i>653</i>&nbsp;                    if (rowName.contains(&quot;.&quot;))</b>
+<i>654</i>&nbsp;                    {
+<b class="fc"><i>655</i>&nbsp;                        result.selectOption.add(rowName.substring(0, rowName.indexOf(&quot;.&quot;)), rowName.substring(rowName.indexOf(&quot;.&quot;)+1));</b>
+<i>656</i>&nbsp;                    }
+<i>657</i>&nbsp;                    else
+<i>658</i>&nbsp;                    {
+<b class="fc"><i>659</i>&nbsp;                        if (rowName.equals(&quot;*&quot;))</b>
+<i>660</i>&nbsp;                        {
+<b class="fc"><i>661</i>&nbsp;                            result.selectOption.tableNames = null;</b>
+<b class="fc"><i>662</i>&nbsp;                            result.selectOption.columnNames = null;</b>
+<i>663</i>&nbsp;                        }
+<i>664</i>&nbsp;                        else
+<i>665</i>&nbsp;                        {
+<b class="fc"><i>666</i>&nbsp;                            result.selectOption.columnNames.add(rowName);</b>
+<b class="fc"><i>667</i>&nbsp;                            needToUpdate = true;</b>
+<i>668</i>&nbsp;                        }
+<i>669</i>&nbsp;                    }
+<b class="fc"><i>670</i>&nbsp;                    rowName = &quot;&quot;;</b>
+<b class="fc"><i>671</i>&nbsp;                    if (sql.toUpperCase().startsWith(&quot;FROM&quot;))</b>
+<i>672</i>&nbsp;                    {
+<b class="fc"><i>673</i>&nbsp;                        sql = sql.substring(4);</b>
+<b class="fc"><i>674</i>&nbsp;                        status = 1;</b>
+<i>675</i>&nbsp;                    }
+<i>676</i>&nbsp;                    else
+<i>677</i>&nbsp;                    {
+<b class="fc"><i>678</i>&nbsp;                        sql = sql.substring(1);</b>
+<i>679</i>&nbsp;                    }
+<i>680</i>&nbsp;                }
+<i>681</i>&nbsp;                else
+<i>682</i>&nbsp;                {
+<b class="fc"><i>683</i>&nbsp;                    rowName += sql.charAt(0);</b>
+<b class="fc"><i>684</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>685</i>&nbsp;                }
+<i>686</i>&nbsp;            }
+<i>687</i>&nbsp;            else
+<i>688</i>&nbsp;            {
+<b class="fc"><i>689</i>&nbsp;                if (sql.charAt(0) == &#39;,&#39; || sql.charAt(0) == &#39;;&#39; || sql.toUpperCase().startsWith(&quot;WHERE&quot;))</b>
+<i>690</i>&nbsp;                {
+<b class="fc"><i>691</i>&nbsp;                    result.selectOption.addFromTable(tableName.trim());</b>
+<b class="fc"><i>692</i>&nbsp;                    lastTableName = tableName.trim();</b>
+<b class="fc"><i>693</i>&nbsp;                    tableName = &quot;&quot;;</b>
+<b class="fc"><i>694</i>&nbsp;                    if (sql.charAt(0) == &#39;,&#39; || sql.charAt(0) == &#39;;&#39;)</b>
+<i>695</i>&nbsp;                    {
+<b class="fc"><i>696</i>&nbsp;                        sql = sql.substring(1);</b>
+<i>697</i>&nbsp;                    }
+<i>698</i>&nbsp;                    else
+<i>699</i>&nbsp;                    {
+<b class="fc"><i>700</i>&nbsp;                        sql = sql.substring(5);</b>
+<b class="fc"><i>701</i>&nbsp;                        break;</b>
+<i>702</i>&nbsp;                    }
+<i>703</i>&nbsp;                }
+<i>704</i>&nbsp;                else
+<i>705</i>&nbsp;                {
+<b class="fc"><i>706</i>&nbsp;                    tableName += sql.charAt(0);</b>
+<b class="fc"><i>707</i>&nbsp;                    sql = sql.substring(1);</b>
+<i>708</i>&nbsp;                }
+<i>709</i>&nbsp;            }
+<i>710</i>&nbsp;
+<i>711</i>&nbsp;        }
+<b class="fc"><i>712</i>&nbsp;        if (needToUpdate)</b>
+<i>713</i>&nbsp;        {
+<b class="fc"><i>714</i>&nbsp;            for (int i = 0; i &lt; result.selectOption.columnNames.size(); i++)</b>
+<i>715</i>&nbsp;            {
+<b class="fc"><i>716</i>&nbsp;                result.selectOption.tableNames.add(lastTableName);</b>
+<i>717</i>&nbsp;            }
+<i>718</i>&nbsp;        }
+<b class="fc"><i>719</i>&nbsp;        result.type = OrderType.SELECT;</b>
+<b class="fc"><i>720</i>&nbsp;        if (!sql.isEmpty())</b>
+<i>721</i>&nbsp;        {
+<b class="fc"><i>722</i>&nbsp;        if (result.selectOption.tableNames != null)</b>
+<i>723</i>&nbsp;            {
+<b class="fc"><i>724</i>&nbsp;                result.where = ConditionParser.parseCondition(sql, result.selectOption.tableNames.get(0));</b>
+<i>725</i>&nbsp;            }
+<i>726</i>&nbsp;            else
+<i>727</i>&nbsp;            {
+<b class="fc"><i>728</i>&nbsp;                result.where = ConditionParser.parseCondition(sql, lastTableName);</b>
+<i>729</i>&nbsp;            }
+<i>730</i>&nbsp;        }
+<i>731</i>&nbsp;        else
+<i>732</i>&nbsp;        {
+<b class="fc"><i>733</i>&nbsp;            result.where = new Where(true);</b>
+<i>734</i>&nbsp;        }
+<b class="fc"><i>735</i>&nbsp;        return result;</b>
+<i>736</i>&nbsp;    }
+<i>737</i>&nbsp;    static ParseResult parseCREATE_DATABASE(String sqlString)
+<i>738</i>&nbsp;    {
+<b class="fc"><i>739</i>&nbsp;        sqlString = sqlString.replaceAll(&quot;;&quot;, &quot; ;&quot;);</b>
+<b class="fc"><i>740</i>&nbsp;        String sql[] =  sqlString.split(&quot; &quot;);</b>
+<b class="fc"><i>741</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>742</i>&nbsp;        result.type = OrderType.CREATE_DATABASE;</b>
+<b class="fc"><i>743</i>&nbsp;        result.dataBaseName = sql[2];</b>
+<b class="fc"><i>744</i>&nbsp;        return result;</b>
+<i>745</i>&nbsp;    }
+<i>746</i>&nbsp;    static ParseResult parseDROP_DATABASE(String sqlString)
+<i>747</i>&nbsp;    {
+<b class="fc"><i>748</i>&nbsp;        sqlString = sqlString.replaceAll(&quot;;&quot;, &quot; ;&quot;);</b>
+<b class="fc"><i>749</i>&nbsp;        String sql[] =  sqlString.split(&quot; &quot;);</b>
+<b class="fc"><i>750</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>751</i>&nbsp;        result.type = OrderType.DROP_DATABASE;</b>
+<b class="fc"><i>752</i>&nbsp;        result.dataBaseName = sql[2];</b>
+<b class="fc"><i>753</i>&nbsp;        return result;</b>
+<i>754</i>&nbsp;    }
+<i>755</i>&nbsp;    static ParseResult parseUSE(String sqlString)
+<i>756</i>&nbsp;    {
+<b class="fc"><i>757</i>&nbsp;        sqlString = sqlString.replaceAll(&quot;;&quot;, &quot; ;&quot;);</b>
+<b class="fc"><i>758</i>&nbsp;        String sql[] =  sqlString.split(&quot; &quot;);</b>
+<b class="fc"><i>759</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>760</i>&nbsp;        result.type = OrderType.USE;</b>
+<b class="fc"><i>761</i>&nbsp;        result.dataBaseName = sql[1];</b>
+<b class="fc"><i>762</i>&nbsp;        return result;</b>
+<i>763</i>&nbsp;    }
+<i>764</i>&nbsp;    static ParseResult parseSHOW_TABLES(String sqlString)
+<i>765</i>&nbsp;    {
+<b class="fc"><i>766</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>767</i>&nbsp;        result.type = OrderType.SHOW_TABLES;</b>
+<b class="fc"><i>768</i>&nbsp;        return result;</b>
+<i>769</i>&nbsp;    }
+<i>770</i>&nbsp;    static ParseResult parseDROP_TABLE(String sqlString)
+<i>771</i>&nbsp;    {
+<b class="fc"><i>772</i>&nbsp;        sqlString = sqlString.replaceAll(&quot;;&quot;, &quot; ;&quot;);</b>
+<b class="fc"><i>773</i>&nbsp;        String sql[] =  sqlString.split(&quot; &quot;);</b>
+<b class="fc"><i>774</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>775</i>&nbsp;        result.type = OrderType.DROP_TABLE;</b>
+<b class="fc"><i>776</i>&nbsp;        result.tableNames.add(sql[2]);</b>
+<b class="fc"><i>777</i>&nbsp;        return result;</b>
+<i>778</i>&nbsp;    }
+<i>779</i>&nbsp;    static ParseResult parseDESC(String sqlString)
+<i>780</i>&nbsp;    {
+<b class="fc"><i>781</i>&nbsp;        sqlString = sqlString.replaceAll(&quot;;&quot;, &quot; ;&quot;);</b>
+<b class="fc"><i>782</i>&nbsp;        String sql[] =  sqlString.split(&quot; &quot;);</b>
+<b class="fc"><i>783</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<b class="fc"><i>784</i>&nbsp;        result.type = OrderType.DESC;</b>
+<b class="fc"><i>785</i>&nbsp;        result.tableNames.add(sql[1]);</b>
+<b class="fc"><i>786</i>&nbsp;        return result;</b>
+<i>787</i>&nbsp;    }
+<i>788</i>&nbsp;    static ParseResult parseCREATE_TABLE(String sql)
+<i>789</i>&nbsp;    {
+<b class="fc"><i>790</i>&nbsp;        sql = sql.replaceAll(&quot;;&quot;, &quot; ;&quot;);</b>
+<b class="fc"><i>791</i>&nbsp;        sql = sql.replaceAll(&quot;\\( &quot;, &quot;(&quot;);</b>
+<b class="fc"><i>792</i>&nbsp;        sql = sql.replaceAll(&quot; \\(&quot;, &quot;(&quot;);</b>
+<b class="fc"><i>793</i>&nbsp;        sql = sql.replaceAll(&quot;\\(&quot;, &quot; ( &quot;);</b>
+<b class="fc"><i>794</i>&nbsp;        sql = sql.replaceAll(&quot;\\) &quot;, &quot;)&quot;);</b>
+<b class="fc"><i>795</i>&nbsp;        sql = sql.replaceAll(&quot; \\)&quot;, &quot;)&quot;);</b>
+<b class="fc"><i>796</i>&nbsp;        sql = sql.replaceAll(&quot;\\)&quot;, &quot; ) &quot;);</b>
+<b class="fc"><i>797</i>&nbsp;        String sqlS[] =  sql.split(&quot; &quot;);</b>
+<b class="fc"><i>798</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<i>799</i>&nbsp;//		result.tableNames.add(sqlS[2]);
+<b class="fc"><i>800</i>&nbsp;        sql = &quot;&quot;;</b>
+<b class="fc"><i>801</i>&nbsp;        for (int i = 2; i &lt; sqlS.length; i++)</b>
+<i>802</i>&nbsp;        {
+<b class="fc"><i>803</i>&nbsp;            sql += sqlS[i] + &#39; &#39;;</b>
+<i>804</i>&nbsp;        }
+<i>805</i>&nbsp;//        System.out.println(sql);
+<i>806</i>&nbsp;//		return null;
+<b class="fc"><i>807</i>&nbsp;        int status = 0;</b>
+<b class="fc"><i>808</i>&nbsp;        while(sql.length() &gt; 0)</b>
+<i>809</i>&nbsp;        {
+<b class="fc"><i>810</i>&nbsp;            if (status == 0)</b>
+<i>811</i>&nbsp;            {
+<b class="fc"><i>812</i>&nbsp;                sql = sql.trim();</b>
+<b class="fc"><i>813</i>&nbsp;                DoubleReturn&lt;String, String&gt; r = readString(sql);</b>
+<b class="fc"><i>814</i>&nbsp;                result.tableNames.add(r.first);</b>
+<b class="fc"><i>815</i>&nbsp;                sql = r.second;</b>
+<b class="fc"><i>816</i>&nbsp;                sql = sql.trim();</b>
+<b class="fc"><i>817</i>&nbsp;                sql = sql.substring(1);</b>
+<b class="fc"><i>818</i>&nbsp;                status = 1;</b>
+<b class="fc"><i>819</i>&nbsp;            }</b>
+<b class="fc"><i>820</i>&nbsp;            else if (status == 1)</b>
+<i>821</i>&nbsp;            {
+<b class="fc"><i>822</i>&nbsp;                if (sql.startsWith(&quot;;&quot;))</b>
+<i>823</i>&nbsp;                {
+<b class="fc"><i>824</i>&nbsp;                    break;</b>
+<i>825</i>&nbsp;                }
+<b class="fc"><i>826</i>&nbsp;                else if (!sql.toUpperCase().startsWith(&quot;PRIMARY KEY&quot;))</b>
+<i>827</i>&nbsp;                {
+<b class="fc"><i>828</i>&nbsp;                    DoubleReturn&lt;Column, String&gt; r = readColumn(sql);</b>
+<b class="fc"><i>829</i>&nbsp;                    result.columns.add(r.first);</b>
+<b class="fc"><i>830</i>&nbsp;                    sql = r.second;</b>
+<b class="fc"><i>831</i>&nbsp;                }</b>
+<i>832</i>&nbsp;                else
+<i>833</i>&nbsp;                {
+<b class="fc"><i>834</i>&nbsp;                    sql = sql.substring(11);</b>
+<b class="fc"><i>835</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>836</i>&nbsp;                    sql = sql.substring(1);</b>
+<b class="fc"><i>837</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>838</i>&nbsp;                    sql = sql.trim();</b>
+<b class="fc"><i>839</i>&nbsp;                    DoubleReturn&lt;String, String&gt; r = readString(sql);</b>
+<b class="fc"><i>840</i>&nbsp;                    for (int i = 0; i &lt; result.columns.size(); i++)</b>
+<i>841</i>&nbsp;                    {
+<b class="fc"><i>842</i>&nbsp;                        if (result.columns.get(i).name.equals(r.first))</b>
+<i>843</i>&nbsp;                        {
+<b class="fc"><i>844</i>&nbsp;                            result.columns.get(i).setPrimary();</b>
+<b class="fc"><i>845</i>&nbsp;                            break;</b>
+<i>846</i>&nbsp;                        }
+<i>847</i>&nbsp;                    }
+<b class="fc"><i>848</i>&nbsp;                    break;</b>
+<i>849</i>&nbsp;                }
+<i>850</i>&nbsp;            }
+<i>851</i>&nbsp;        }
+<b class="fc"><i>852</i>&nbsp;        result.type = OrderType.CREATE_TABLE;</b>
+<b class="fc"><i>853</i>&nbsp;        return result;</b>
+<i>854</i>&nbsp;    }
+<i>855</i>&nbsp;    public static void main(String[] args)
+<i>856</i>&nbsp;    {
+<i>857</i>&nbsp;//		Scanner s = new Scanner(System.in);
+<i>858</i>&nbsp;//		String sql = s.nextLine();
+<i>859</i>&nbsp;//        System.out.println(calcStm(&quot;10000&quot;));
+<i>860</i>&nbsp;//        ParseResult result = parse(&quot;DELETE FROM publisher WHERE state=¡¯(CA,)¡¯;&quot;);
+<i>861</i>&nbsp;//		System.out.print(&quot;123&quot;);
+<b class="nc"><i>862</i>&nbsp;        System.out.println(calcStm(&quot;8-(1+2+3)*4/6+5-7&quot;));</b>
+<b class="nc"><i>863</i>&nbsp;    }</b>
+<i>864</i>&nbsp;    static String preParse(String sql)
+<i>865</i>&nbsp;    {
+<b class="fc"><i>866</i>&nbsp;        sql = sql.replaceAll(&quot;\\, &quot;, &quot;,&quot;);</b>
+<b class="fc"><i>867</i>&nbsp;        sql = sql.replaceAll(&quot; \\,&quot;, &quot;,&quot;);</b>
+<b class="fc"><i>868</i>&nbsp;        sql = sql.replaceAll(&quot;\\,&quot;, &quot; , &quot;);</b>
+<b class="fc"><i>869</i>&nbsp;        sql = sql.replaceAll(&quot;= &quot;, &quot;=&quot;);</b>
+<b class="fc"><i>870</i>&nbsp;        sql = sql.replaceAll(&quot; =&quot;, &quot;=&quot;);</b>
+<b class="fc"><i>871</i>&nbsp;        sql = sql.replaceAll(&quot;=&quot;, &quot; = &quot;);</b>
+<b class="fc"><i>872</i>&nbsp;        sql = sql.replaceAll(&quot;&lt; &quot;, &quot;&lt;&quot;);</b>
+<b class="fc"><i>873</i>&nbsp;        sql = sql.replaceAll(&quot; &lt;&quot;, &quot;&lt;&quot;);</b>
+<b class="fc"><i>874</i>&nbsp;        sql = sql.replaceAll(&quot;&lt;&quot;, &quot; &lt; &quot;);</b>
+<b class="fc"><i>875</i>&nbsp;        sql = sql.replaceAll(&quot;&gt; &quot;, &quot;&gt;&quot;);</b>
+<b class="fc"><i>876</i>&nbsp;        sql = sql.replaceAll(&quot; &gt;&quot;, &quot;&gt;&quot;);</b>
+<b class="fc"><i>877</i>&nbsp;        sql = sql.replaceAll(&quot;&gt;&quot;, &quot; &gt; &quot;);</b>
+<b class="fc"><i>878</i>&nbsp;        return sql;</b>
+<i>879</i>&nbsp;    }
+<i>880</i>&nbsp;    public static ParseResult parse(String sql)
+<i>881</i>&nbsp;    {
+<b class="fc"><i>882</i>&nbsp;        sql = sql.trim();</b>
+<b class="fc"><i>883</i>&nbsp;        String preSql = preParse(sql);</b>
+<b class="fc"><i>884</i>&nbsp;        String ss[] =  preSql.split(&quot; &quot;);</b>
+<b class="fc"><i>885</i>&nbsp;        ParseResult result = new ParseResult();</b>
+<i>886</i>&nbsp;//		try
+<i>887</i>&nbsp;//		{
+<b class="fc"><i>888</i>&nbsp;        if (ss[0].toUpperCase().equals(&quot;INSERT&quot;))</b>
+<i>889</i>&nbsp;        {
+<b class="fc"><i>890</i>&nbsp;            result = parseINSERT(sql);</b>
+<i>891</i>&nbsp;        }
+<b class="fc"><i>892</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;DELETE&quot;))</b>
+<i>893</i>&nbsp;        {
+<b class="fc"><i>894</i>&nbsp;            result = parseDELETE(sql);</b>
+<i>895</i>&nbsp;        }
+<b class="fc"><i>896</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;UPDATE&quot;))</b>
+<i>897</i>&nbsp;        {
+<b class="fc"><i>898</i>&nbsp;            result = parseUPDATE(sql);</b>
+<i>899</i>&nbsp;        }
+<b class="fc"><i>900</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;SELECT&quot;))</b>
+<i>901</i>&nbsp;        {
+<b class="fc"><i>902</i>&nbsp;            result = parseSELECT(sql);</b>
+<i>903</i>&nbsp;        }
+<b class="fc"><i>904</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;CREATE&quot;) &amp;&amp; ss[1].toUpperCase().equals(&quot;DATABASE&quot;))</b>
+<i>905</i>&nbsp;        {
+<b class="fc"><i>906</i>&nbsp;            result = parseCREATE_DATABASE(sql);</b>
+<i>907</i>&nbsp;        }
+<b class="fc"><i>908</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;DROP&quot;) &amp;&amp; ss[1].toUpperCase().equals(&quot;DATABASE&quot;))</b>
+<i>909</i>&nbsp;        {
+<b class="fc"><i>910</i>&nbsp;            result = parseDROP_DATABASE(sql);</b>
+<i>911</i>&nbsp;        }
+<b class="fc"><i>912</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;USE&quot;))</b>
+<i>913</i>&nbsp;        {
+<b class="fc"><i>914</i>&nbsp;            result = parseUSE(sql);</b>
+<i>915</i>&nbsp;        }
+<b class="fc"><i>916</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;SHOW&quot;) &amp;&amp; ss[1].toUpperCase().equals(&quot;TABLES;&quot;))</b>
+<i>917</i>&nbsp;        {
+<b class="fc"><i>918</i>&nbsp;            result = parseSHOW_TABLES(sql);</b>
+<i>919</i>&nbsp;        }
+<b class="fc"><i>920</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;CREATE&quot;) &amp;&amp; ss[1].toUpperCase().equals(&quot;TABLE&quot;))</b>
+<i>921</i>&nbsp;        {
+<b class="fc"><i>922</i>&nbsp;            result = parseCREATE_TABLE(sql);</b>
+<i>923</i>&nbsp;        }
+<b class="fc"><i>924</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;DROP&quot;) &amp;&amp; ss[1].toUpperCase().equals(&quot;TABLE&quot;))</b>
+<i>925</i>&nbsp;        {
+<b class="fc"><i>926</i>&nbsp;            result = parseDROP_TABLE(sql);</b>
+<i>927</i>&nbsp;        }
+<b class="fc"><i>928</i>&nbsp;        else if (ss[0].toUpperCase().equals(&quot;DESC&quot;))</b>
+<i>929</i>&nbsp;        {
+<b class="fc"><i>930</i>&nbsp;            result = parseDESC(sql);</b>
+<i>931</i>&nbsp;        }
+<i>932</i>&nbsp;        else
+<i>933</i>&nbsp;        {
+<b class="nc"><i>934</i>&nbsp;            result.type = OrderType.ERROR;</b>
+<i>935</i>&nbsp;        }
+<i>936</i>&nbsp;//		} catch (Exception e)
+<i>937</i>&nbsp;//		{
+<i>938</i>&nbsp;//			result.type = OrderType.ERROR;
+<i>939</i>&nbsp;//		}
+<b class="fc"><i>940</i>&nbsp;        return result;</b>
+<i>941</i>&nbsp;    }
+<i>942</i>&nbsp;}
+<i>943</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

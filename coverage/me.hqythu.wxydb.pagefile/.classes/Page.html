@@ -1,0 +1,162 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Page</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.pagefile</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Page (me.hqythu.wxydb.pagefile)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Page</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/ 8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (18/ 21)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.pagefile;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import java.io.IOException;
+<i>4</i>&nbsp;import java.nio.ByteBuffer;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp; * 页
+<i>8</i>&nbsp; */
+<i>9</i>&nbsp;public class Page {
+<i>10</i>&nbsp;    protected int fileId;
+<i>11</i>&nbsp;    protected int pageId;
+<i>12</i>&nbsp;    public boolean dirty;
+<i>13</i>&nbsp;    protected byte[] data;
+<i>14</i>&nbsp;    protected ByteBuffer buffer;
+<i>15</i>&nbsp;
+<b class="fc"><i>16</i>&nbsp;    public Page(int fileId, int pageId, byte[] data) {</b>
+<b class="fc"><i>17</i>&nbsp;        this.fileId = fileId;</b>
+<b class="fc"><i>18</i>&nbsp;        this.pageId = pageId;</b>
+<b class="fc"><i>19</i>&nbsp;        this.dirty = false;</b>
+<b class="fc"><i>20</i>&nbsp;        this.data = data;</b>
+<b class="fc"><i>21</i>&nbsp;        buffer = ByteBuffer.wrap(data);</b>
+<b class="fc"><i>22</i>&nbsp;    }</b>
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    /**
+<i>25</i>&nbsp;     * 返回页数据
+<i>26</i>&nbsp;     * 用于读写
+<i>27</i>&nbsp;     *
+<i>28</i>&nbsp;     * @return
+<i>29</i>&nbsp;     */
+<i>30</i>&nbsp;    public byte[] getData() {
+<b class="fc"><i>31</i>&nbsp;        return data;</b>
+<i>32</i>&nbsp;    }
+<i>33</i>&nbsp;
+<i>34</i>&nbsp;    public ByteBuffer getBuffer() {
+<b class="fc"><i>35</i>&nbsp;        return buffer;</b>
+<i>36</i>&nbsp;    }
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * 标记为dirty
+<i>40</i>&nbsp;     * 进行写操作后，标记为dirty才能写回
+<i>41</i>&nbsp;     */
+<i>42</i>&nbsp;    public void setDirty() {
+<b class="fc"><i>43</i>&nbsp;        dirty = true;</b>
+<b class="fc"><i>44</i>&nbsp;    }</b>
+<i>45</i>&nbsp;
+<i>46</i>&nbsp;    /**
+<i>47</i>&nbsp;     * 是否为dirty
+<i>48</i>&nbsp;     */
+<i>49</i>&nbsp;    public boolean isDirty() {
+<b class="nc"><i>50</i>&nbsp;        return dirty;</b>
+<i>51</i>&nbsp;    }
+<i>52</i>&nbsp;
+<i>53</i>&nbsp;    /**
+<i>54</i>&nbsp;     * 写回
+<i>55</i>&nbsp;     * 建议在页释放的时候执行
+<i>56</i>&nbsp;     *
+<i>57</i>&nbsp;     * @throws IOException
+<i>58</i>&nbsp;     */
+<i>59</i>&nbsp;    public void writeBack() {
+<b class="fc"><i>60</i>&nbsp;        if (dirty) {</b>
+<i>61</i>&nbsp;            try {
+<i>62</i>&nbsp;//                System.out.println(String.format(&quot;write file:%d page:%d&quot;,fileId,pageId));
+<b class="fc"><i>63</i>&nbsp;                FilePageManager.getInstance().writePage(fileId, pageId, data);</b>
+<b class="nc"><i>64</i>&nbsp;            } catch (Exception e) {</b>
+<b class="nc"><i>65</i>&nbsp;                e.printStackTrace();</b>
+<b class="fc"><i>66</i>&nbsp;            }</b>
+<b class="fc"><i>67</i>&nbsp;            dirty = false;</b>
+<i>68</i>&nbsp;        }
+<b class="fc"><i>69</i>&nbsp;    }</b>
+<i>70</i>&nbsp;
+<i>71</i>&nbsp;    public int getFileId() {
+<b class="fc"><i>72</i>&nbsp;        return fileId;</b>
+<i>73</i>&nbsp;    }
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    public int getPageId() {
+<b class="fc"><i>76</i>&nbsp;        return pageId;</b>
+<i>77</i>&nbsp;    }
+<i>78</i>&nbsp;
+<i>79</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

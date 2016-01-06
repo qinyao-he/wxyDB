@@ -1,0 +1,237 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Record</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.object</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Record (me.hqythu.wxydb.object)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Record</td>
+<td class="coverageStat">
+  <span class="percent">
+    60%
+  </span>
+  <span class="absValue">
+    (3/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    82.8%
+  </span>
+  <span class="absValue">
+    (48/ 58)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Record$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (4/ 6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.1%
+  </span>
+  <span class="absValue">
+    (49/ 59)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.object;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import me.hqythu.wxydb.exception.level1.SQLRecordException;
+<i>4</i>&nbsp;import me.hqythu.wxydb.util.BitSetMask;
+<i>5</i>&nbsp;import me.hqythu.wxydb.util.Global;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.nio.ByteBuffer;
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;import static java.lang.Math.ceil;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;public class Record {
+<b class="nc"><i>12</i>&nbsp;    private Record() {</b>
+<b class="nc"><i>13</i>&nbsp;    }</b>
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    /**
+<i>16</i>&nbsp;     * Object[] 转 byte[]
+<i>17</i>&nbsp;     * 要求values.size() == columns.size()
+<i>18</i>&nbsp;     */
+<i>19</i>&nbsp;    public static byte[] valuesToBytes(Table table, Object[] values) throws SQLRecordException {
+<i>20</i>&nbsp;
+<b class="fc"><i>21</i>&nbsp;        ByteBuffer buffer = ByteBuffer.allocate(table.getRecordLen());</b>
+<b class="fc"><i>22</i>&nbsp;        Column[] columns = table.getColumns();</b>
+<b class="fc"><i>23</i>&nbsp;        int[] offsets = table.getOffsets();</b>
+<b class="fc"><i>24</i>&nbsp;        int nullPos = offsets[columns.length];</b>
+<i>25</i>&nbsp;
+<i>26</i>&nbsp;        // 状态位AB
+<b class="fc"><i>27</i>&nbsp;        buffer.clear();</b>
+<b class="fc"><i>28</i>&nbsp;        buffer.putShort((short) 0);</b>
+<i>29</i>&nbsp;        // 列数
+<b class="fc"><i>30</i>&nbsp;        buffer.putShort((short) columns.length);</b>
+<i>31</i>&nbsp;        // 定长部分长度
+<b class="fc"><i>32</i>&nbsp;        buffer.putShort((short) offsets[columns.length - 1]);</b>
+<i>33</i>&nbsp;        // 定长数据
+<b class="fc"><i>34</i>&nbsp;        for (int i = 0; i &lt; columns.length; i++) {</b>
+<b class="fc"><i>35</i>&nbsp;            Column column = columns[i];</b>
+<b class="fc"><i>36</i>&nbsp;            if (values[i] == null) {</b>
+<b class="fc"><i>37</i>&nbsp;                if (column.notNull()) {</b>
+<b class="fc"><i>38</i>&nbsp;                    throw new SQLRecordException(&quot;not null try to null&quot;);</b>
+<i>39</i>&nbsp;                } else {
+<b class="fc"><i>40</i>&nbsp;                    BitSetMask.setBit(buffer.array(), nullPos, i);</b>
+<i>41</i>&nbsp;                }
+<i>42</i>&nbsp;            } else {
+<b class="fc"><i>43</i>&nbsp;                switch (column.type) {</b>
+<i>44</i>&nbsp;                    case UNKNOWN:
+<b class="nc"><i>45</i>&nbsp;                        throw new SQLRecordException(&quot;unknown data type&quot;);</b>
+<i>46</i>&nbsp;                    case INT:
+<i>47</i>&nbsp;                        try {
+<b class="fc"><i>48</i>&nbsp;                            Integer ii = (Integer) values[i];</b>
+<b class="fc"><i>49</i>&nbsp;                            buffer.putInt(offsets[i] + Global.RECORD_STATIC_DATA_POS, ii);</b>
+<b class="fc"><i>50</i>&nbsp;                        } catch (Exception e) {</b>
+<b class="fc"><i>51</i>&nbsp;                            throw new SQLRecordException(&quot;insert error type at column &quot; + (i+1));</b>
+<b class="fc"><i>52</i>&nbsp;                        }</b>
+<i>53</i>&nbsp;                        break;
+<i>54</i>&nbsp;                    case VARCHAR:
+<i>55</i>&nbsp;                        String ss;
+<i>56</i>&nbsp;                        try {
+<b class="fc"><i>57</i>&nbsp;                            ss = (String) values[i];</b>
+<b class="nc"><i>58</i>&nbsp;                        } catch (Exception e) {</b>
+<b class="nc"><i>59</i>&nbsp;                            throw new SQLRecordException(&quot;insert error type at column &quot; + (i+1));</b>
+<b class="fc"><i>60</i>&nbsp;                        }</b>
+<b class="fc"><i>61</i>&nbsp;                        if (ss.length() &gt; column.len) {</b>
+<b class="nc"><i>62</i>&nbsp;                            throw new SQLRecordException(&quot;column data too long at column &quot; + (i+1));</b>
+<i>63</i>&nbsp;                        }
+<b class="fc"><i>64</i>&nbsp;                        buffer.position(offsets[i] + Global.RECORD_STATIC_DATA_POS);</b>
+<b class="fc"><i>65</i>&nbsp;                        buffer.put(ss.getBytes());</b>
+<i>66</i>&nbsp;                        break;
+<i>67</i>&nbsp;                }
+<b class="fc"><i>68</i>&nbsp;                BitSetMask.clearBit(buffer.array(), Global.RECORD_STATIC_DATA_POS + offsets[columns.length], i);</b>
+<i>69</i>&nbsp;            }
+<i>70</i>&nbsp;        }
+<b class="fc"><i>71</i>&nbsp;        return buffer.array();</b>
+<i>72</i>&nbsp;    }
+<i>73</i>&nbsp;
+<i>74</i>&nbsp;    /**
+<i>75</i>&nbsp;     * byte[] 转 Object[]
+<i>76</i>&nbsp;     */
+<i>77</i>&nbsp;    public static Object[] bytesToValues(Table table, byte[] data) {
+<b class="fc"><i>78</i>&nbsp;        Column[] columns = table.getColumns();</b>
+<b class="fc"><i>79</i>&nbsp;        int[] offsets = table.getOffsets();</b>
+<b class="fc"><i>80</i>&nbsp;        int nullPos = offsets[columns.length];</b>
+<b class="fc"><i>81</i>&nbsp;        ByteBuffer buffer = ByteBuffer.wrap(data);</b>
+<b class="fc"><i>82</i>&nbsp;        Object[] values = new Object[columns.length];</b>
+<i>83</i>&nbsp;
+<b class="fc"><i>84</i>&nbsp;        for (int i = 0; i &lt; columns.length; i++) {</b>
+<i>85</i>&nbsp;            // NULL值
+<b class="fc"><i>86</i>&nbsp;            if ((!columns[i].notNull()) &amp;&amp; BitSetMask.checkBit(data, nullPos, i)) {</b>
+<b class="fc"><i>87</i>&nbsp;                values[i] = null;</b>
+<i>88</i>&nbsp;            } else {
+<b class="fc"><i>89</i>&nbsp;                switch (columns[i].type) {</b>
+<i>90</i>&nbsp;                    case UNKNOWN:
+<b class="nc"><i>91</i>&nbsp;                        values[i] = null;</b>
+<b class="nc"><i>92</i>&nbsp;                        break;</b>
+<i>93</i>&nbsp;                    case INT:
+<b class="fc"><i>94</i>&nbsp;                        values[i] = buffer.getInt(Global.RECORD_STATIC_DATA_POS + offsets[i]);</b>
+<b class="fc"><i>95</i>&nbsp;                        break;</b>
+<i>96</i>&nbsp;                    case VARCHAR:
+<b class="fc"><i>97</i>&nbsp;                        String temp = new String(data, Global.RECORD_STATIC_DATA_POS + offsets[i], columns[i].len);</b>
+<b class="fc"><i>98</i>&nbsp;                        if (temp.indexOf(0) &gt; 0) {</b>
+<b class="fc"><i>99</i>&nbsp;                            temp = temp.substring(0, temp.indexOf(0));</b>
+<i>100</i>&nbsp;                        }
+<b class="fc"><i>101</i>&nbsp;                        values[i] = temp;</b>
+<i>102</i>&nbsp;                        break;
+<i>103</i>&nbsp;                }
+<i>104</i>&nbsp;            }
+<i>105</i>&nbsp;        }
+<b class="fc"><i>106</i>&nbsp;        return values;</b>
+<i>107</i>&nbsp;    }
+<i>108</i>&nbsp;
+<i>109</i>&nbsp;    /**
+<i>110</i>&nbsp;     * 由该列组成的记录的长度
+<i>111</i>&nbsp;     */
+<i>112</i>&nbsp;    public static int calcRecordLen(Column[] columns) {
+<b class="fc"><i>113</i>&nbsp;        int len = 0;</b>
+<b class="fc"><i>114</i>&nbsp;        for (Column column : columns) {</b>
+<b class="fc"><i>115</i>&nbsp;            len += column.len;</b>
+<i>116</i>&nbsp;        }
+<b class="fc"><i>117</i>&nbsp;        len += Global.RECORD_STATUS_LEN + ceil((double) columns.length / 8);</b>
+<b class="fc"><i>118</i>&nbsp;        return len;</b>
+<i>119</i>&nbsp;    }
+<i>120</i>&nbsp;
+<i>121</i>&nbsp;    /**
+<i>122</i>&nbsp;     * 检查记录的某个列是否为null
+<i>123</i>&nbsp;     */
+<i>124</i>&nbsp;    public static boolean checkNull(Table table, byte[] record, int index) {
+<b class="nc"><i>125</i>&nbsp;        int offset = table.getOffsets()[table.getColumns().length];</b>
+<b class="nc"><i>126</i>&nbsp;        return BitSetMask.checkBit(record, offset, index);</b>
+<i>127</i>&nbsp;    }
+<i>128</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

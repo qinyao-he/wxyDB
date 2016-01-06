@@ -1,0 +1,312 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: DataPageUser</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.pagefile</a> ]
+</div>
+
+<h1>Coverage Summary for Class: DataPageUser (me.hqythu.wxydb.pagefile)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataPageUser</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88%
+  </span>
+  <span class="absValue">
+    (22/ 25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.1%
+  </span>
+  <span class="absValue">
+    (108/ 116)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.pagefile;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import me.hqythu.wxydb.util.Global;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;import java.nio.ByteBuffer;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;public class DataPageUser {
+<i>8</i>&nbsp;
+<i>9</i>&nbsp;    public static final int DATA_PROP_HASPRIMARY = 0x8000;
+<i>10</i>&nbsp;
+<b class="nc"><i>11</i>&nbsp;    private DataPageUser() {</b>
+<b class="nc"><i>12</i>&nbsp;    }</b>
+<i>13</i>&nbsp;
+<i>14</i>&nbsp;    /**
+<i>15</i>&nbsp;     * 初始化数据页
+<i>16</i>&nbsp;     *
+<i>17</i>&nbsp;     * @param page
+<i>18</i>&nbsp;     * @param recordLen 每个记录的长度
+<i>19</i>&nbsp;     */
+<i>20</i>&nbsp;    public static void initPage(Page page, int recordLen) {
+<b class="fc"><i>21</i>&nbsp;        setIndex(page, page.getPageId());    // 该页索引号</b>
+<b class="fc"><i>22</i>&nbsp;        setPreIndex(page, -1);               // 上一页索引</b>
+<b class="fc"><i>23</i>&nbsp;        setNextIndex(page, -1);              // 下一页索引</b>
+<b class="fc"><i>24</i>&nbsp;        setProp(page, 0);                    // 属性</b>
+<b class="fc"><i>25</i>&nbsp;        setRecordLen(page, recordLen);       // 记录的长度</b>
+<b class="fc"><i>26</i>&nbsp;        setRecordSize(page, 0);              // 记录的个数</b>
+<b class="fc"><i>27</i>&nbsp;        setCapacity(page, (Global.DTPAGE_DATA_LEN / recordLen)); // 容量</b>
+<b class="fc"><i>28</i>&nbsp;        page.setDirty();</b>
+<b class="fc"><i>29</i>&nbsp;    }</b>
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    /**
+<i>32</i>&nbsp;     * 获取该数据页上的一个记录
+<i>33</i>&nbsp;     *
+<i>34</i>&nbsp;     * @param index 在该页中的位置,从[0,size)
+<i>35</i>&nbsp;     */
+<i>36</i>&nbsp;    public static byte[] readRecord(Page page, int index) {
+<b class="fc"><i>37</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>38</i>&nbsp;        int recordLen = getRecordLen(page);</b>
+<b class="fc"><i>39</i>&nbsp;        int size = getRecordSize(page);</b>
+<b class="fc"><i>40</i>&nbsp;        if (index &gt;= size) return null;</b>
+<b class="fc"><i>41</i>&nbsp;        int pos = Global.DTPAGE_DATA_POS + index * recordLen;</b>
+<b class="fc"><i>42</i>&nbsp;        byte[] record = new byte[recordLen];</b>
+<b class="fc"><i>43</i>&nbsp;        buffer.position(pos);</b>
+<b class="fc"><i>44</i>&nbsp;        buffer.get(record);</b>
+<b class="fc"><i>45</i>&nbsp;        return record;</b>
+<i>46</i>&nbsp;    }
+<i>47</i>&nbsp;
+<i>48</i>&nbsp;    /**
+<i>49</i>&nbsp;     * 往数据页上写一个记录
+<i>50</i>&nbsp;     *
+<i>51</i>&nbsp;     * @param record 记录
+<i>52</i>&nbsp;     */
+<i>53</i>&nbsp;    public static boolean addRecord(Page page, byte[] record) {
+<b class="fc"><i>54</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>55</i>&nbsp;        int size = getRecordSize(page);</b>
+<b class="fc"><i>56</i>&nbsp;        int recordLen = getRecordLen(page);</b>
+<i>57</i>&nbsp;
+<b class="fc"><i>58</i>&nbsp;        if (isFull(page)) return false;</b>
+<b class="fc"><i>59</i>&nbsp;        if (record.length != recordLen) return false;</b>
+<b class="fc"><i>60</i>&nbsp;        int pos = Global.DTPAGE_DATA_POS + size * recordLen;</b>
+<b class="fc"><i>61</i>&nbsp;        buffer.position(pos);</b>
+<b class="fc"><i>62</i>&nbsp;        buffer.put(record);</b>
+<b class="fc"><i>63</i>&nbsp;        incRecordSize(page);</b>
+<i>64</i>&nbsp;
+<b class="fc"><i>65</i>&nbsp;        page.setDirty();</b>
+<b class="fc"><i>66</i>&nbsp;        return true;</b>
+<i>67</i>&nbsp;    }
+<i>68</i>&nbsp;
+<i>69</i>&nbsp;    /**
+<i>70</i>&nbsp;     * 写记录
+<i>71</i>&nbsp;     */
+<i>72</i>&nbsp;    public static boolean writeRecord(Page page, int index, byte[] record) {
+<b class="fc"><i>73</i>&nbsp;        byte[] data = page.getData();</b>
+<b class="fc"><i>74</i>&nbsp;        int size = getRecordSize(page);</b>
+<b class="fc"><i>75</i>&nbsp;        int recordLen = getRecordLen(page);</b>
+<i>76</i>&nbsp;
+<b class="fc"><i>77</i>&nbsp;        if (index &gt;= size) return false;</b>
+<b class="fc"><i>78</i>&nbsp;        if (record.length != recordLen) return false;</b>
+<b class="fc"><i>79</i>&nbsp;        int pos = Global.DTPAGE_DATA_POS + index * recordLen;</b>
+<b class="fc"><i>80</i>&nbsp;        System.arraycopy(record, 0, data, pos, recordLen);</b>
+<i>81</i>&nbsp;
+<b class="fc"><i>82</i>&nbsp;        page.setDirty();</b>
+<b class="fc"><i>83</i>&nbsp;        return true;</b>
+<i>84</i>&nbsp;    }
+<i>85</i>&nbsp;
+<i>86</i>&nbsp;    /**
+<i>87</i>&nbsp;     * 删除记录
+<i>88</i>&nbsp;     * 最后一个挪到被删除位置
+<i>89</i>&nbsp;     */
+<i>90</i>&nbsp;    public static void removeRecord(Page page, int index) {
+<b class="fc"><i>91</i>&nbsp;        byte[] data = page.getData();</b>
+<b class="fc"><i>92</i>&nbsp;        int size = getRecordSize(page);</b>
+<b class="fc"><i>93</i>&nbsp;        int recordLen = getRecordLen(page);</b>
+<i>94</i>&nbsp;
+<b class="fc"><i>95</i>&nbsp;        if (index &gt;= size) return;</b>
+<b class="fc"><i>96</i>&nbsp;        if (index != (size - 1)) {</b>
+<b class="fc"><i>97</i>&nbsp;            int posTo = Global.DTPAGE_DATA_POS + index * recordLen;</b>
+<b class="fc"><i>98</i>&nbsp;            int posFrom = Global.DTPAGE_DATA_POS + (size - 1) * recordLen;</b>
+<b class="fc"><i>99</i>&nbsp;            System.arraycopy(data, posFrom, data, posTo, recordLen);</b>
+<i>100</i>&nbsp;        }
+<b class="fc"><i>101</i>&nbsp;        decRecordSize(page);</b>
+<i>102</i>&nbsp;
+<b class="fc"><i>103</i>&nbsp;        page.setDirty();</b>
+<b class="fc"><i>104</i>&nbsp;    }</b>
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;    /**
+<i>107</i>&nbsp;     * 连着两个数据页
+<i>108</i>&nbsp;     */
+<i>109</i>&nbsp;    public static void connectPage(Page page1, Page page2) {
+<b class="fc"><i>110</i>&nbsp;        setNextIndex(page1, page2.getPageId());</b>
+<b class="fc"><i>111</i>&nbsp;        setPreIndex(page2, page1.getPageId());</b>
+<b class="fc"><i>112</i>&nbsp;        page1.setDirty();</b>
+<b class="fc"><i>113</i>&nbsp;        page2.setDirty();</b>
+<b class="fc"><i>114</i>&nbsp;        page1.setDirty();</b>
+<b class="fc"><i>115</i>&nbsp;        page2.setDirty();</b>
+<b class="fc"><i>116</i>&nbsp;    }</b>
+<i>117</i>&nbsp;
+<i>118</i>&nbsp;    /**
+<i>119</i>&nbsp;     * 断开数据页的连接
+<i>120</i>&nbsp;     */
+<i>121</i>&nbsp;    public static void removeConnectPage(Page page) {
+<b class="fc"><i>122</i>&nbsp;        int fileId = page.getFileId();</b>
+<i>123</i>&nbsp;        try {
+<b class="fc"><i>124</i>&nbsp;            int lastPageIndex = getPreIndex(page);</b>
+<b class="fc"><i>125</i>&nbsp;            int nextPageIndex = getNextIndex(page);</b>
+<b class="fc"><i>126</i>&nbsp;            if (lastPageIndex != -1) {</b>
+<b class="fc"><i>127</i>&nbsp;                Page lastPage = BufPageManager.getInstance().getPage(fileId, lastPageIndex);</b>
+<b class="fc"><i>128</i>&nbsp;                setNextIndex(lastPage, nextPageIndex);</b>
+<i>129</i>&nbsp;            }
+<b class="fc"><i>130</i>&nbsp;            if (nextPageIndex != -1) {</b>
+<b class="fc"><i>131</i>&nbsp;                Page nextPage = BufPageManager.getInstance().getPage(fileId, nextPageIndex);</b>
+<b class="fc"><i>132</i>&nbsp;                setPreIndex(nextPage, lastPageIndex);</b>
+<i>133</i>&nbsp;            }
+<b class="fc"><i>134</i>&nbsp;            page.setDirty();</b>
+<b class="nc"><i>135</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>136</i>&nbsp;            e.printStackTrace();</b>
+<b class="fc"><i>137</i>&nbsp;        }</b>
+<b class="fc"><i>138</i>&nbsp;    }</b>
+<i>139</i>&nbsp;
+<i>140</i>&nbsp;    /**
+<i>141</i>&nbsp;     * 数据页是否存满记录
+<i>142</i>&nbsp;     */
+<i>143</i>&nbsp;    public static boolean isFull(Page page) {
+<b class="fc"><i>144</i>&nbsp;        int size = getRecordSize(page);</b>
+<b class="fc"><i>145</i>&nbsp;        int cap = getCapacity(page);</b>
+<b class="fc"><i>146</i>&nbsp;        return size &gt;= cap;</b>
+<i>147</i>&nbsp;    }
+<i>148</i>&nbsp;
+<i>149</i>&nbsp;    //------------------------获取页信息------------------------
+<i>150</i>&nbsp;    public static void setIndex(Page page, int index) { // 该页索引号
+<b class="fc"><i>151</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>152</i>&nbsp;        buffer.putInt(Global.DTPAGE_IDX_POS, index);</b>
+<b class="fc"><i>153</i>&nbsp;    }</b>
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;    public static int getIndex(Page page) {
+<b class="nc"><i>156</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="nc"><i>157</i>&nbsp;        return buffer.getInt(Global.DTPAGE_IDX_POS);</b>
+<i>158</i>&nbsp;    }
+<i>159</i>&nbsp;
+<i>160</i>&nbsp;    public static void setPreIndex(Page page, int index) { // 该页索引号
+<b class="fc"><i>161</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>162</i>&nbsp;        buffer.putInt(Global.DTPAGE_PREIDX_POS, index);</b>
+<b class="fc"><i>163</i>&nbsp;    }</b>
+<i>164</i>&nbsp;
+<i>165</i>&nbsp;    public static int getPreIndex(Page page) {
+<b class="fc"><i>166</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>167</i>&nbsp;        return buffer.getInt(Global.DTPAGE_PREIDX_POS);</b>
+<i>168</i>&nbsp;    }
+<i>169</i>&nbsp;
+<i>170</i>&nbsp;    public static void setNextIndex(Page page, int index) { // 该页索引号
+<b class="fc"><i>171</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>172</i>&nbsp;        buffer.putInt(Global.DTPAGE_NEXTIDX_POS, index);</b>
+<b class="fc"><i>173</i>&nbsp;    }</b>
+<i>174</i>&nbsp;
+<i>175</i>&nbsp;    public static int getNextIndex(Page page) {
+<b class="fc"><i>176</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>177</i>&nbsp;        return buffer.getInt(Global.DTPAGE_NEXTIDX_POS);</b>
+<i>178</i>&nbsp;    }
+<i>179</i>&nbsp;
+<i>180</i>&nbsp;    public static void setProp(Page page, int prop) { // 该页索引号
+<b class="fc"><i>181</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>182</i>&nbsp;        buffer.putInt(Global.DTPAGE_PROP_POS, prop);</b>
+<b class="fc"><i>183</i>&nbsp;    }</b>
+<i>184</i>&nbsp;
+<i>185</i>&nbsp;    public static int getProp(Page page) { // 该页索引号
+<b class="nc"><i>186</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="nc"><i>187</i>&nbsp;        return buffer.getInt(Global.DTPAGE_PROP_POS);</b>
+<i>188</i>&nbsp;    }
+<i>189</i>&nbsp;
+<i>190</i>&nbsp;    public static void setRecordLen(Page page, int len) { // 该页索引号
+<b class="fc"><i>191</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>192</i>&nbsp;        buffer.putInt(Global.DTPAGE_RECORDLEN_POS, len);</b>
+<b class="fc"><i>193</i>&nbsp;    }</b>
+<i>194</i>&nbsp;
+<i>195</i>&nbsp;    public static int getRecordLen(Page page) { // 该页索引号
+<b class="fc"><i>196</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>197</i>&nbsp;        return buffer.getInt(Global.DTPAGE_RECORDLEN_POS);</b>
+<i>198</i>&nbsp;    }
+<i>199</i>&nbsp;
+<i>200</i>&nbsp;    public static void setRecordSize(Page page, int size) {
+<b class="fc"><i>201</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>202</i>&nbsp;        buffer.putInt(Global.DTPAGE_SIZE_POS, size);</b>
+<b class="fc"><i>203</i>&nbsp;    }</b>
+<i>204</i>&nbsp;
+<i>205</i>&nbsp;    public static int getRecordSize(Page page) {
+<b class="fc"><i>206</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>207</i>&nbsp;        return buffer.getInt(Global.DTPAGE_SIZE_POS);</b>
+<i>208</i>&nbsp;    }
+<i>209</i>&nbsp;
+<i>210</i>&nbsp;    public static void incRecordSize(Page page) {
+<b class="fc"><i>211</i>&nbsp;        int size = getRecordSize(page);</b>
+<b class="fc"><i>212</i>&nbsp;        setRecordSize(page, ++size);</b>
+<b class="fc"><i>213</i>&nbsp;    }</b>
+<i>214</i>&nbsp;
+<i>215</i>&nbsp;    public static void decRecordSize(Page page) {
+<b class="fc"><i>216</i>&nbsp;        int size = getRecordSize(page);</b>
+<b class="fc"><i>217</i>&nbsp;        setRecordSize(page, --size);</b>
+<b class="fc"><i>218</i>&nbsp;    }</b>
+<i>219</i>&nbsp;
+<i>220</i>&nbsp;    public static void setCapacity(Page page, int cap) {
+<b class="fc"><i>221</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>222</i>&nbsp;        buffer.putInt(Global.DTPAGE_CAP_POS, cap);</b>
+<b class="fc"><i>223</i>&nbsp;    }</b>
+<i>224</i>&nbsp;
+<i>225</i>&nbsp;    public static int getCapacity(Page page) {
+<b class="fc"><i>226</i>&nbsp;        ByteBuffer buffer = page.getBuffer();</b>
+<b class="fc"><i>227</i>&nbsp;        return buffer.getInt(Global.DTPAGE_CAP_POS);</b>
+<i>228</i>&nbsp;    }
+<i>229</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

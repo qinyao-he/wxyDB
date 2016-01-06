@@ -1,0 +1,173 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: RecordManager</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.manager</a> ]
+</div>
+
+<h1>Coverage Summary for Class: RecordManager (me.hqythu.wxydb.manager)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RecordManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (9/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    88.6%
+  </span>
+  <span class="absValue">
+    (31/ 35)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.manager;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import me.hqythu.wxydb.exception.level1.SQLRecordException;
+<i>4</i>&nbsp;import me.hqythu.wxydb.object.Table;
+<i>5</i>&nbsp;import me.hqythu.wxydb.util.SetValue;
+<i>6</i>&nbsp;import me.hqythu.wxydb.util.Where;
+<i>7</i>&nbsp;
+<i>8</i>&nbsp;import java.util.Arrays;
+<i>9</i>&nbsp;import java.util.List;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;//recordLength 记录的长度
+<i>13</i>&nbsp;//recordSizePerPage 每一页记录的个数
+<i>14</i>&nbsp;//size         文件中记录总数
+<i>15</i>&nbsp;//fieldSize    记录的字段个数
+<i>16</i>&nbsp;//recordFieldPos 记录的每个字段的位置
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;/**
+<i>19</i>&nbsp; * RecordManager
+<i>20</i>&nbsp; * 记录管理器
+<i>21</i>&nbsp; * 记录的插入、删除、修改
+<i>22</i>&nbsp; */
+<i>23</i>&nbsp;public class RecordManager {
+<i>24</i>&nbsp;
+<b class="fc"><i>25</i>&nbsp;    private static RecordManager manager = null;</b>
+<i>26</i>&nbsp;    private static boolean fast;
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    public static RecordManager getInstance() {
+<b class="fc"><i>29</i>&nbsp;        if (manager == null) {</b>
+<b class="fc"><i>30</i>&nbsp;            manager = new RecordManager();</b>
+<b class="fc"><i>31</i>&nbsp;            manager.clearFast();</b>
+<i>32</i>&nbsp;        }
+<b class="fc"><i>33</i>&nbsp;        return manager;</b>
+<i>34</i>&nbsp;    }
+<b class="fc"><i>35</i>&nbsp;    public void setFast() {fast = true;}</b>
+<b class="fc"><i>36</i>&nbsp;    public void clearFast() {fast = false;}</b>
+<i>37</i>&nbsp;
+<i>38</i>&nbsp;    /**
+<i>39</i>&nbsp;     * INSERT
+<i>40</i>&nbsp;     */
+<i>41</i>&nbsp;    public boolean insert(String tableName, List&lt;Object&gt; values) throws SQLRecordException {
+<b class="fc"><i>42</i>&nbsp;        int nCol = values.size();</b>
+<b class="fc"><i>43</i>&nbsp;        Object[] mvalues = new Object[nCol];</b>
+<b class="fc"><i>44</i>&nbsp;        values.toArray(mvalues);</b>
+<b class="fc"><i>45</i>&nbsp;        insert(tableName, mvalues);</b>
+<b class="fc"><i>46</i>&nbsp;        return true;</b>
+<i>47</i>&nbsp;    }
+<i>48</i>&nbsp;
+<i>49</i>&nbsp;    /**
+<i>50</i>&nbsp;     * DELETE
+<i>51</i>&nbsp;     */
+<i>52</i>&nbsp;    public void remove(String tableName, Where where) throws SQLRecordException {
+<b class="fc"><i>53</i>&nbsp;        Table table = SystemManager.getInstance().getTable(tableName);</b>
+<b class="fc"><i>54</i>&nbsp;        if (table == null) throw new SQLRecordException(&quot;not have table: &quot; + tableName);</b>
+<i>55</i>&nbsp;        try {
+<b class="fc"><i>56</i>&nbsp;            table.remove(where);</b>
+<b class="nc"><i>57</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>58</i>&nbsp;            throw new SQLRecordException(e.getMessage());</b>
+<b class="fc"><i>59</i>&nbsp;        }</b>
+<b class="fc"><i>60</i>&nbsp;    }</b>
+<i>61</i>&nbsp;
+<i>62</i>&nbsp;    /**
+<i>63</i>&nbsp;     * UPDATE
+<i>64</i>&nbsp;     */
+<i>65</i>&nbsp;    public void update(String tableName, Where where, List&lt;SetValue&gt; setValues) throws SQLRecordException {
+<b class="fc"><i>66</i>&nbsp;        Table table = SystemManager.getInstance().getTable(tableName);</b>
+<b class="fc"><i>67</i>&nbsp;        if (table == null) throw new SQLRecordException(&quot;not have table: &quot; + tableName);</b>
+<i>68</i>&nbsp;        try {
+<b class="fc"><i>69</i>&nbsp;            table.update(where, setValues, fast);</b>
+<b class="nc"><i>70</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>71</i>&nbsp;            throw new SQLRecordException(e.getMessage());</b>
+<b class="fc"><i>72</i>&nbsp;        }</b>
+<b class="fc"><i>73</i>&nbsp;    }</b>
+<i>74</i>&nbsp;
+<i>75</i>&nbsp;    //--------------------内部辅助函数--------------------
+<i>76</i>&nbsp;    protected void insert(String tableName, Object[] values) throws SQLRecordException {
+<b class="fc"><i>77</i>&nbsp;        Table table = SystemManager.getInstance().getTable(tableName);</b>
+<b class="fc"><i>78</i>&nbsp;        if (table == null) throw new SQLRecordException(&quot;not have table: &quot; + tableName);</b>
+<i>79</i>&nbsp;        try {
+<b class="fc"><i>80</i>&nbsp;            table.insert(values,fast);</b>
+<b class="fc"><i>81</i>&nbsp;        } catch (Exception e) {</b>
+<b class="fc"><i>82</i>&nbsp;            throw new SQLRecordException(e.getMessage());</b>
+<b class="fc"><i>83</i>&nbsp;        }</b>
+<b class="fc"><i>84</i>&nbsp;    }</b>
+<i>85</i>&nbsp;
+<b class="fc"><i>86</i>&nbsp;    private RecordManager() {</b>
+<i>87</i>&nbsp;
+<b class="fc"><i>88</i>&nbsp;    }</b>
+<i>89</i>&nbsp;}
+<i>90</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,107 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UiUtilities</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.ui</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UiUtilities (me.hqythu.wxydb.ui)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UiUtilities</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.ui;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import javax.swing.*;
+<i>4</i>&nbsp;import java.awt.*;
+<i>5</i>&nbsp;
+<i>6</i>&nbsp;/**
+<i>7</i>&nbsp; * Created by hqythu on 12/29/2015.
+<i>8</i>&nbsp; */
+<b class="nc"><i>9</i>&nbsp;public class UiUtilities {</b>
+<i>10</i>&nbsp;    /**
+<i>11</i>&nbsp;     *
+<i>12</i>&nbsp;     * @param parent
+<i>13</i>&nbsp;     * @return file path chosen
+<i>14</i>&nbsp;     */
+<i>15</i>&nbsp;    public static String chooseFile(Component parent) {
+<b class="nc"><i>16</i>&nbsp;        JFileChooser chooser = new JFileChooser();</b>
+<b class="nc"><i>17</i>&nbsp;        int returnVal = chooser.showOpenDialog(parent);</b>
+<b class="nc"><i>18</i>&nbsp;        if (returnVal == JFileChooser.APPROVE_OPTION) {</b>
+<b class="nc"><i>19</i>&nbsp;            return chooser.getSelectedFile().getPath();</b>
+<i>20</i>&nbsp;        } else {
+<b class="nc"><i>21</i>&nbsp;            return null;</b>
+<i>22</i>&nbsp;        }
+<i>23</i>&nbsp;    }
+<i>24</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,291 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ExeSQLTab</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.ui</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ExeSQLTab (me.hqythu.wxydb.ui)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ExeSQLTab</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ExeSQLTab$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExeSQLTab$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExeSQLTab$2$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 16)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExeSQLTab$2$1$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 6)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">ExeSQLTab$2$1$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 45)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.ui;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import me.hqythu.wxydb.manager.QueryEngine;
+<i>4</i>&nbsp;import me.hqythu.wxydb.sql.ParseResult;
+<i>5</i>&nbsp;import me.hqythu.wxydb.sql.SQLParser;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import javax.swing.*;
+<i>8</i>&nbsp;import javax.swing.table.AbstractTableModel;
+<i>9</i>&nbsp;import javax.swing.table.TableModel;
+<i>10</i>&nbsp;import java.awt.*;
+<i>11</i>&nbsp;import java.awt.event.ActionEvent;
+<i>12</i>&nbsp;import java.awt.event.ActionListener;
+<i>13</i>&nbsp;import java.util.ArrayList;
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;/**
+<i>16</i>&nbsp; * Created by hqythu on 12/29/2015.
+<i>17</i>&nbsp; */
+<b class="nc"><i>18</i>&nbsp;public class ExeSQLTab extends JPanel {</b>
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    private JTextField sqlTextField;
+<i>21</i>&nbsp;    private JButton sqlExeButton;
+<i>22</i>&nbsp;    private JTable executeResultTable;
+<i>23</i>&nbsp;    private JScrollPane resultScroll;
+<i>24</i>&nbsp;    private JPanel controlPanel;
+<i>25</i>&nbsp;
+<b class="nc"><i>26</i>&nbsp;    public ExeSQLTab() {</b>
+<b class="nc"><i>27</i>&nbsp;        SwingUtilities.invokeLater(new Runnable() {</b>
+<i>28</i>&nbsp;            @Override
+<i>29</i>&nbsp;            public void run() {
+<b class="nc"><i>30</i>&nbsp;                createUi();</b>
+<i>31</i>&nbsp;            }
+<i>32</i>&nbsp;        });
+<i>33</i>&nbsp;    }
+<i>34</i>&nbsp;
+<i>35</i>&nbsp;    private void createUi() {
+<b class="nc"><i>36</i>&nbsp;        sqlTextField = new JTextField();</b>
+<b class="nc"><i>37</i>&nbsp;        sqlTextField.setPreferredSize(new Dimension(400, 24));</b>
+<b class="nc"><i>38</i>&nbsp;        sqlExeButton = new JButton(&quot;Execute&quot;);</b>
+<b class="nc"><i>39</i>&nbsp;        executeResultTable = new JTable();</b>
+<b class="nc"><i>40</i>&nbsp;        resultScroll = new JScrollPane(executeResultTable);</b>
+<i>41</i>&nbsp;
+<b class="nc"><i>42</i>&nbsp;        controlPanel = new JPanel();</b>
+<b class="nc"><i>43</i>&nbsp;        controlPanel.add(sqlTextField);</b>
+<b class="nc"><i>44</i>&nbsp;        controlPanel.add(sqlExeButton);</b>
+<i>45</i>&nbsp;
+<b class="nc"><i>46</i>&nbsp;        setLayout(new BorderLayout());</b>
+<b class="nc"><i>47</i>&nbsp;        add(controlPanel, BorderLayout.NORTH);</b>
+<b class="nc"><i>48</i>&nbsp;        add(resultScroll, BorderLayout.CENTER);</b>
+<i>49</i>&nbsp;
+<b class="nc"><i>50</i>&nbsp;        sqlExeButton.addActionListener(new ActionListener() {</b>
+<i>51</i>&nbsp;            @Override
+<i>52</i>&nbsp;            public void actionPerformed(ActionEvent e) {
+<b class="nc"><i>53</i>&nbsp;                String sqlStr = sqlTextField.getText();</b>
+<b class="nc"><i>54</i>&nbsp;                new Thread(new Runnable() {</b>
+<i>55</i>&nbsp;                    @Override
+<i>56</i>&nbsp;                    public void run() {
+<b class="nc"><i>57</i>&nbsp;                        ParseResult parseResult = SQLParser.parse(sqlStr);</b>
+<b class="nc"><i>58</i>&nbsp;                        java.util.List&lt;Object[]&gt; resultList = new ArrayList&lt;&gt;();</b>
+<i>59</i>&nbsp;                        try {
+<b class="nc"><i>60</i>&nbsp;                            if (parseResult.type == ParseResult.OrderType.SELECT) {</b>
+<b class="nc"><i>61</i>&nbsp;                                resultList = QueryEngine.getInstance().queryById(</b>
+<i>62</i>&nbsp;                                        parseResult.selectOption, parseResult.where);
+<i>63</i>&nbsp;                            } else {
+<b class="nc"><i>64</i>&nbsp;                                Object[] tmp = new Object[1];</b>
+<b class="nc"><i>65</i>&nbsp;                                tmp[0] = parseResult.execute();</b>
+<b class="nc"><i>66</i>&nbsp;                                resultList.add(tmp);</b>
+<i>67</i>&nbsp;                            }
+<b class="nc"><i>68</i>&nbsp;                        } catch (Exception e) {</b>
+<b class="nc"><i>69</i>&nbsp;                            Object[] tmp = new Object[1];</b>
+<b class="nc"><i>70</i>&nbsp;                            tmp[0] = e.getMessage();</b>
+<b class="nc"><i>71</i>&nbsp;                            resultList.add(tmp);</b>
+<b class="nc"><i>72</i>&nbsp;                        }</b>
+<b class="nc"><i>73</i>&nbsp;                        final java.util.List&lt;Object[]&gt; result = resultList;</b>
+<b class="nc"><i>74</i>&nbsp;                        TableModel model = new AbstractTableModel() {</b>
+<i>75</i>&nbsp;                            @Override
+<i>76</i>&nbsp;                            public int getRowCount() {
+<b class="nc"><i>77</i>&nbsp;                                return result.size();</b>
+<i>78</i>&nbsp;                            }
+<i>79</i>&nbsp;
+<i>80</i>&nbsp;                            @Override
+<i>81</i>&nbsp;                            public int getColumnCount() {
+<b class="nc"><i>82</i>&nbsp;                                if (result.size() == 0) {</b>
+<b class="nc"><i>83</i>&nbsp;                                    return 0;</b>
+<i>84</i>&nbsp;                                } else {
+<b class="nc"><i>85</i>&nbsp;                                    return result.get(0).length;</b>
+<i>86</i>&nbsp;                                }
+<i>87</i>&nbsp;                            }
+<i>88</i>&nbsp;
+<i>89</i>&nbsp;                            @Override
+<i>90</i>&nbsp;                            public Object getValueAt(int rowIndex, int columnIndex) {
+<b class="nc"><i>91</i>&nbsp;                                return result.get(rowIndex)[columnIndex];</b>
+<i>92</i>&nbsp;                            }
+<i>93</i>&nbsp;                        };
+<b class="nc"><i>94</i>&nbsp;                        SwingUtilities.invokeLater(new Runnable() {</b>
+<i>95</i>&nbsp;                            @Override
+<i>96</i>&nbsp;                            public void run() {
+<b class="nc"><i>97</i>&nbsp;                                executeResultTable.setModel(model);</b>
+<i>98</i>&nbsp;                            }
+<i>99</i>&nbsp;                        });
+<i>100</i>&nbsp;                    }
+<b class="nc"><i>101</i>&nbsp;                }).start();</b>
+<i>102</i>&nbsp;            }
+<i>103</i>&nbsp;        });
+<i>104</i>&nbsp;    }
+<i>105</i>&nbsp;
+<i>106</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

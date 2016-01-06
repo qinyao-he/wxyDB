@@ -1,0 +1,503 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: QueryEngine</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.manager</a> ]
+</div>
+
+<h1>Coverage Summary for Class: QueryEngine (me.hqythu.wxydb.manager)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">QueryEngine</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/ 9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60.3%
+  </span>
+  <span class="absValue">
+    (138/ 229)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">QueryEngine$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (8/ 10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    60.4%
+  </span>
+  <span class="absValue">
+    (139/ 230)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.manager;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import me.hqythu.wxydb.exception.level1.SQLQueryException;
+<i>4</i>&nbsp;import me.hqythu.wxydb.exception.level2.SQLWhereException;
+<i>5</i>&nbsp;import me.hqythu.wxydb.object.Table;
+<i>6</i>&nbsp;import me.hqythu.wxydb.util.Func;
+<i>7</i>&nbsp;import me.hqythu.wxydb.util.SelectOption;
+<i>8</i>&nbsp;import me.hqythu.wxydb.util.Where;
+<i>9</i>&nbsp;
+<i>10</i>&nbsp;import java.util.*;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;/**
+<i>13</i>&nbsp; * QueryEngine
+<i>14</i>&nbsp; * 查询器
+<i>15</i>&nbsp; * 记录的查询
+<i>16</i>&nbsp; * 记录查询的优化、工作计划
+<i>17</i>&nbsp; */
+<b class="fc"><i>18</i>&nbsp;public class QueryEngine {</b>
+<b class="fc"><i>19</i>&nbsp;    private static QueryEngine engine = null;</b>
+<i>20</i>&nbsp;
+<i>21</i>&nbsp;    public static QueryEngine getInstance() {
+<b class="fc"><i>22</i>&nbsp;        if (engine == null) {</b>
+<b class="fc"><i>23</i>&nbsp;            engine = new QueryEngine();</b>
+<i>24</i>&nbsp;        }
+<b class="fc"><i>25</i>&nbsp;        return engine;</b>
+<i>26</i>&nbsp;    }
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    /**
+<i>29</i>&nbsp;     * 查询
+<i>30</i>&nbsp;     */
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    protected double func(SelectOption option, Where where) throws SQLQueryException {
+<i>33</i>&nbsp;        String tableName;
+<i>34</i>&nbsp;        String columnName;
+<i>35</i>&nbsp;        Table table;
+<i>36</i>&nbsp;        List&lt;Object[]&gt; records;
+<i>37</i>&nbsp;        Func func;
+<i>38</i>&nbsp;
+<b class="fc"><i>39</i>&nbsp;        func = option.func;</b>
+<i>40</i>&nbsp;        try {
+<b class="fc"><i>41</i>&nbsp;            tableName = option.tableNames.get(0);</b>
+<b class="fc"><i>42</i>&nbsp;            columnName = option.columnNames.get(0);</b>
+<b class="fc"><i>43</i>&nbsp;            table = SystemManager.getInstance().getTable(tableName);</b>
+<b class="fc"><i>44</i>&nbsp;            records = table.getAllRecords();</b>
+<b class="nc"><i>45</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>46</i>&nbsp;            throw new SQLQueryException(e.getMessage());</b>
+<b class="fc"><i>47</i>&nbsp;        }</b>
+<i>48</i>&nbsp;
+<b class="fc"><i>49</i>&nbsp;        int col = table.getColumnCol(columnName);</b>
+<i>50</i>&nbsp;        Integer temp;
+<b class="fc"><i>51</i>&nbsp;        double result = 0;</b>
+<i>52</i>&nbsp;        int size;
+<i>53</i>&nbsp;        try {
+<b class="fc"><i>54</i>&nbsp;            switch (func) {</b>
+<i>55</i>&nbsp;                case SUM:
+<b class="fc"><i>56</i>&nbsp;                    result = 0;</b>
+<b class="fc"><i>57</i>&nbsp;                    for (Object[] record : records) {</b>
+<b class="fc"><i>58</i>&nbsp;                        if (where.match(record, table) &amp;&amp; record[col] != null) {</b>
+<b class="fc"><i>59</i>&nbsp;                            result += (Integer) record[col];</b>
+<i>60</i>&nbsp;                        }
+<b class="fc"><i>61</i>&nbsp;                    }</b>
+<b class="fc"><i>62</i>&nbsp;                    break;</b>
+<i>63</i>&nbsp;                case AVG:
+<b class="fc"><i>64</i>&nbsp;                    result = 0;</b>
+<b class="fc"><i>65</i>&nbsp;                    size = 0;</b>
+<b class="fc"><i>66</i>&nbsp;                    for (Object[] record : records) {</b>
+<b class="fc"><i>67</i>&nbsp;                        if (where.match(record, table) &amp;&amp; record[col] != null) {</b>
+<b class="fc"><i>68</i>&nbsp;                            size++;</b>
+<b class="fc"><i>69</i>&nbsp;                            result += (Integer) record[col];</b>
+<i>70</i>&nbsp;                        }
+<b class="fc"><i>71</i>&nbsp;                    }</b>
+<b class="fc"><i>72</i>&nbsp;                    if (size == 0) result = 0;</b>
+<b class="fc"><i>73</i>&nbsp;                    else result /= size;</b>
+<b class="fc"><i>74</i>&nbsp;                    break;</b>
+<i>75</i>&nbsp;                case MAX:
+<b class="fc"><i>76</i>&nbsp;                    result = Double.MIN_VALUE;</b>
+<b class="fc"><i>77</i>&nbsp;                    for (Object[] record : records) {</b>
+<b class="fc"><i>78</i>&nbsp;                        if (where.match(record, table) &amp;&amp; record[col] != null) {</b>
+<b class="fc"><i>79</i>&nbsp;                            temp = (Integer) record[col];</b>
+<b class="fc"><i>80</i>&nbsp;                            if (result &lt; temp) result = temp;</b>
+<i>81</i>&nbsp;                        }
+<b class="fc"><i>82</i>&nbsp;                    }</b>
+<b class="fc"><i>83</i>&nbsp;                    if (records.size() == 0) result = 0;</b>
+<i>84</i>&nbsp;                    break;
+<i>85</i>&nbsp;                case MIN:
+<b class="fc"><i>86</i>&nbsp;                    result = Double.MAX_VALUE;</b>
+<b class="fc"><i>87</i>&nbsp;                    for (Object[] record : records) {</b>
+<b class="fc"><i>88</i>&nbsp;                        if (where.match(record, table) &amp;&amp; record[col] != null) {</b>
+<b class="fc"><i>89</i>&nbsp;                            temp = (Integer) record[col];</b>
+<b class="fc"><i>90</i>&nbsp;                            if (result &gt; temp) result = temp;</b>
+<i>91</i>&nbsp;                        }
+<b class="fc"><i>92</i>&nbsp;                    }</b>
+<b class="fc"><i>93</i>&nbsp;                    if (records.size() == 0) result = 0;</b>
+<i>94</i>&nbsp;                    break;
+<i>95</i>&nbsp;                case COUNT:
+<b class="fc"><i>96</i>&nbsp;                    result = 0;</b>
+<b class="fc"><i>97</i>&nbsp;                    for (Object[] record : records) {</b>
+<b class="fc"><i>98</i>&nbsp;                        if (where.match(record, table) &amp;&amp; record[col] != null) {</b>
+<b class="fc"><i>99</i>&nbsp;                            result++;</b>
+<i>100</i>&nbsp;                        }
+<b class="fc"><i>101</i>&nbsp;                    }</b>
+<b class="fc"><i>102</i>&nbsp;                    break;</b>
+<i>103</i>&nbsp;            }
+<b class="nc"><i>104</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>105</i>&nbsp;            throw new SQLQueryException(e.getMessage());</b>
+<b class="fc"><i>106</i>&nbsp;        }</b>
+<b class="fc"><i>107</i>&nbsp;        return result;</b>
+<i>108</i>&nbsp;    }
+<i>109</i>&nbsp;
+<i>110</i>&nbsp;    /**
+<i>111</i>&nbsp;     * 表的联合
+<i>112</i>&nbsp;     * 内部使用
+<i>113</i>&nbsp;     */
+<i>114</i>&nbsp;
+<i>115</i>&nbsp;
+<i>116</i>&nbsp;    //------------------------test------------------------
+<i>117</i>&nbsp;    public List&lt;Map&lt;Table, Integer&gt;&gt; tableJoinRecordIds(Set&lt;String&gt; tableNames) throws SQLQueryException {
+<i>118</i>&nbsp;        Table table;
+<i>119</i>&nbsp;        List&lt;Integer&gt; tempIds;
+<i>120</i>&nbsp;
+<b class="fc"><i>121</i>&nbsp;        Map&lt;String, Table&gt; tables = SystemManager.getInstance().getTables();</b>
+<b class="fc"><i>122</i>&nbsp;        List&lt;Table&gt; tableChoose = new ArrayList&lt;&gt;(tableNames.size());</b>
+<i>123</i>&nbsp;
+<i>124</i>&nbsp;        try {
+<b class="fc"><i>125</i>&nbsp;            for (String tableName : tableNames) {</b>
+<b class="fc"><i>126</i>&nbsp;                table = tables.get(tableName);</b>
+<b class="fc"><i>127</i>&nbsp;                tableChoose.add(table);</b>
+<b class="fc"><i>128</i>&nbsp;            }</b>
+<b class="nc"><i>129</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>130</i>&nbsp;            throw new SQLQueryException(&quot;get tables error, may have not open database&quot;);</b>
+<b class="fc"><i>131</i>&nbsp;        }</b>
+<i>132</i>&nbsp;
+<i>133</i>&nbsp;        try {
+<i>134</i>&nbsp;            List&lt;Map&lt;Table, Integer&gt;&gt; results;
+<i>135</i>&nbsp;            List&lt;Map&lt;Table, Integer&gt;&gt; tempResults;
+<i>136</i>&nbsp;
+<i>137</i>&nbsp;            // 第一个表
+<b class="fc"><i>138</i>&nbsp;            table = tableChoose.get(0);</b>
+<b class="fc"><i>139</i>&nbsp;            tempIds = table.getAllRecordIds();</b>
+<i>140</i>&nbsp;//            results = new LinkedList&lt;&gt;();
+<b class="fc"><i>141</i>&nbsp;            results = new ArrayList&lt;&gt;(tempIds.size());</b>
+<b class="fc"><i>142</i>&nbsp;            for (Integer tempId : tempIds) {</b>
+<b class="fc"><i>143</i>&nbsp;                Map&lt;Table, Integer&gt; record = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>144</i>&nbsp;                record.put(table, tempId);</b>
+<b class="fc"><i>145</i>&nbsp;                results.add(record);</b>
+<b class="fc"><i>146</i>&nbsp;            }</b>
+<i>147</i>&nbsp;
+<b class="fc"><i>148</i>&nbsp;            for (int i = 1; i &lt; tableChoose.size(); i++) {</b>
+<b class="fc"><i>149</i>&nbsp;                table = tableChoose.get(i);</b>
+<i>150</i>&nbsp;
+<b class="fc"><i>151</i>&nbsp;                tempIds = table.getAllRecordIds();</b>
+<b class="fc"><i>152</i>&nbsp;                System.out.println(results.size() * tempIds.size());</b>
+<b class="fc"><i>153</i>&nbsp;                tempResults = new ArrayList&lt;&gt;(results.size() * tempIds.size());</b>
+<i>154</i>&nbsp;
+<i>155</i>&nbsp;                // 每条记录
+<b class="fc"><i>156</i>&nbsp;                for (Integer tempRecord : tempIds) {</b>
+<i>157</i>&nbsp;
+<i>158</i>&nbsp;                    // 累积至上一次的结果
+<b class="fc"><i>159</i>&nbsp;                    for (Map&lt;Table, Integer&gt; result : results) {</b>
+<b class="fc"><i>160</i>&nbsp;                        Map&lt;Table, Integer&gt; record = new HashMap&lt;&gt;(results.size() + 1);</b>
+<b class="fc"><i>161</i>&nbsp;                        for (Map.Entry&lt;Table, Integer&gt; entry : result.entrySet()) {</b>
+<b class="fc"><i>162</i>&nbsp;                            record.put(entry.getKey(), entry.getValue());</b>
+<b class="fc"><i>163</i>&nbsp;                        }</b>
+<b class="fc"><i>164</i>&nbsp;                        record.put(table, tempRecord);</b>
+<b class="fc"><i>165</i>&nbsp;                        tempResults.add(record);</b>
+<b class="fc"><i>166</i>&nbsp;                    }</b>
+<b class="fc"><i>167</i>&nbsp;                }</b>
+<i>168</i>&nbsp;
+<b class="fc"><i>169</i>&nbsp;                results = tempResults;</b>
+<i>170</i>&nbsp;            }
+<b class="fc"><i>171</i>&nbsp;            return results;</b>
+<b class="nc"><i>172</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>173</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>174</i>&nbsp;            throw new SQLQueryException(e.getMessage());</b>
+<i>175</i>&nbsp;        }
+<i>176</i>&nbsp;    }
+<i>177</i>&nbsp;
+<i>178</i>&nbsp;    /**
+<i>179</i>&nbsp;     *
+<i>180</i>&nbsp;     */
+<i>181</i>&nbsp;    public List&lt;Object[]&gt; queryById(SelectOption select, Where where) throws SQLQueryException {
+<i>182</i>&nbsp;        List&lt;Object[]&gt; result;
+<i>183</i>&nbsp;
+<i>184</i>&nbsp;        // Func类型
+<b class="fc"><i>185</i>&nbsp;        if (select.isFunc()) {</b>
+<b class="fc"><i>186</i>&nbsp;            result = new ArrayList&lt;&gt;();</b>
+<b class="fc"><i>187</i>&nbsp;            Object[] ret = new Object[1];</b>
+<b class="fc"><i>188</i>&nbsp;            ret[0] = func(select, where);</b>
+<b class="fc"><i>189</i>&nbsp;            result.add(ret);</b>
+<b class="fc"><i>190</i>&nbsp;            return result;</b>
+<i>191</i>&nbsp;        }
+<i>192</i>&nbsp;
+<i>193</i>&nbsp;        Map&lt;String, Table&gt; tables;
+<i>194</i>&nbsp;        List&lt;Map&lt;Table, Integer&gt;&gt; tempIds;
+<i>195</i>&nbsp;
+<i>196</i>&nbsp;        Table[] t; // select对应的表
+<i>197</i>&nbsp;        int[] c;   // select对应的列号
+<i>198</i>&nbsp;        int nCol;
+<i>199</i>&nbsp;        try {
+<b class="fc"><i>200</i>&nbsp;            tables = SystemManager.getInstance().getTables();</b>
+<b class="fc"><i>201</i>&nbsp;            tempIds = tableJoinRecordIds(select.fromTableNames);</b>
+<b class="fc"><i>202</i>&nbsp;            if (select.isAll()) {</b>
+<b class="fc"><i>203</i>&nbsp;                nCol = 0;</b>
+<b class="fc"><i>204</i>&nbsp;                for (String tableName : select.getFromTableNames()) {</b>
+<b class="fc"><i>205</i>&nbsp;                    Table table = tables.get(tableName);</b>
+<b class="fc"><i>206</i>&nbsp;                    nCol += table.getColumns().length;</b>
+<b class="fc"><i>207</i>&nbsp;                }</b>
+<b class="fc"><i>208</i>&nbsp;                t = new Table[nCol];</b>
+<b class="fc"><i>209</i>&nbsp;                c = new int[nCol];</b>
+<i>210</i>&nbsp;            } else {
+<b class="fc"><i>211</i>&nbsp;                nCol = select.tableNames.size();    // 查询结果的列数</b>
+<b class="fc"><i>212</i>&nbsp;                t = new Table[nCol];            // select对应的表</b>
+<b class="fc"><i>213</i>&nbsp;                c = new int[nCol];                // select对应的列号</b>
+<b class="fc"><i>214</i>&nbsp;                for (int i = 0; i &lt; t.length; i++) {</b>
+<b class="fc"><i>215</i>&nbsp;                    t[i] = tables.get(select.tableNames.get(i));</b>
+<b class="fc"><i>216</i>&nbsp;                    c[i] = t[i].getColumnCol(select.columnNames.get(i));</b>
+<i>217</i>&nbsp;                }
+<i>218</i>&nbsp;            }
+<b class="nc"><i>219</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>220</i>&nbsp;            throw new SQLQueryException(&quot;query error : &quot; + e.getMessage());</b>
+<b class="fc"><i>221</i>&nbsp;        }</b>
+<i>222</i>&nbsp;
+<b class="fc"><i>223</i>&nbsp;        result = new ArrayList&lt;&gt;(tempIds.size());</b>
+<i>224</i>&nbsp;        try {
+<b class="fc"><i>225</i>&nbsp;            for (Map&lt;Table, Integer&gt; tempId : tempIds) {</b>
+<b class="fc"><i>226</i>&nbsp;                Map&lt;Table, Object[]&gt; temp = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>227</i>&nbsp;                for (Map.Entry&lt;Table, Integer&gt; id : tempId.entrySet()) {</b>
+<b class="fc"><i>228</i>&nbsp;                    Object[] o = id.getKey().getRecord(id.getValue());</b>
+<b class="fc"><i>229</i>&nbsp;                    temp.put(id.getKey(), o);</b>
+<b class="fc"><i>230</i>&nbsp;                }</b>
+<b class="fc"><i>231</i>&nbsp;                if (where.match(temp, tables)) {</b>
+<b class="fc"><i>232</i>&nbsp;                    Object[] record = new Object[nCol];</b>
+<b class="fc"><i>233</i>&nbsp;                    if (select.isAll()) {</b>
+<b class="fc"><i>234</i>&nbsp;                        int ii = 0;</b>
+<b class="fc"><i>235</i>&nbsp;                        for (Object[] objects : temp.values()) {</b>
+<b class="fc"><i>236</i>&nbsp;                            for (int i = 0; i &lt; objects.length; i++, ii++) {</b>
+<b class="fc"><i>237</i>&nbsp;                                record[ii] = objects[i];</b>
+<i>238</i>&nbsp;                            }
+<b class="fc"><i>239</i>&nbsp;                        }</b>
+<b class="fc"><i>240</i>&nbsp;                    } else {</b>
+<b class="fc"><i>241</i>&nbsp;                        for (int i = 0; i &lt; nCol; i++) {</b>
+<b class="fc"><i>242</i>&nbsp;                            record[i] = temp.get(t[i])[c[i]];</b>
+<i>243</i>&nbsp;                        }
+<i>244</i>&nbsp;                    }
+<b class="fc"><i>245</i>&nbsp;                    result.add(record);</b>
+<i>246</i>&nbsp;                }
+<b class="fc"><i>247</i>&nbsp;            }</b>
+<b class="nc"><i>248</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>249</i>&nbsp;            throw new SQLQueryException(&quot;query error : &quot; + e.getMessage());</b>
+<b class="fc"><i>250</i>&nbsp;        }</b>
+<i>251</i>&nbsp;
+<b class="fc"><i>252</i>&nbsp;        return result;</b>
+<i>253</i>&nbsp;    }
+<i>254</i>&nbsp;
+<i>255</i>&nbsp;    public static String resultsToString(List&lt;Object[]&gt; results) {
+<b class="fc"><i>256</i>&nbsp;        StringBuilder builder = new StringBuilder();</b>
+<b class="fc"><i>257</i>&nbsp;        if (results == null) {</b>
+<b class="nc"><i>258</i>&nbsp;            builder.append(&quot;result is null&quot;);</b>
+<b class="fc"><i>259</i>&nbsp;        } else if (results.isEmpty()) {</b>
+<b class="fc"><i>260</i>&nbsp;            builder.append(&quot;empty&quot;);</b>
+<i>261</i>&nbsp;        } else {
+<b class="fc"><i>262</i>&nbsp;            for (Object[] result : results) {</b>
+<b class="fc"><i>263</i>&nbsp;                builder.append(Arrays.toString(result));</b>
+<b class="fc"><i>264</i>&nbsp;                builder.append(&#39;\n&#39;);</b>
+<b class="fc"><i>265</i>&nbsp;            }</b>
+<i>266</i>&nbsp;        }
+<b class="fc"><i>267</i>&nbsp;        return builder.toString();</b>
+<i>268</i>&nbsp;    }
+<i>269</i>&nbsp;
+<i>270</i>&nbsp;    protected List&lt;Object[]&gt; query(SelectOption select, Where where) throws SQLQueryException {
+<i>271</i>&nbsp;        List&lt;Object[]&gt; result;
+<i>272</i>&nbsp;        Table[] t; // select对应的表
+<i>273</i>&nbsp;        int[] c;   // select对应的列号
+<i>274</i>&nbsp;        int nCol;
+<i>275</i>&nbsp;
+<i>276</i>&nbsp;        // Func类型
+<b class="nc"><i>277</i>&nbsp;        if (select.isFunc()) {</b>
+<b class="nc"><i>278</i>&nbsp;            result = new ArrayList&lt;&gt;();</b>
+<b class="nc"><i>279</i>&nbsp;            Object[] ret = new Object[1];</b>
+<b class="nc"><i>280</i>&nbsp;            ret[0] = func(select, where);</b>
+<b class="nc"><i>281</i>&nbsp;            result.add(ret);</b>
+<b class="nc"><i>282</i>&nbsp;            return result;</b>
+<i>283</i>&nbsp;        }
+<i>284</i>&nbsp;
+<i>285</i>&nbsp;        // 初始化查询结果相关信息
+<i>286</i>&nbsp;        Map&lt;String, Table&gt; tables;
+<i>287</i>&nbsp;        List&lt;Map&lt;Table, Object[]&gt;&gt; temps;
+<i>288</i>&nbsp;        try {
+<b class="nc"><i>289</i>&nbsp;            tables = SystemManager.getInstance().getTables();</b>
+<b class="nc"><i>290</i>&nbsp;            temps = tableJoinRecords(select.fromTableNames);</b>
+<b class="nc"><i>291</i>&nbsp;            if (select.isAll()) {</b>
+<b class="nc"><i>292</i>&nbsp;                nCol = 0;</b>
+<b class="nc"><i>293</i>&nbsp;                for (String tableName : select.getFromTableNames()) {</b>
+<b class="nc"><i>294</i>&nbsp;                    Table table = tables.get(tableName);</b>
+<b class="nc"><i>295</i>&nbsp;                    nCol += table.getColumns().length;</b>
+<b class="nc"><i>296</i>&nbsp;                }</b>
+<b class="nc"><i>297</i>&nbsp;                t = new Table[nCol];</b>
+<b class="nc"><i>298</i>&nbsp;                c = new int[nCol];</b>
+<i>299</i>&nbsp;            } else {
+<b class="nc"><i>300</i>&nbsp;                nCol = select.tableNames.size();    // 查询结果的列数</b>
+<b class="nc"><i>301</i>&nbsp;                t = new Table[nCol];            // select对应的表</b>
+<b class="nc"><i>302</i>&nbsp;                c = new int[nCol];                // select对应的列号</b>
+<b class="nc"><i>303</i>&nbsp;                for (int i = 0; i &lt; t.length; i++) {</b>
+<b class="nc"><i>304</i>&nbsp;                    t[i] = tables.get(select.tableNames.get(i));</b>
+<b class="nc"><i>305</i>&nbsp;                    c[i] = t[i].getColumnCol(select.columnNames.get(i));</b>
+<i>306</i>&nbsp;                }
+<i>307</i>&nbsp;            }
+<b class="nc"><i>308</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>309</i>&nbsp;            e.printStackTrace();</b>
+<b class="nc"><i>310</i>&nbsp;            throw new SQLQueryException(e.getMessage());</b>
+<b class="nc"><i>311</i>&nbsp;        }</b>
+<i>312</i>&nbsp;
+<i>313</i>&nbsp;        // 执行查询
+<i>314</i>&nbsp;        try {
+<b class="nc"><i>315</i>&nbsp;            result = new ArrayList&lt;&gt;(temps.size());</b>
+<b class="nc"><i>316</i>&nbsp;            for (Map&lt;Table, Object[]&gt; temp : temps) {</b>
+<b class="nc"><i>317</i>&nbsp;                if (where.match(temp, tables)) {</b>
+<b class="nc"><i>318</i>&nbsp;                    Object[] record = new Object[nCol];</b>
+<b class="nc"><i>319</i>&nbsp;                    if (select.isAll()) { // select *</b>
+<b class="nc"><i>320</i>&nbsp;                        int ii = 0;</b>
+<b class="nc"><i>321</i>&nbsp;                        for (Object[] objects : temp.values()) {</b>
+<b class="nc"><i>322</i>&nbsp;                            for (int i = 0; i &lt; objects.length; i++, ii++) {</b>
+<b class="nc"><i>323</i>&nbsp;                                record[ii] = objects[i];</b>
+<i>324</i>&nbsp;                            }
+<b class="nc"><i>325</i>&nbsp;                        }</b>
+<b class="nc"><i>326</i>&nbsp;                    } else { // 相应的列</b>
+<b class="nc"><i>327</i>&nbsp;                        for (int i = 0; i &lt; nCol; i++) {</b>
+<b class="nc"><i>328</i>&nbsp;                            record[i] = temp.get(t[i])[c[i]];</b>
+<i>329</i>&nbsp;                        }
+<i>330</i>&nbsp;                    }
+<b class="nc"><i>331</i>&nbsp;                    result.add(record);</b>
+<i>332</i>&nbsp;                }
+<b class="nc"><i>333</i>&nbsp;            }</b>
+<b class="nc"><i>334</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>335</i>&nbsp;            throw new SQLQueryException(&quot;query error : &quot; + e.getMessage());</b>
+<b class="nc"><i>336</i>&nbsp;        }</b>
+<i>337</i>&nbsp;
+<b class="nc"><i>338</i>&nbsp;        return result;</b>
+<i>339</i>&nbsp;    }
+<i>340</i>&nbsp;
+<i>341</i>&nbsp;    protected List&lt;Map&lt;Table, Object[]&gt;&gt; tableJoinRecords(Set&lt;String&gt; tableNames) throws SQLQueryException {
+<i>342</i>&nbsp;        Table table;
+<i>343</i>&nbsp;        List&lt;Object[]&gt; tempRecords;
+<i>344</i>&nbsp;
+<b class="nc"><i>345</i>&nbsp;        Map&lt;String, Table&gt; tables = SystemManager.getInstance().getTables();</b>
+<b class="nc"><i>346</i>&nbsp;        List&lt;Table&gt; tableChoose = new ArrayList&lt;&gt;(tableNames.size());</b>
+<i>347</i>&nbsp;        try {
+<b class="nc"><i>348</i>&nbsp;            for (String tableName : tableNames) {</b>
+<b class="nc"><i>349</i>&nbsp;                table = tables.get(tableName);</b>
+<b class="nc"><i>350</i>&nbsp;                tableChoose.add(table);</b>
+<b class="nc"><i>351</i>&nbsp;            }</b>
+<i>352</i>&nbsp;            List&lt;Map&lt;Table, Object[]&gt;&gt; results;
+<i>353</i>&nbsp;            List&lt;Map&lt;Table, Object[]&gt;&gt; tempResults;
+<i>354</i>&nbsp;
+<i>355</i>&nbsp;            // 第一个表
+<b class="nc"><i>356</i>&nbsp;            table = tableChoose.get(0);</b>
+<b class="nc"><i>357</i>&nbsp;            tempRecords = table.getAllRecords();</b>
+<i>358</i>&nbsp;//            results = new LinkedList&lt;&gt;();
+<b class="nc"><i>359</i>&nbsp;            results = new ArrayList&lt;&gt;(tempRecords.size());</b>
+<b class="nc"><i>360</i>&nbsp;            for (Object[] tempRecord : tempRecords) {</b>
+<b class="nc"><i>361</i>&nbsp;                Map&lt;Table, Object[]&gt; record = new HashMap&lt;&gt;();</b>
+<b class="nc"><i>362</i>&nbsp;                record.put(table, tempRecord);</b>
+<b class="nc"><i>363</i>&nbsp;                results.add(record);</b>
+<b class="nc"><i>364</i>&nbsp;            }</b>
+<i>365</i>&nbsp;
+<b class="nc"><i>366</i>&nbsp;            for (int i = 1; i &lt; tableChoose.size(); i++) {</b>
+<b class="nc"><i>367</i>&nbsp;                table = tableChoose.get(i);</b>
+<i>368</i>&nbsp;
+<b class="nc"><i>369</i>&nbsp;                tempRecords = table.getAllRecords();</b>
+<i>370</i>&nbsp;//                tempResults = new LinkedList&lt;&gt;();
+<b class="nc"><i>371</i>&nbsp;                tempResults = new ArrayList&lt;&gt;(results.size() * tempRecords.size());</b>
+<i>372</i>&nbsp;
+<i>373</i>&nbsp;                // 每条记录
+<b class="nc"><i>374</i>&nbsp;                for (Object[] tempRecord : tempRecords) {</b>
+<i>375</i>&nbsp;
+<i>376</i>&nbsp;                    // 累积至上一次的结果
+<b class="nc"><i>377</i>&nbsp;                    for (Map&lt;Table, Object[]&gt; result : results) {</b>
+<b class="nc"><i>378</i>&nbsp;                        Map&lt;Table, Object[]&gt; record = new HashMap&lt;&gt;(results.size() + 1);</b>
+<b class="nc"><i>379</i>&nbsp;                        for (Map.Entry&lt;Table, Object[]&gt; entry : result.entrySet()) {</b>
+<b class="nc"><i>380</i>&nbsp;                            record.put(entry.getKey(), entry.getValue());</b>
+<b class="nc"><i>381</i>&nbsp;                        }</b>
+<b class="nc"><i>382</i>&nbsp;                        record.put(table, tempRecord);</b>
+<b class="nc"><i>383</i>&nbsp;                        tempResults.add(record);</b>
+<b class="nc"><i>384</i>&nbsp;                    }</b>
+<b class="nc"><i>385</i>&nbsp;                }</b>
+<i>386</i>&nbsp;
+<b class="nc"><i>387</i>&nbsp;                results = tempResults;</b>
+<i>388</i>&nbsp;            }
+<b class="nc"><i>389</i>&nbsp;            return results;</b>
+<b class="nc"><i>390</i>&nbsp;        } catch (Exception e) {</b>
+<b class="nc"><i>391</i>&nbsp;            throw new SQLQueryException(e.getMessage());</b>
+<i>392</i>&nbsp;        }
+<i>393</i>&nbsp;    }
+<i>394</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>

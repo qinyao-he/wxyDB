@@ -1,0 +1,172 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: Global</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">me.hqythu.wxydb.util</a> ]
+</div>
+
+<h1>Coverage Summary for Class: Global (me.hqythu.wxydb.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Global</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/ 1)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package me.hqythu.wxydb.util;
+<i>2</i>&nbsp;
+<b class="nc"><i>3</i>&nbsp;public class Global {</b>
+<i>4</i>&nbsp;    /**
+<i>5</i>&nbsp;     * 页式文件系统
+<i>6</i>&nbsp;     */
+<i>7</i>&nbsp;    public static final int MAX_CACHE_SIZE = 65536;
+<i>8</i>&nbsp;    public static final int PAGE_BYTE_SIZE = 8192;
+<i>9</i>&nbsp;    public static final int PAGE_SIZE_IDX = 13; // 2^13 = 8192
+<i>10</i>&nbsp;    public static final int MAX_FILE_NUM = 128;
+<i>11</i>&nbsp;
+<i>12</i>&nbsp;    /**
+<i>13</i>&nbsp;     * 页
+<i>14</i>&nbsp;     */
+<i>15</i>&nbsp;    public static final int PER_PAGE_DATA = 8096;
+<i>16</i>&nbsp;
+<i>17</i>&nbsp;    /**
+<i>18</i>&nbsp;     * 库页（数据库文件的第一页）
+<i>19</i>&nbsp;     */
+<i>20</i>&nbsp;    public static final int DBPAGE_INFO_POS = 0;
+<i>21</i>&nbsp;    public static final int DBPATE_INFO_TABLESIZE = 0;
+<i>22</i>&nbsp;    public static final int DBPAGE_BITMAP_POS = 256;
+<i>23</i>&nbsp;    public static final int DBPAGE_INFO_LEN = DBPAGE_BITMAP_POS - DBPAGE_INFO_POS;
+<i>24</i>&nbsp;    public static final int DBPAGE_BITMAP_LEN = 4096;
+<i>25</i>&nbsp;    public static final int DBPAGE_TABLE_POS = DBPAGE_BITMAP_POS + DBPAGE_BITMAP_LEN;
+<i>26</i>&nbsp;    public static final int DBPAGE_TABLE_LEN = (PER_PAGE_DATA - DBPAGE_BITMAP_LEN - DBPAGE_INFO_LEN);
+<i>27</i>&nbsp;
+<i>28</i>&nbsp;    public static final int PER_TABLE_INFO_LEN = 128;
+<i>29</i>&nbsp;    public static final int TABLE_MAX_SIZE = DBPAGE_TABLE_LEN / PER_TABLE_INFO_LEN;
+<i>30</i>&nbsp;
+<i>31</i>&nbsp;    /**
+<i>32</i>&nbsp;     * 表页信息
+<i>33</i>&nbsp;     */
+<i>34</i>&nbsp;    public static final int TBPAGE_NAME_POS = 0;
+<i>35</i>&nbsp;    public static final int TBPAGE_PRIMARY_POS = 124;
+<i>36</i>&nbsp;    public static final int TBPAGE_PROP_POS = 128;
+<i>37</i>&nbsp;    public static final int TBPAGE_PAGEIDX_POS = 132;
+<i>38</i>&nbsp;    public static final int TBPAGE_DATAIDX_POS = 136;
+<i>39</i>&nbsp;    public static final int TBPAGE_RECORD_SIZE_POS = 140;
+<i>40</i>&nbsp;    public static final int TBPAGE_RECORD_LEN_POS = 144;
+<i>41</i>&nbsp;    public static final int TBPAGE_COLUMN_POS = 148; // 2
+<i>42</i>&nbsp;    public static final int COL_NAME_POS = 0;
+<i>43</i>&nbsp;    public static final int COL_PROP_POS = 120;
+<i>44</i>&nbsp;    public static final int COL_TYPE_POS = 124;
+<i>45</i>&nbsp;    public static final int COL_LEN_POS = 126;
+<i>46</i>&nbsp;
+<i>47</i>&nbsp;    public static final int TABLE_NAME_LEN = TBPAGE_PRIMARY_POS - TBPAGE_NAME_POS; // 100
+<i>48</i>&nbsp;    public static final int COL_NAME_LEN = COL_PROP_POS - COL_NAME_POS; // 120
+<i>49</i>&nbsp;    public static final int COL_INFO_POS = 256;
+<i>50</i>&nbsp;    public static final int PER_COL_INFO_LEN = 128;
+<i>51</i>&nbsp;
+<i>52</i>&nbsp;    /**
+<i>53</i>&nbsp;     * 数据页
+<i>54</i>&nbsp;     */
+<i>55</i>&nbsp;    public static final int DTPAGE_INFO_POS = 0;
+<i>56</i>&nbsp;    public static final int DTPAGE_IDX_POS = 0;
+<i>57</i>&nbsp;    public static final int DTPAGE_PREIDX_POS = 4;
+<i>58</i>&nbsp;    public static final int DTPAGE_PROP_POS = 8;
+<i>59</i>&nbsp;    public static final int DTPAGE_RECORDLEN_POS = 12;
+<i>60</i>&nbsp;    public static final int DTPAGE_NEXTIDX_POS = 16;
+<i>61</i>&nbsp;    public static final int DTPAGE_SIZE_POS = 20;
+<i>62</i>&nbsp;    public static final int DTPAGE_CAP_POS = 24;
+<i>63</i>&nbsp;    public static final int DTPAGE_DATA_POS = 96;
+<i>64</i>&nbsp;
+<i>65</i>&nbsp;    public static final int DTPAGE_INFO_LEN = DTPAGE_DATA_POS - DTPAGE_INFO_POS;
+<i>66</i>&nbsp;    public static final int DTPAGE_DATA_LEN = PAGE_BYTE_SIZE - DTPAGE_DATA_POS;
+<i>67</i>&nbsp;    /**
+<i>68</i>&nbsp;     * 行结构
+<i>69</i>&nbsp;     */
+<i>70</i>&nbsp;    public static final int RECORD_STATUSA_POS = 0;
+<i>71</i>&nbsp;    public static final int RECORD_STATUSB_POS = 1;
+<i>72</i>&nbsp;    public static final int RECORD_STATIC_LEN_POS = 2;
+<i>73</i>&nbsp;    public static final int RECORD_COLNUM_POS = 4;
+<i>74</i>&nbsp;    public static final int RECORD_STATIC_DATA_POS = 6;
+<i>75</i>&nbsp;    public static final int RECORD_STATUS_LEN = RECORD_STATIC_DATA_POS - RECORD_STATUSA_POS;
+<i>76</i>&nbsp;
+<i>77</i>&nbsp;    /**
+<i>78</i>&nbsp;     * where条件运算
+<i>79</i>&nbsp;     */
+<i>80</i>&nbsp;    public static final String AND = &quot;and&quot;;
+<i>81</i>&nbsp;    public static final String OR = &quot;or&quot;;
+<i>82</i>&nbsp;    public static final String EQU = &quot;equ&quot;; // ==
+<i>83</i>&nbsp;    public static final String NEQ = &quot;neq&quot;; // !=
+<i>84</i>&nbsp;    public static final String LES = &quot;les&quot;; // &lt;
+<i>85</i>&nbsp;    public static final String LEQ = &quot;leq&quot;; // &lt;=
+<i>86</i>&nbsp;    public static final String GTR = &quot;gtr&quot;; // &gt;
+<i>87</i>&nbsp;    public static final String GEQ = &quot;geq&quot;; // &gt;=
+<i>88</i>&nbsp;    public static final String IS = &quot;is&quot;;
+<i>89</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2016-01-06 15:23</div>
+</div>
+</body>
+</html>
